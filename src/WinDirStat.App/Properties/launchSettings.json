@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WinDirStat.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WinDirStat.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
