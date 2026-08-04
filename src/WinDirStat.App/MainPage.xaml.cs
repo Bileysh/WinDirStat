@@ -5,10 +5,11 @@ namespace WinDirStat_App;
 
 public sealed partial class MainPage : Page
 {
-    public MainPageViewModel ViewModel { get; } = new();
+    public MainPageViewModel ViewModel { get; } 
 
-    public MainPage()
+    public MainPage(MainPageViewModel viewModel)
     {
+        ViewModel = viewModel;
         InitializeComponent();
     }
 }

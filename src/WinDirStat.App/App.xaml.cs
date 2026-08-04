@@ -16,15 +16,15 @@ public partial class App : Application
     }
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        _mWindow = new MainWindow();
-        
-        _mWindow.Content = new MainPage();
+        var mainPage = Services.GetRequiredService<MainPage>();
+        _mWindow = new MainWindow(mainPage);
         _mWindow.Activate();
     }
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
         services.AddTransient<MainPageViewModel>();
+        services.AddTransient<MainPage>();
         return services.BuildServiceProvider();
     }
 }

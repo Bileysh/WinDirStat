@@ -4,7 +4,7 @@ namespace WinDirStat_App;
 
 public sealed partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(MainPage mainPage)
     {
         InitializeComponent();
 
@@ -13,6 +13,6 @@ public sealed partial class MainWindow : Window
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
-        RootFrame.Navigate(typeof(MainPage));
+        RootFrame.Content = mainPage;
     }
 }
