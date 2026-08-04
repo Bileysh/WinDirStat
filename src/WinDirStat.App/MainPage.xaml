@@ -17,7 +17,7 @@
 
         <MenuBar Grid.Row="0">
             <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Open Folder..." Icon="Folder" />
+                <MenuFlyoutItem Text="Open Folder..." Icon="Folder" Command="{x:Bind ViewModel.ScanDiskCommand}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Exit" Icon="Cancel" />
             </MenuBarItem>

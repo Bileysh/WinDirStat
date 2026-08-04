@@ -1,24 +1,25 @@
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.ViewModels;
 
-/// <summary>
-/// Sample ViewModel using CommunityToolkit.Mvvm partial property syntax.
-/// Uses <see cref="ObservableProperty"/> for change notification and
-/// <see cref="RelayCommand"/> for command binding.
-/// </summary>
 public partial class MainPageViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private string _greeting = "Welcome to WinDirStat";
+    private readonly IDiskScanService _diskScanService;
 
-    [ObservableProperty]
-    private int _counter;
+    public MainPageViewModel(IDiskScanService diskScanService)
+    {
+        _diskScanService = diskScanService;
+    }
 
+    
     [RelayCommand]
-    private void IncrementCounter() => Counter++;
-
-    [RelayCommand]
-    private void DecrementCounter() => Counter--;
+    private void ScanDisk()
+    {
+        var scan = _diskScanService.Scan("C:\\Users\\Білеуш Антон");
+        
+        Debug.WriteLine($"Scan completed. Root node: {scan.Name}, SizeLogical: {scan.SizeLogical}, SizePhysical: {scan.SizePhysical}, LastModified: {scan.LastModified}, Children count: {scan.Children.Count}, FullPath: {scan.FullPath}, IsDirectory: {scan.IsDirectory}, Extension: {scan.Extension}");
+    }
 }
