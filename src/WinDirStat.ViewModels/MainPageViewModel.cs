@@ -22,7 +22,8 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty] private bool _isScanning;
+    [ObservableProperty]
+    private bool _isScanning;
 
     [RelayCommand]
     private async Task OpenFolderAsync()

@@ -4,7 +4,7 @@ using WinDirStat.ViewModels;
 
 namespace WinDirStat.Tests.Tests;
 
-public class FolderPickerServiceTests
+public class MainPageViewModelTests
 {
     [Fact]
     public async Task OpenFolderAsync_WhenFolderSelected_PopulatesRootNodes()
