@@ -66,11 +66,25 @@
 
                 <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
                                      ResizeBehavior="BasedOnAlignment" />
+                
+                <Border Grid.Column="2" Margin="8" CornerRadius="4">
+                    <Grid RowDefinitions="Auto,*">
+                        <ToggleSwitch Grid.Row="0" Margin="8"
+                                      OnContent="За типом" OffContent="За extension"
+                                      IsOn="{x:Bind ViewModel.GroupByCategory, Mode=TwoWay}" />
 
-                <Border Grid.Column="2" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
-                        Margin="8" CornerRadius="4">
-                    <TextBlock Text="Statistics (Типи файлів)" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.TypeStatistics, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:FileTypeStatViewModel">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" Padding="8,4">
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Label}"/>
+                                        <TextBlock Grid.Column="1" Margin="8,0" Opacity="0.7" Text="{x:Bind TotalSizeFormatted}"/>
+                                        <TextBlock Grid.Column="2" Text="{x:Bind PercentFormatted}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
                 </Border>
             </Grid>
 
