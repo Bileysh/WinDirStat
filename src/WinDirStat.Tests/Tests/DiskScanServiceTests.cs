@@ -1,6 +1,6 @@
 ﻿using WinDirStat.Services;
 
-namespace WinDirStat.Tests;
+namespace WinDirStat.Tests.Tests;
 
 public class DiskScanServiceTests
 {

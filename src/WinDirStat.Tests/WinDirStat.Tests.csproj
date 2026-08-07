@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WinDirStat.Core\WinDirStat.Core.csproj" />
     <ProjectReference Include="..\WinDirStat.Services\WinDirStat.Services.csproj" />
+    <ProjectReference Include="..\WinDirStat.ViewModels\WinDirStat.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>

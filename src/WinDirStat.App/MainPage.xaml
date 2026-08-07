@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sizers="using:CommunityToolkit.WinUI.Controls"
+    xmlns:vm="using:WinDirStat.ViewModels"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -18,7 +19,7 @@
 
         <MenuBar Grid.Row="0">
             <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Open Folder..." Icon="Folder" Command="{x:Bind ViewModel.ScanDiskCommand}" />
+                <MenuFlyoutItem Text="Open Folder..." Icon="Folder" Command="{x:Bind ViewModel.OpenFolderCommand}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Exit" Icon="Cancel" />
             </MenuBarItem>
@@ -43,12 +44,24 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
-
-                <Border Grid.Column="0" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
-                        Margin="8" CornerRadius="4">
-                    <TextBlock Text="TreeView (Дерево каталогів)" HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                
+                <Border Grid.Column="0" Margin="8" CornerRadius="4">
+                    <TreeView x:Name="FileTreeView"
+                              ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}">
+                        <TreeView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NodeViewModel">
+                                <TreeViewItem ItemsSource="{x:Bind Children}">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="{x:Bind Name}" Width="220"/>
+                                        <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7"/>
+                                        <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7"/>
+                                        <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5"/>
+                                        <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50"/>
+                                    </StackPanel>
+                                </TreeViewItem>
+                            </DataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
                 </Border>
 
                 <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
