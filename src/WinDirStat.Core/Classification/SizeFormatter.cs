@@ -1,12 +1,21 @@
 ﻿namespace WinDirStat.Core.Classification;
 
-public static  class SizeFormatter
+public static class SizeFormatter
 {
-    public static string Format(long bytes) => bytes switch
+    private static readonly string[] Units = ["B", "KB", "MB", "GB", "TB", "PB"];
+
+    public static string Format(long bytes)
     {
-        >= 1_073_741_824 => $"{bytes / 1_073_741_824.0:F2} GB",
-        >= 1_048_576 => $"{bytes / 1_048_576.0:F2} MB",
-        >= 1024 => $"{bytes / 1024.0:F1} KB",
-        _ => $"{bytes} B"
-    };
+        if (bytes < 1024) return $"{bytes} B";
+
+        double size = bytes;
+        var unitIndex = 0;
+        while (size >= 1024 && unitIndex < Units.Length - 1)
+        {
+            size /= 1024;
+            unitIndex++;
+        }
+
+        return $"{size:F2} {Units[unitIndex]}";
+    }
 }
