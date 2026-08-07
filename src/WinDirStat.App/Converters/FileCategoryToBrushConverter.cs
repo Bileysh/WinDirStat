@@ -22,6 +22,9 @@ public class FileCategoryToBrushConverter : IValueConverter
         FileCategory.Images => Colors.SeaGreen,
         FileCategory.Archives => Colors.Goldenrod,
         FileCategory.Executables => Colors.Crimson,
+        FileCategory.Development => Colors.LightSeaGreen, 
+        FileCategory.VirtualDisks => Colors.SlateGray,  
+        FileCategory.System => Colors.DimGray,
         _ => Colors.Gray
     };
 }

@@ -4,38 +4,45 @@ namespace WinDirStat.Core.Classification;
 
 public static class FileCategoryClassifier
 {
-    private static readonly Dictionary<string, FileCategory> ExtensionMap = new(StringComparer.OrdinalIgnoreCase)
+    public static FileCategory Classify(string extension)
     {
-        [".doc"] = FileCategory.Documents,
-        [".docx"] = FileCategory.Documents,
-        [".pdf"] = FileCategory.Documents,
-        [".txt"] = FileCategory.Documents,
-        [".xls"] = FileCategory.Documents,
-        [".xlsx"] = FileCategory.Documents,
+        if (string.IsNullOrWhiteSpace(extension))
+            return FileCategory.Other;
 
-        [".mp4"] = FileCategory.Videos,
-        [".mkv"] = FileCategory.Videos,
-        [".avi"] = FileCategory.Videos,
-        [".mov"] = FileCategory.Videos,
+        return extension.ToLowerInvariant() switch
+        {
+            ".cs" or ".cpp" or ".h" or ".hpp" or ".js"
+                or ".ts" or ".json" or ".xml" or
+                ".csproj" or ".sln" or ".ipch" or ".pdb"
+                or ".obj" or ".bin" or ".vsix" => FileCategory.Development,
 
-        [".mp3"] = FileCategory.Audio,
-        [".wav"] = FileCategory.Audio,
-        [".flac"] = FileCategory.Audio,
+            ".vhd" or ".vhdx" or ".vmdk"
+                or ".vdi" or ".ova" => FileCategory.VirtualDisks,
 
-        [".jpg"] = FileCategory.Images,
-        [".png"] = FileCategory.Images,
-        [".gif"] = FileCategory.Images,
-        [".bmp"] = FileCategory.Images,
+            ".dll" or ".sys" or ".ini" or
+                ".log" or ".tmp" or ".cache" or ".nvph" => FileCategory.System,
 
-        [".zip"] = FileCategory.Archives,
-        [".rar"] = FileCategory.Archives,
-        [".7z"] = FileCategory.Archives,
+            ".doc" or ".docx" or ".pdf" or
+                ".txt" or ".xls" or ".xlsx" or
+                ".rtf" or ".ppt" or ".pptx" or ".csv" => FileCategory.Documents,
 
-        [".exe"] = FileCategory.Executables,
-        [".msi"] = FileCategory.Executables,
-        [".dll"] = FileCategory.Executables,
-    };
+            ".mp4" or ".mkv" or ".avi" or
+                ".mov" or ".wmv" or ".flv" or ".webm" => FileCategory.Videos,
 
-    public static FileCategory Classify(string extension) =>
-        ExtensionMap.GetValueOrDefault(extension, FileCategory.Other);
+            ".mp3" or ".wav" or ".flac" or
+                ".aac" or ".ogg" or ".m4a" => FileCategory.Audio,
+
+            ".jpg" or ".jpeg" or ".png" or
+                ".gif" or ".bmp" or ".svg" or
+                ".webp" or ".tiff" or ".ico" => FileCategory.Images,
+
+            ".zip" or ".rar" or ".7z" or
+                ".tar" or ".gz" or ".iso" => FileCategory.Archives,
+
+            ".exe" or ".msi" or ".bat" or
+                ".cmd" or ".sh" or ".apk" or ".app" => FileCategory.Executables,
+
+            _ => FileCategory.Other
+        };
+    }
 }
