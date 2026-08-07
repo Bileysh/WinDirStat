@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <Page
     x:Class="WinDirStat_App.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -11,13 +12,13 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> 
-            <RowDefinition Height="*" />    
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <MenuBar Grid.Row="0">
             <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Open Folder..." Icon="Folder" />
+                <MenuFlyoutItem Text="Open Folder..." Icon="Folder" Command="{x:Bind ViewModel.ScanDiskCommand}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Exit" Icon="Cancel" />
             </MenuBarItem>
@@ -31,33 +32,42 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="6*" /> 
-                <RowDefinition Height="Auto" /> 
-                <RowDefinition Height="4*" /> 
+                <RowDefinition Height="6*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="4*" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="6*" />
-                    <ColumnDefinition Width="Auto" /> 
-                    <ColumnDefinition Width="4*" /> 
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Margin="8" CornerRadius="4">
-                    <TextBlock Text="TreeView (Дерево каталогів)" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <Border Grid.Column="0" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+                        Margin="8" CornerRadius="4">
+                    <TextBlock Text="TreeView (Дерево каталогів)" HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                 </Border>
 
-                <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent" ResizeBehavior="BasedOnAlignment" />
+                <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
+                                     ResizeBehavior="BasedOnAlignment" />
 
-                <Border Grid.Column="2" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Margin="8" CornerRadius="4">
-                    <TextBlock Text="Statistics (Типи файлів)" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <Border Grid.Column="2" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+                        Margin="8" CornerRadius="4">
+                    <TextBlock Text="Statistics (Типи файлів)" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                 </Border>
             </Grid>
 
-            <sizers:GridSplitter Grid.Row="1" Height="8" Cursor="SizeNorthSouth" Background="Transparent" ResizeBehavior="BasedOnAlignment" />
+            <sizers:GridSplitter Grid.Row="1" Height="8" Cursor="SizeNorthSouth" Background="Transparent"
+                                 ResizeBehavior="BasedOnAlignment" />
 
-            <Border Grid.Row="2" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Margin="8" CornerRadius="4">
-                <TextBlock Text="TreeMap (Теплова карта)" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+            <Border Grid.Row="2" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Margin="8"
+                    CornerRadius="4">
+                <TextBlock Text="TreeMap (Теплова карта)" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
             </Border>
         </Grid>
     </Grid>

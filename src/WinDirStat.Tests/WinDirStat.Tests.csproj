@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WinDirStat.Core\WinDirStat.Core.csproj" />
+    <ProjectReference Include="..\WinDirStat.Services\WinDirStat.Services.csproj" />
   </ItemGroup>
 
 </Project>

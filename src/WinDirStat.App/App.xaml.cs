@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using WinDirStat.Core.Interfaces;
+using WinDirStat.Services;
 using WinDirStat.ViewModels;
 
 namespace WinDirStat_App;
@@ -27,6 +29,7 @@ public partial class App : Application
         var services = new ServiceCollection();
         services.AddTransient<MainPageViewModel>();
         services.AddTransient<MainPage>();
+        services.AddSingleton<IDiskScanService, DiskScanService>();
         return services.BuildServiceProvider();
     }
 }
