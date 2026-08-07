@@ -19,7 +19,8 @@ public static class SquarifiedTreeMapLayout
         var totalSize = (double)children.Sum(c => c.SizeLogical);
         var scale = (width * height) / totalSize;
 
-        var itemsList = children.Select(c => new Item(c, c.SizeLogical * scale));
+        var mappedItems = children.Select(c => new Item(c, c.SizeLogical * scale));
+        var itemsList = mappedItems.ToList();
         var items = new Queue<Item>(itemsList);
 
         var rect = (X: x, Y: y, W: width, H: height);
@@ -30,9 +31,10 @@ public static class SquarifiedTreeMapLayout
             var next = items.Peek();
             var sideLength = Math.Min(rect.W, rect.H);
 
-            var rowWithNext = row.Append(next).ToList();
+            var rowWithNext = new List<Item>(row) { next };
             
-            if (row.Count == 0 || Worst(row, sideLength) >= Worst(rowWithNext, sideLength)){
+            if (row.Count == 0 || Worst(row, sideLength) >= Worst(rowWithNext, sideLength))
+            {
                 row.Add(next);
                 items.Dequeue();
             }
