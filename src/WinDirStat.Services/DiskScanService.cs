@@ -3,7 +3,7 @@ using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.Services;
 
-public class DiskScanService: IDiskScanService
+public class DiskScanService : IDiskScanService
 {
     public FileSystemNode Scan(string rootPath)
     {
@@ -22,7 +22,7 @@ public class DiskScanService: IDiskScanService
         };
         if (directoryInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
             return node;
-        
+
         IEnumerable<FileSystemInfo> entries;
         try
         {
@@ -36,6 +36,7 @@ public class DiskScanService: IDiskScanService
         {
             return node;
         }
+
         foreach (var entry in entries)
         {
             if (entry is DirectoryInfo subDirectory)
