@@ -18,12 +18,13 @@ public partial class MainPageViewModel : ObservableObject
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
     }
-    
-    [ObservableProperty]
-    private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty]
-    private bool _isScanning;
+    [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
+
+    [ObservableProperty] private bool _isScanning;
+
+    [ObservableProperty] private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
+
 
     [ObservableProperty]
     private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];    
@@ -54,10 +55,19 @@ public partial class MainPageViewModel : ObservableObject
             _scannedRoot = rootNode;
             RootNodes = [new NodeViewModel(rootNode)];
             RefreshStatistics();
+            RefreshTreeMap();
         }
         finally
         {
             IsScanning = false;
         }
+    }
+
+    private void RefreshTreeMap()
+    {
+        if (_scannedRoot is null) return;
+        // TODO: брати реальні ActualWidth/ActualHeight контролу через SizeChanged, а не хардкод
+        var rects = SquarifiedTreeMapLayout.Compute(_scannedRoot, 0, 0, 600, 200);
+        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(rects.Select(r => new TreeMapRectViewModel(r)));
     }
 }
