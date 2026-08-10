@@ -7,6 +7,7 @@ public class DiskScanService : IDiskScanService
 {
     public FileSystemNode Scan(string rootPath)
     {
+        PrivilegeHelper.EnableBackupPrivilege();
         var directoryInfo = new DirectoryInfo(rootPath);
         var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
         return ScanDirectory(directoryInfo, clusterSize);
