@@ -62,6 +62,7 @@
                                         <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7"/>
                                         <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5"/>
                                         <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50"/>
+                                        <TextBlock Text="{x:Bind ChildSummaryFormatted}" Width="140" Opacity="0.6"/>
                                     </StackPanel>
                                 </TreeViewItem>
                             </DataTemplate>
