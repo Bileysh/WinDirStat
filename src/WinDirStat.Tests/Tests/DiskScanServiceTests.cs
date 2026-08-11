@@ -14,7 +14,7 @@ public class DiskScanServiceTests
 
         var result = new DiskScanService().Scan(tempRoot.FullName);
 
-        Assert.Equal(300, result.SizeLogical);
-        Assert.Equal(2, result.Children.Count);
+        Assert.Equal(300, result.TotalSize);
+        Assert.Equal(2, result.RootNode.Children.Count);
     }
 }

@@ -11,43 +11,52 @@ public partial class MainPageViewModel : ObservableObject
 {
     private readonly IDiskScanService _diskScanService;
     private readonly IFolderPickerService _folderPickerService;
-    private FileSystemNode? _scannedRoot;
+    private readonly IScanStateService _scanStateService;
 
-    public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService)
+    public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
+        IScanStateService scanStateService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
+        _scanStateService = scanStateService;
+
+        _scanStateService.StateChanged += OnStateChanged;
     }
 
-    [ObservableProperty] 
-    private ObservableCollection<NodeViewModel> _rootNodes = [];
+    [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty] 
-    private bool _isScanning;
+    [ObservableProperty] private bool _isScanning;
 
-    [ObservableProperty] 
-    private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
+    [ObservableProperty] private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
 
-    [ObservableProperty]
-    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
+    [ObservableProperty] private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
 
-    [ObservableProperty]
-    private bool _groupByCategory;
+    [ObservableProperty] private bool _groupByCategory;
 
     partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
 
+    private void OnStateChanged(object? sender, ScanResult? result)
+    {
+        if (result is null) return;
+
+        RootNodes = [new NodeViewModel(result.RootNode)];
+        RefreshStatistics();
+        RefreshTreeMap();
+    }
+
     private void RefreshStatistics()
     {
-        if (_scannedRoot is null) return;
+        var currentResult = _scanStateService.CurrentResult;
+        if (currentResult is null) return;
 
         var stats = GroupByCategory
-            ? FileStatisticsAggregator.ByCategory(_scannedRoot)
-            : FileStatisticsAggregator.ByExtension(_scannedRoot);
+            ? currentResult.StatisticsByCategory
+            : currentResult.StatisticsByExtension;
 
         var viewModels = stats.Select(s => new FileTypeStatisticsViewModel(s));
-        TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(viewModels);
+        TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(viewModels.ToList());
     }
-    
+
     [RelayCommand]
     private async Task OpenFolderAsync()
     {
@@ -57,33 +66,32 @@ public partial class MainPageViewModel : ObservableObject
         IsScanning = true;
         try
         {
-            var rootNode = await Task.Run(() => _diskScanService.Scan(path));
-            _scannedRoot = rootNode;
-            RootNodes = [new NodeViewModel(rootNode)];
-            RefreshStatistics();
-            RefreshTreeMap();
+            var scanResult = await Task.Run(() => _diskScanService.Scan(path));
+            _scanStateService.SetResult(scanResult);
         }
         finally
         {
             IsScanning = false;
         }
     }
+
     private double _treeMapWidth = 600;
     private double _treeMapHeight = 200;
-    
+
     public void UpdateTreeMapSize(double width, double height)
     {
         _treeMapWidth = width;
         _treeMapHeight = height;
         RefreshTreeMap();
     }
-    
+
     private void RefreshTreeMap()
     {
-        if (_scannedRoot is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
-    
-        var rects = SquarifiedTreeMapLayout.Compute(_scannedRoot, 0, 0, _treeMapWidth, _treeMapHeight);
+        var currentResult = _scanStateService.CurrentResult;
+        if (currentResult is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
+
+        var rects = SquarifiedTreeMapLayout.Compute(currentResult.RootNode, 0, 0, _treeMapWidth, _treeMapHeight);
         var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
-        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels);
+        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels.ToList());
     }
 }

@@ -1,14 +1,31 @@
-﻿using WinDirStat.Core.Entities;
+﻿using System.Diagnostics;
+using WinDirStat.Core.Classification;
+using WinDirStat.Core.Entities;
 using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.Services;
 
 public class DiskScanService : IDiskScanService
 {
-    public FileSystemNode Scan(string rootPath)
+    public ScanResult Scan(string rootPath)
     {
+        var stopwatch = Stopwatch.StartNew();
+        
         var directoryInfo = new DirectoryInfo(rootPath);
-        return ScanDirectory(directoryInfo);
+        var rootNode = ScanDirectory(directoryInfo); 
+        
+        var byCategory = FileStatisticsAggregator.ByCategory(rootNode);
+        var byExtension = FileStatisticsAggregator.ByExtension(rootNode);
+        
+        stopwatch.Stop();
+        
+        return new ScanResult(
+            rootPath,
+            rootNode,
+            byCategory,
+            byExtension,
+            stopwatch.Elapsed
+        );
     }
 
     private FileSystemNode ScanDirectory(DirectoryInfo directoryInfo)

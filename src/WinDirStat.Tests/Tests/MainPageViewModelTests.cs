@@ -10,9 +10,12 @@ public class MainPageViewModelTests
     public async Task OpenFolderAsync_WhenFolderSelected_PopulatesRootNodes()
     {
         var tempFolder = Directory.CreateTempSubdirectory();
+        
         var vm = new MainPageViewModel(
             new DiskScanService(),
-            new FakeFolderPickerService { PathToReturn = tempFolder.FullName });
+            new FakeFolderPickerService { PathToReturn = tempFolder.FullName },
+            new ScanStateService() 
+        );
 
         await vm.OpenFolderCommand.ExecuteAsync(null);
 

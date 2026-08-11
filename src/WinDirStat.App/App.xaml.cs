@@ -34,6 +34,7 @@ public partial class App : Application
         services.AddTransient<MainPage>();
         services.AddSingleton<IDiskScanService, DiskScanService>();
         services.AddSingleton<IFolderPickerService, FolderPickerService>(); 
+        services.AddSingleton<IScanStateService, ScanStateService>();
         return services.BuildServiceProvider();
     }
 }
