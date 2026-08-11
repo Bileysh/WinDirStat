@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinDirStat.Core.Classification;
 using WinDirStat.Core.Entities;
 using WinDirStat.Core.Interfaces;
 
@@ -25,14 +25,25 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     private bool _isScanning;
 
+    [ObservableProperty]
+    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];    
+    
+    [ObservableProperty]
+    private bool _groupByCategory;
+    
+    partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
+    
+    private void RefreshStatistics()
+    {
+        if (_scannedRoot is null) return;
+        TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(
+            (GroupByCategory ? FileStatisticsAggregator.ByCategory(_scannedRoot)
+                : FileStatisticsAggregator.ByExtension(_scannedRoot))
+            .Select(s => new FileTypeStatisticsViewModel(s)));}
+    
     [RelayCommand]
     private async Task OpenFolderAsync()
     {
-        var scan = _diskScanService.Scan(
-            "C:\\Users\\Білеуш Антон"); // TODO: temporary manual scan trigger, replaced with FolderPicker in PR #3
-
-        Debug.WriteLine(
-            $"Scan completed. Root node: {scan.Name}, SizeLogical: {scan.SizeLogical}, SizePhysical: {scan.SizePhysical}, LastModified: {scan.LastModified}, Children count: {scan.Children.Count}, FullPath: {scan.FullPath}, IsDirectory: {scan.IsDirectory}, Extension: {scan.Extension}");
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 
@@ -42,6 +53,7 @@ public partial class MainPageViewModel : ObservableObject
             var rootNode = await Task.Run(() => _diskScanService.Scan(path));
             _scannedRoot = rootNode;
             RootNodes = [new NodeViewModel(rootNode)];
+            RefreshStatistics();
         }
         finally
         {
