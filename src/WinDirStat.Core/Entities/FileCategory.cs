@@ -8,5 +8,8 @@ public enum FileCategory
     Images,
     Archives,
     Executables,
+    Development,  
+    VirtualDisks, 
+    System,
     Other
 }

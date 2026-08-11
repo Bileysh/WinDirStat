@@ -34,4 +34,8 @@ public partial class NodeViewModel: ObservableObject
         _children ??= _node.Children
             .Select(c => new NodeViewModel(c, _node.SizeLogical))
             .ToList();
+    
+    public string ChildSummaryFormatted => IsDirectory
+        ? $"{ChildFileCount} файлів, {ChildDirectoryCount} папок"
+        : string.Empty;
 }
