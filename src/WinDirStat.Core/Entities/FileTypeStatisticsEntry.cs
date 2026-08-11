@@ -1,6 +1,6 @@
 namespace WinDirStat.Core.Entities;
 
-public class FileTypeStat
+public class FileTypeStatisticsEntry
 {
     public required string Label { get; init; }
     public long TotalSize { get; init; }

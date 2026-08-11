@@ -4,20 +4,20 @@ namespace WinDirStat.Core.Classification;
 
 public static class FileStatisticsAggregator
 {
-    public static List<FileTypeStat> ByExtension(FileSystemNode root) =>
+    public static List<FileTypeStatisticsEntry> ByExtension(FileSystemNode root) =>
         Aggregate(root, f => string.IsNullOrEmpty(f.Extension) ? "(без розширення)" : f.Extension.ToLowerInvariant());
 
-    public static List<FileTypeStat> ByCategory(FileSystemNode root) =>
+    public static List<FileTypeStatisticsEntry> ByCategory(FileSystemNode root) =>
         Aggregate(root, f => FileCategoryClassifier.Classify(f.Extension).ToString());
 
-    private static List<FileTypeStat> Aggregate(FileSystemNode root, Func<FileSystemNode, string> keySelector)
+    private static List<FileTypeStatisticsEntry> Aggregate(FileSystemNode root, Func<FileSystemNode, string> keySelector)
     {
         var files = EnumerateFiles(root).ToList();
         var totalSize = files.Sum(f => (double)f.SizeLogical);
 
         return files
             .GroupBy(keySelector)
-            .Select(g => new FileTypeStat
+            .Select(g => new FileTypeStatisticsEntry
             {
                 Label = g.Key,
                 TotalSize = g.Sum(f => f.SizeLogical),

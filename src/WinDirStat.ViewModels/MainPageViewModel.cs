@@ -26,7 +26,7 @@ public partial class MainPageViewModel : ObservableObject
     private bool _isScanning;
 
     [ObservableProperty]
-    private ObservableCollection<FileTypeStatViewModel> _typeStatistics = [];    
+    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];    
     
     [ObservableProperty]
     private bool _groupByCategory;
@@ -36,10 +36,10 @@ public partial class MainPageViewModel : ObservableObject
     private void RefreshStatistics()
     {
         if (_scannedRoot is null) return;
-        TypeStatistics = new ObservableCollection<FileTypeStatViewModel>(
+        TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(
             (GroupByCategory ? FileStatisticsAggregator.ByCategory(_scannedRoot)
                 : FileStatisticsAggregator.ByExtension(_scannedRoot))
-            .Select(s => new FileTypeStatViewModel(s)));}
+            .Select(s => new FileTypeStatisticsViewModel(s)));}
     
     [RelayCommand]
     private async Task OpenFolderAsync()
