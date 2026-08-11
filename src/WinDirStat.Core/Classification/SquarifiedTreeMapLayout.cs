@@ -15,10 +15,12 @@ public static class SquarifiedTreeMapLayout
 
         var result = new List<TreeMapRect>();
         if (children.Count == 0 || width <= 0 || height <= 0) return result;
-        
+
         var totalSize = (double)children.Sum(c => c.SizeLogical);
         var scale = (width * height) / totalSize;
-        var items = new Queue<Item>(children.Select(c => new Item(c, c.SizeLogical * scale)));
+
+        var itemsList = children.Select(c => new Item(c, c.SizeLogical * scale));
+        var items = new Queue<Item>(itemsList);
 
         var rect = (X: x, Y: y, W: width, H: height);
         var row = new List<Item>();
@@ -28,8 +30,9 @@ public static class SquarifiedTreeMapLayout
             var next = items.Peek();
             var sideLength = Math.Min(rect.W, rect.H);
 
-            if (row.Count == 0 || Worst(row, sideLength) >= Worst([.. row, next], sideLength))
-            {
+            var rowWithNext = row.Append(next).ToList();
+            
+            if (row.Count == 0 || Worst(row, sideLength) >= Worst(rowWithNext, sideLength)){
                 row.Add(next);
                 items.Dequeue();
             }
@@ -39,6 +42,7 @@ public static class SquarifiedTreeMapLayout
                 row.Clear();
             }
         }
+
         if (row.Count > 0)
             LayoutRow(row, rect, result);
 
@@ -60,7 +64,7 @@ public static class SquarifiedTreeMapLayout
     {
         var rowArea = row.Sum(i => i.Area);
 
-        if (rect.W <= rect.H)   
+        if (rect.W <= rect.H)
         {
             var rowHeight = rowArea / rect.W;
             var offsetX = rect.X;
@@ -70,9 +74,10 @@ public static class SquarifiedTreeMapLayout
                 result.Add(new TreeMapRect(item.Node, offsetX, rect.Y, w, rowHeight));
                 offsetX += w;
             }
+
             return (rect.X, rect.Y + rowHeight, rect.W, rect.H - rowHeight);
         }
-        else   
+        else
         {
             var rowWidth = rowArea / rect.H;
             var offsetY = rect.Y;
@@ -82,6 +87,7 @@ public static class SquarifiedTreeMapLayout
                 result.Add(new TreeMapRect(item.Node, rect.X, offsetY, rowWidth, h));
                 offsetY += h;
             }
+
             return (rect.X + rowWidth, rect.Y, rect.W - rowWidth, rect.H);
         }
     }

@@ -46,7 +46,9 @@ public partial class MainPageViewModel : ObservableObject
 
         var viewModels = stats.Select(s => new FileTypeStatisticsViewModel(s));
         TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(viewModels);
-    }    [RelayCommand]
+    }
+    
+    [RelayCommand]
     private async Task OpenFolderAsync()
     {
         var path = await _folderPickerService.PickFolderAsync();
@@ -81,6 +83,7 @@ public partial class MainPageViewModel : ObservableObject
         if (_scannedRoot is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
     
         var rects = SquarifiedTreeMapLayout.Compute(_scannedRoot, 0, 0, _treeMapWidth, _treeMapHeight);
-        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(rects.Select(r => new TreeMapRectViewModel(r)));
+        var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
+        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels);
     }
 }
