@@ -50,46 +50,62 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Margin="8" CornerRadius="4">
-                    <TreeView x:Name="FileTreeView"
-                              ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}">
-                        <TreeView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:NodeViewModel">
-                                <TreeViewItem ItemsSource="{x:Bind Children}">
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <TextBlock Text="{x:Bind Name}" Width="220"/>
-                                        <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7"/>
-                                        <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7"/>
-                                        <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5"/>
-                                        <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50"/>
-                                        <TextBlock Text="{x:Bind ChildSummaryFormatted}" Width="140" Opacity="0.6"/>
-                                    </StackPanel>
-                                </TreeViewItem>
-                            </DataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                <Border Grid.Column="0" Margin="8" CornerRadius="4" 
+                        BorderThickness="1" BorderBrush="{ThemeResource SystemControlForegroundChromeDisabledLowBrush}"
+                        Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+                    <Grid>
+                        <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.RootNodes.Count, ViewModel.IsScanning), Mode=OneWay}"/>
+                        
+                        <TreeView x:Name="FileTreeView"
+                                  ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}">
+                            <TreeView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:NodeViewModel">
+                                    <TreeViewItem ItemsSource="{x:Bind Children}">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <TextBlock Text="{x:Bind Name}" Width="220"/>
+                                            <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7"/>
+                                            <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7"/>
+                                            <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5"/>
+                                            <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50"/>
+                                            <TextBlock Text="{x:Bind ChildSummaryFormatted}" Width="140" Opacity="0.6"/>
+                                        </StackPanel>
+                                    </TreeViewItem>
+                                </DataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Grid>
                 </Border>
 
                 <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
                                      ResizeBehavior="BasedOnAlignment" />
                 
-                <Border Grid.Column="2" Margin="8" CornerRadius="4">
-                    <Grid RowDefinitions="Auto,*">
-                        <ToggleSwitch Grid.Row="0" Margin="8"
-                                      OnContent="За типом" OffContent="За extension"
-                                      IsOn="{x:Bind ViewModel.GroupByCategory, Mode=TwoWay}" />
+                <Border Grid.Column="2" Margin="8" CornerRadius="4" 
+                        BorderThickness="1" BorderBrush="{ThemeResource SystemControlForegroundChromeDisabledLowBrush}"
+                        Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+                    <Grid>
+                        <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.TypeStatistics.Count, ViewModel.IsScanning), Mode=OneWay}"/>
+                        
+                        <Grid RowDefinitions="Auto,*">
+                            <ToggleSwitch Grid.Row="0" Margin="8"
+                                          OnContent="За типом" OffContent="За extension"
+                                          IsOn="{x:Bind ViewModel.GroupByCategory, Mode=TwoWay}" />
 
-                        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.TypeStatistics, Mode=OneWay}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:FileTypeStatisticsViewModel">
-                                    <Grid ColumnDefinitions="*,Auto,Auto" Padding="8,4">
-                                        <TextBlock Grid.Column="0" Text="{x:Bind Label}"/>
-                                        <TextBlock Grid.Column="1" Margin="8,0" Opacity="0.7" Text="{x:Bind TotalSizeFormatted}"/>
-                                        <TextBlock Grid.Column="2" Text="{x:Bind PercentFormatted}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                            <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.TypeStatistics, Mode=OneWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:FileTypeStatisticsViewModel">
+                                        <Grid ColumnDefinitions="*,Auto,Auto" Padding="8,4">
+                                            <TextBlock Grid.Column="0" Text="{x:Bind Label}"/>
+                                            <TextBlock Grid.Column="1" Margin="8,0" Opacity="0.7" Text="{x:Bind TotalSizeFormatted}"/>
+                                            <TextBlock Grid.Column="2" Text="{x:Bind PercentFormatted}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
                     </Grid>
                 </Border>
             </Grid>
@@ -98,28 +114,40 @@
                                  ResizeBehavior="BasedOnAlignment" />
 
             <Border x:Name="TreeMapContainer" Grid.Row="2" Margin="8" CornerRadius="4" 
+                    BorderThickness="1" BorderBrush="{ThemeResource SystemControlForegroundChromeDisabledLowBrush}"
                     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
                     SizeChanged="TreeMapContainer_SizeChanged">
-    
-                <ItemsControl ItemsSource="{x:Bind ViewModel.TreeMapRects, Mode=OneWay}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:TreeMapRectViewModel">
-                            <Border Canvas.Left="{x:Bind X}" Canvas.Top="{x:Bind Y}"
-                                    Width="{x:Bind Width}" Height="{x:Bind Height}"
-                                    Background="{x:Bind Category, Converter={StaticResource CategoryToBrushConverter}}"
-                                    BorderThickness="0.5" BorderBrush="Black">
-                                <TextBlock Text="{x:Bind Name}" FontSize="10" Foreground="White"
-                                           Margin="2" TextTrimming="CharacterEllipsis" />
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <Grid>
+                    <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               Visibility="{x:Bind GetNoDataVisibility(ViewModel.TreeMapRects.Count, ViewModel.IsScanning), Mode=OneWay}"/>
+                               
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.TreeMapRects, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TreeMapRectViewModel">
+                                <Border Canvas.Left="{x:Bind X}" Canvas.Top="{x:Bind Y}"
+                                        Width="{x:Bind Width}" Height="{x:Bind Height}"
+                                        Background="{x:Bind Category, Converter={StaticResource CategoryToBrushConverter}}"
+                                        BorderThickness="0.5" BorderBrush="Black">
+                                    <TextBlock Text="{x:Bind Name}" FontSize="10" Foreground="White"
+                                               Margin="2" TextTrimming="CharacterEllipsis" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
             </Border>
+            
+            <ProgressRing Grid.RowSpan="3" 
+                          IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" 
+                          Width="64" Height="64" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          
         </Grid>
     </Grid>
 </Page>
