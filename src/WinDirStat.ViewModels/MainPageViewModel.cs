@@ -18,15 +18,12 @@ public partial class MainPageViewModel : ObservableObject
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
     }
-
+    
     [ObservableProperty] 
     private ObservableCollection<NodeViewModel> _rootNodes = [];
 
     [ObservableProperty] 
     private bool _isScanning;
-
-    [ObservableProperty] 
-    private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
 
     [ObservableProperty]
     private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
@@ -35,7 +32,30 @@ public partial class MainPageViewModel : ObservableObject
     private bool _groupByCategory;
 
     partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
+    
+    [ObservableProperty] 
+    private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
 
+    private double _treeMapWidth = 600;
+    private double _treeMapHeight = 200;
+    
+    public void UpdateTreeMapSize(double width, double height)
+    {
+        _treeMapWidth = width;
+        _treeMapHeight = height;
+        RefreshTreeMap();
+    }
+    
+    private void RefreshTreeMap()
+    {
+        if (_scannedRoot is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
+    
+        var rects = SquarifiedTreeMapLayout.Compute(_scannedRoot, 0, 0, _treeMapWidth, _treeMapHeight);
+        var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
+        var viewModelsList = viewModels.ToList();
+        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModelsList);
+    }
+    
     private void RefreshStatistics()
     {
         if (_scannedRoot is null) return;
@@ -45,12 +65,15 @@ public partial class MainPageViewModel : ObservableObject
             : FileStatisticsAggregator.ByExtension(_scannedRoot);
 
         var viewModels = stats.Select(s => new FileTypeStatisticsViewModel(s));
-        TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(viewModels);
+        var viewModelsList = viewModels.ToList();
+        TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(viewModelsList);
     }
     
     [RelayCommand]
     private async Task OpenFolderAsync()
     {
+        // TODO: (Elevated Support) Замінити FolderPicker на класичний IFileOpenDialog для підтримки режиму Адміністратора. 
+        // Поточний пікер конфліктує з правами Windows і видає помилку при спробі відкрити вікно.
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 
@@ -68,22 +91,5 @@ public partial class MainPageViewModel : ObservableObject
             IsScanning = false;
         }
     }
-    private double _treeMapWidth = 600;
-    private double _treeMapHeight = 200;
     
-    public void UpdateTreeMapSize(double width, double height)
-    {
-        _treeMapWidth = width;
-        _treeMapHeight = height;
-        RefreshTreeMap();
-    }
-    
-    private void RefreshTreeMap()
-    {
-        if (_scannedRoot is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
-    
-        var rects = SquarifiedTreeMapLayout.Compute(_scannedRoot, 0, 0, _treeMapWidth, _treeMapHeight);
-        var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
-        TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels);
-    }
 }
