@@ -8,4 +8,5 @@ public class FileTypeStatisticsViewModel(FileTypeStatisticsEntry statisticsEntry
     public string Label => statisticsEntry.Label;
     public string TotalSizeFormatted => SizeFormatter.Format(statisticsEntry.TotalSize);
     public string PercentFormatted => $"{statisticsEntry.PercentOfTotal:F1}%";
+    public FileCategory Category => statisticsEntry.Category; 
 }

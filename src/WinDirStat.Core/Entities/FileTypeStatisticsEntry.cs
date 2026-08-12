@@ -6,4 +6,5 @@ public class FileTypeStatisticsEntry
     public long TotalSize { get; init; }
     public int FileCount { get; init; }
     public double PercentOfTotal { get; init; }
+    public FileCategory Category { get; init; }
 }
