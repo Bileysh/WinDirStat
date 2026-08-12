@@ -4,5 +4,5 @@ namespace WinDirStat.Core.Interfaces;
 
 public interface IDiskScanService
 {
-    FileSystemNode Scan(string rootPath);
+    ScanResult Scan(string rootPath);
 }

@@ -11,6 +11,8 @@ public sealed partial class MainPage : Page
     {
         ViewModel = viewModel;
         InitializeComponent();
+        Unloaded += (_, _) => ViewModel.Dispose();
+
     }
     
     private void TreeMapContainer_SizeChanged(object sender, Microsoft.UI.Xaml.SizeChangedEventArgs e)
