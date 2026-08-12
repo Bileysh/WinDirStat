@@ -7,7 +7,7 @@ using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.ViewModels;
 
-public partial class MainPageViewModel : ObservableObject
+public partial class MainPageViewModel : ObservableObject, IDisposable
 {
     private readonly IDiskScanService _diskScanService;
     private readonly IFolderPickerService _folderPickerService;
@@ -64,6 +64,9 @@ public partial class MainPageViewModel : ObservableObject
         if (path is null) return;
 
         IsScanning = true;
+        RootNodes = [];
+        TypeStatistics = [];
+        TreeMapRects = [];
         try
         {
             var scanResult = await Task.Run(() => _diskScanService.Scan(path));
@@ -93,5 +96,10 @@ public partial class MainPageViewModel : ObservableObject
         var rects = SquarifiedTreeMapLayout.Compute(currentResult.RootNode, 0, 0, _treeMapWidth, _treeMapHeight);
         var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
         TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels.ToList());
+    }
+    
+    public void Dispose()
+    {
+        _scanStateService.StateChanged -= OnStateChanged;
     }
 }
