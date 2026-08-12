@@ -11,8 +11,11 @@ public class DiskScanService : IDiskScanService
     {
         var stopwatch = Stopwatch.StartNew();
         
+        PrivilegeHelper.EnableBackupPrivilege();
         var directoryInfo = new DirectoryInfo(rootPath);
-        var rootNode = ScanDirectory(directoryInfo); 
+        var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
+        
+        var rootNode = ScanDirectory(directoryInfo, clusterSize); 
         
         var byCategory = FileStatisticsAggregator.ByCategory(rootNode);
         var byExtension = FileStatisticsAggregator.ByExtension(rootNode);
@@ -28,7 +31,7 @@ public class DiskScanService : IDiskScanService
         );
     }
 
-    private FileSystemNode ScanDirectory(DirectoryInfo directoryInfo)
+    private FileSystemNode ScanDirectory(DirectoryInfo directoryInfo, uint clusterSize)
     {
         var node = new FileSystemNode
         {
@@ -58,13 +61,14 @@ public class DiskScanService : IDiskScanService
         {
             if (entry is DirectoryInfo subDirectory)
             {
-                var childNode = ScanDirectory(subDirectory);
+                var childNode = ScanDirectory(subDirectory, clusterSize); 
                 node.Children.Add(childNode);
                 node.SizeLogical += childNode.SizeLogical;
                 node.SizePhysical += childNode.SizePhysical;
             }
             else if (entry is FileInfo fileInfo)
             {
+                var physicalSize = DiskSizeHelper.GetPhysicalSize(fileInfo.FullName, clusterSize);
                 var fileNode = new FileSystemNode
                 {
                     Name = fileInfo.Name,
@@ -72,7 +76,7 @@ public class DiskScanService : IDiskScanService
                     IsDirectory = false,
                     Extension = fileInfo.Extension,
                     SizeLogical = fileInfo.Length,
-                    SizePhysical = fileInfo.Length,
+                    SizePhysical = physicalSize >= 0 ? physicalSize : fileInfo.Length,
                     LastModified = fileInfo.LastWriteTimeUtc
                 };
                 node.Children.Add(fileNode);

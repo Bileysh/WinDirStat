@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,15 +24,20 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         _scanStateService.StateChanged += OnStateChanged;
     }
 
-    [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
+    [ObservableProperty] 
+    private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty] private bool _isScanning;
+    [ObservableProperty] 
+    private bool _isScanning;
 
-    [ObservableProperty] private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
+    [ObservableProperty]
+    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
+    
+    [ObservableProperty] 
+    private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
 
-    [ObservableProperty] private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
-
-    [ObservableProperty] private bool _groupByCategory;
+    [ObservableProperty] 
+    private bool _groupByCategory;
 
     partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
 
@@ -43,7 +49,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         RefreshStatistics();
         RefreshTreeMap();
     }
-
+    
     private void RefreshStatistics()
     {
         var currentResult = _scanStateService.CurrentResult;
@@ -60,13 +66,16 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task OpenFolderAsync()
     {
+        // TODO: (Elevated Support) Замінити FolderPicker на класичний IFileOpenDialog для підтримки режиму Адміністратора. 
+        // Поточний пікер конфліктує з правами Windows і видає помилку при спробі відкрити вікно.
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 
         IsScanning = true;
-        RootNodes = [];
-        TypeStatistics = [];
-        TreeMapRects = [];
+        RootNodes.Clear();
+        TypeStatistics.Clear();
+        TreeMapRects.Clear();
+        
         try
         {
             var scanResult = await Task.Run(() => _diskScanService.Scan(path));
@@ -101,5 +110,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _scanStateService.StateChanged -= OnStateChanged;
+        GC.SuppressFinalize(this);
     }
 }
