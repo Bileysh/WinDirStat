@@ -4,5 +4,5 @@ namespace WinDirStat.Core.Interfaces;
 
 public interface IDiskScanService
 {
-    ScanResult Scan(string rootPath);
+    Task<ScanResult> ScanAsync(string rootPath, CancellationToken cancellationToken = default);
 }
