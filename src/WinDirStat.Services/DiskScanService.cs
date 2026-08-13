@@ -7,32 +7,32 @@ namespace WinDirStat.Services;
 
 public class DiskScanService : IDiskScanService
 {
-    public ScanResult Scan(string rootPath)
+    public Task<ScanResult> ScanAsync(string rootPath, CancellationToken cancellationToken = default)
     {
-        var stopwatch = Stopwatch.StartNew();
-        
-        PrivilegeHelper.EnableBackupPrivilege();
-        var directoryInfo = new DirectoryInfo(rootPath);
-        var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
-        
-        var rootNode = ScanDirectory(directoryInfo, clusterSize); 
-        
-        var byCategory = FileStatisticsAggregator.ByCategory(rootNode);
-        var byExtension = FileStatisticsAggregator.ByExtension(rootNode);
-        
-        stopwatch.Stop();
-        
-        return new ScanResult(
-            rootPath,
-            rootNode,
-            byCategory,
-            byExtension,
-            stopwatch.Elapsed
-        );
+        return Task.Run(() =>
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var directoryInfo = new DirectoryInfo(rootPath);
+            var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
+            var rootNode = ScanDirectory(directoryInfo, clusterSize, cancellationToken);
+
+            stopwatch.Stop();
+
+            return new ScanResult(
+                rootPath,
+                rootNode,
+                FileStatisticsAggregator.ByCategory(rootNode),
+                FileStatisticsAggregator.ByExtension(rootNode),
+                stopwatch.Elapsed
+            );
+        }, cancellationToken);
     }
 
-    private FileSystemNode ScanDirectory(DirectoryInfo directoryInfo, uint clusterSize)
+    private FileSystemNode ScanDirectory(DirectoryInfo directoryInfo, uint clusterSize, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var node = new FileSystemNode
         {
             Name = directoryInfo.Name,
@@ -40,28 +40,22 @@ public class DiskScanService : IDiskScanService
             IsDirectory = true,
             LastModified = directoryInfo.LastWriteTimeUtc
         };
+
         if (directoryInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
             return node;
 
         IEnumerable<FileSystemInfo> entries;
-        try
-        {
-            entries = directoryInfo.EnumerateFileSystemInfos();
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return node; //TODO: Обійти обмеження доступу за допомогою SeBackupPrivilege
-        }
-        catch (IOException)
-        {
-            return node;
-        }
+        try { entries = directoryInfo.EnumerateFileSystemInfos(); }
+        catch (UnauthorizedAccessException) { return node; }
+        catch (IOException) { return node; }
 
         foreach (var entry in entries)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (entry is DirectoryInfo subDirectory)
             {
-                var childNode = ScanDirectory(subDirectory, clusterSize); 
+                var childNode = ScanDirectory(subDirectory, clusterSize, cancellationToken);
                 node.Children.Add(childNode);
                 node.SizeLogical += childNode.SizeLogical;
                 node.SizePhysical += childNode.SizePhysical;

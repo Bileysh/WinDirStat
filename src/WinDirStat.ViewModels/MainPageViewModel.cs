@@ -14,6 +14,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly IFolderPickerService _folderPickerService;
     private readonly IScanStateService _scanStateService;
 
+    private CancellationTokenSource? _scanCts;
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService)
     {
@@ -71,22 +72,39 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 
+        CancelScan();
+        _scanCts = new CancellationTokenSource();
+        
         IsScanning = true;
         RootNodes.Clear();
         TypeStatistics.Clear();
         TreeMapRects.Clear();
-        
+
         try
         {
-            var scanResult = await Task.Run(() => _diskScanService.Scan(path));
+            var scanResult = await _diskScanService.ScanAsync(path, _scanCts.Token);
             _scanStateService.SetResult(scanResult);
+        }
+        catch (OperationCanceledException)
+        {
         }
         finally
         {
             IsScanning = false;
+            _scanCts?.Dispose();
+            _scanCts = null;
         }
     }
-
+    
+    [RelayCommand]
+    public void CancelScan()
+    {
+        if (_scanCts != null && !_scanCts.IsCancellationRequested)
+        {
+            _scanCts.Cancel();
+        }
+    }
+    
     private double _treeMapWidth = 600;
     private double _treeMapHeight = 200;
 
@@ -110,6 +128,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _scanStateService.StateChanged -= OnStateChanged;
+        CancelScan();
         GC.SuppressFinalize(this);
     }
 }
