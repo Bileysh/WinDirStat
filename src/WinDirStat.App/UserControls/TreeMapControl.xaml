@@ -1,0 +1,48 @@
+<UserControl
+    x:Class="WinDirStat_App.UserControls.TreeMapControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:WinDirStat.ViewModels"
+    xmlns:converters="using:WinDirStat_App.Converters">
+
+    <UserControl.Resources>
+        <converters:FileCategoryToBrushConverter x:Key="CategoryToBrushConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid x:Name="RootGrid" SizeChanged="RootGrid_SizeChanged">
+        <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.TreeMapRects.Count, ViewModel.IsScanning), Mode=OneWay}" />
+
+        <ItemsControl ItemsSource="{x:Bind ViewModel.TreeMapRects, Mode=OneWay}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:TreeMapRectViewModel">
+                    <Border Width="{x:Bind Width}" Height="{x:Bind Height}"
+                            Background="{x:Bind Category, Converter={StaticResource CategoryToBrushConverter}}"
+                            BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                            ToolTipService.ToolTip="{x:Bind ToolTipText}">
+                        <Border.RenderTransform>
+                            <TranslateTransform X="{x:Bind X}" Y="{x:Bind Y}" />
+                        </Border.RenderTransform>
+                        <Grid>
+                            <TextBlock Text="{x:Bind Name}" FontSize="11" FontWeight="SemiBold" Foreground="White"
+                                       HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4"
+                                       TextTrimming="CharacterEllipsis"
+                                       Visibility="{x:Bind IsTitleVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            <TextBlock Text="{x:Bind SizeFormatted}" FontSize="9" Foreground="White" Opacity="0.8"
+                                       HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="4"
+                                       Visibility="{x:Bind IsSizeVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

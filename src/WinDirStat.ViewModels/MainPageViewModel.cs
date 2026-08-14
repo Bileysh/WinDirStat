@@ -13,16 +13,21 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly IDiskScanService _diskScanService;
     private readonly IFolderPickerService _folderPickerService;
     private readonly IScanStateService _scanStateService;
-
+    private readonly IWindowManagerService _windowManagerService;
+    
     private CancellationTokenSource? _scanCts;
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
-        IScanStateService scanStateService)
+        IScanStateService scanStateService, IWindowManagerService windowManagerService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
         _scanStateService = scanStateService;
+        _windowManagerService = windowManagerService;
 
         _scanStateService.StateChanged += OnStateChanged;
+        
+        if (_scanStateService.CurrentResult is not null)
+            OnStateChanged(this, _scanStateService.CurrentResult);   
     }
 
     [ObservableProperty] 
@@ -131,4 +136,28 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         CancelScan();
         GC.SuppressFinalize(this);
     }
+    
+    [RelayCommand]
+    private void OpenInNewWindow()
+    {
+        _windowManagerService.OpenMainWindow();
+    }
+    
+    [RelayCommand]
+    private void OpenStatisticsWindow()
+    {
+        _windowManagerService.OpenStatisticsWindow();
+    }
+
+    [RelayCommand]
+    private void OpenTreeViewWindow()
+    {
+        _windowManagerService.OpenTreeViewWindow();
+    }
+
+    [RelayCommand]
+    private void OpenTreeMapWindow()
+    {
+        _windowManagerService.OpenTreeMapWindow();
+    } 
 }
