@@ -35,6 +35,7 @@ public partial class App : Application
         services.AddSingleton<IDiskScanService, DiskScanService>();
         services.AddSingleton<IFolderPickerService, FolderPickerService>(); 
         services.AddSingleton<IScanStateService, ScanStateService>();
+        services.AddSingleton<IWindowManagerService, WindowManagerService>();
         return services.BuildServiceProvider();
     }
 }

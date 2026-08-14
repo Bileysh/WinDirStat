@@ -1,0 +1,29 @@
+<UserControl
+    x:Class="WinDirStat_App.UserControls.TreeViewControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:WinDirStat.ViewModels">
+
+    <Grid>
+        <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.RootNodes.Count, ViewModel.IsScanning), Mode=OneWay}" />
+
+        <TreeView ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}">
+            <TreeView.ItemTemplate>
+                <DataTemplate x:DataType="vm:NodeViewModel">
+                    <TreeViewItem ItemsSource="{x:Bind Children}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="{x:Bind Name}" Width="220" />
+                            <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7" />
+                            <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7" />
+                            <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5" />
+                            <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50" />
+                            <TextBlock Text="{x:Bind ChildSummaryFormatted}" Width="140" Opacity="0.6" />
+                        </StackPanel>
+                    </TreeViewItem>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
+</UserControl>
