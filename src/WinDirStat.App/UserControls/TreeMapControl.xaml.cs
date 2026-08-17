@@ -15,7 +15,7 @@ public sealed partial class TreeMapControl : UserControl
 
     public static readonly DependencyProperty ViewModelProperty =
         DependencyProperty.Register(nameof(ViewModel), typeof(MainPageViewModel), typeof(TreeMapControl),
-            new PropertyMetadata(null));
+            new PropertyMetadata(null, OnViewModelChanged));
 
     public TreeMapControl() => InitializeComponent();
 

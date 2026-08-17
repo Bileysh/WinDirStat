@@ -21,6 +21,10 @@ public sealed partial class StatisticsControl : UserControl
 
     public StatisticsControl()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
+    
+    private Visibility GetNoDataVisibility(int count, bool isScanning) =>
+        count == 0 && !isScanning ? Visibility.Visible : Visibility.Collapsed;
+
 }
