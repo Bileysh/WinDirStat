@@ -62,7 +62,7 @@ public class DiskScanService : IDiskScanService
             }
             else if (entry is FileInfo fileInfo)
             {
-                var physicalSize = DiskSizeHelper.GetPhysicalSize(fileInfo.FullName, clusterSize);
+                var physicalSize = DiskSizeHelper.GetPhysicalSize(fileInfo, clusterSize);
                 var fileNode = new FileSystemNode
                 {
                     Name = fileInfo.Name,
