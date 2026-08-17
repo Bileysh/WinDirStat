@@ -11,5 +11,6 @@ public enum FileCategory
     Development,  
     VirtualDisks, 
     System,
+    Folder,
     Other
 }
