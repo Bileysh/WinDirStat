@@ -26,10 +26,11 @@ public class TreeMapRectViewModel
         Height = rect.Height;
         Name = rect.Node.Name;
         
-        IsFolder = rect.Node.Children.Any();
+        IsFolder = rect.Node.IsDirectory;
+        Category = IsFolder 
+            ? FileCategory.Folder 
+            : FileCategoryClassifier.Classify(rect.Node.Extension);
         
-        Category = FileCategoryClassifier.Classify(rect.Node.Extension);
-
         SizeFormatted = SizeFormatter.Format(rect.Node.SizeLogical);
         ToolTipText = $"{rect.Node.Name}\n{SizeFormatted}";
 

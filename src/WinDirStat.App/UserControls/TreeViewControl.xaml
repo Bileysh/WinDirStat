@@ -5,9 +5,9 @@
     xmlns:vm="using:WinDirStat.ViewModels">
 
     <Grid>
-        <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center"
+        <TextBlock Grid.Row="1" x:Uid="NoDataText" HorizontalAlignment="Center" VerticalAlignment="Center"
                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.RootNodes.Count, ViewModel.IsScanning), Mode=OneWay}" />
+                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.TreeMapRects.Count, ViewModel.IsScanning), Mode=OneWay}" />
 
         <TreeView ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}">
             <TreeView.ItemTemplate>
