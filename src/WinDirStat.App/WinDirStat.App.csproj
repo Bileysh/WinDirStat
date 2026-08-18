@@ -53,6 +53,9 @@
     <ProjectReference Include="..\WinDirStat.Services\WinDirStat.Services.csproj" />
     <ProjectReference Include="..\WinDirStat.ViewModels\WinDirStat.ViewModels.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="UserControls\App.xaml" />
+  </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution

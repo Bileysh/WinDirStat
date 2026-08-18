@@ -13,15 +13,21 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly IDiskScanService _diskScanService;
     private readonly IFolderPickerService _folderPickerService;
     private readonly IScanStateService _scanStateService;
-
+    private readonly IWindowManagerService _windowManagerService;
+    
+    private CancellationTokenSource? _scanCts;
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
-        IScanStateService scanStateService)
+        IScanStateService scanStateService, IWindowManagerService windowManagerService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
         _scanStateService = scanStateService;
+        _windowManagerService = windowManagerService;
 
         _scanStateService.StateChanged += OnStateChanged;
+        
+        if (_scanStateService.CurrentResult is not null)
+            OnStateChanged(this, _scanStateService.CurrentResult);   
     }
 
     [ObservableProperty] 
@@ -71,22 +77,39 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 
+        CancelScan();
+        _scanCts = new CancellationTokenSource();
+        
         IsScanning = true;
         RootNodes.Clear();
         TypeStatistics.Clear();
         TreeMapRects.Clear();
-        
+
         try
         {
-            var scanResult = await Task.Run(() => _diskScanService.Scan(path));
+            var scanResult = await _diskScanService.ScanAsync(path, _scanCts.Token);
             _scanStateService.SetResult(scanResult);
+        }
+        catch (OperationCanceledException)
+        {
         }
         finally
         {
             IsScanning = false;
+            _scanCts?.Dispose();
+            _scanCts = null;
         }
     }
-
+    
+    [RelayCommand]
+    public void CancelScan()
+    {
+        if (_scanCts != null && !_scanCts.IsCancellationRequested)
+        {
+            _scanCts.Cancel();
+        }
+    }
+    
     private double _treeMapWidth = 600;
     private double _treeMapHeight = 200;
 
@@ -110,6 +133,31 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _scanStateService.StateChanged -= OnStateChanged;
+        CancelScan();
         GC.SuppressFinalize(this);
     }
+    
+    [RelayCommand]
+    private void OpenInNewWindow()
+    {
+        _windowManagerService.OpenMainWindow();
+    }
+    
+    [RelayCommand]
+    private void OpenStatisticsWindow()
+    {
+        _windowManagerService.OpenStatisticsWindow();
+    }
+
+    [RelayCommand]
+    private void OpenTreeViewWindow()
+    {
+        _windowManagerService.OpenTreeViewWindow();
+    }
+
+    [RelayCommand]
+    private void OpenTreeMapWindow()
+    {
+        _windowManagerService.OpenTreeMapWindow();
+    } 
 }

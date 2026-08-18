@@ -14,9 +14,8 @@ public class MainPageViewModelTests
         var vm = new MainPageViewModel(
             new DiskScanService(),
             new FakeFolderPickerService { PathToReturn = tempFolder.FullName },
-            new ScanStateService() 
-        );
-
+            new ScanStateService(),
+            new FakeWindowManagerService());
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
         Assert.Single(vm.RootNodes);
