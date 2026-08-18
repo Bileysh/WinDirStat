@@ -36,6 +36,9 @@ public partial class App : Application
         services.AddSingleton<IFolderPickerService, FolderPickerService>(); 
         services.AddSingleton<IScanStateService, ScanStateService>();
         services.AddSingleton<IWindowManagerService, WindowManagerService>();
+        services.AddSingleton<IDialogService, WinUIDialogService>();
+        services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
+        services.AddSingleton<IThemeService, WinUiThemeService>();
         return services.BuildServiceProvider();
     }
 }

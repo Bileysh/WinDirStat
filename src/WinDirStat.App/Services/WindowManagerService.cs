@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
@@ -12,12 +13,28 @@ namespace WinDirStat_App.Services;
 public class WindowManagerService : IWindowManagerService
 {
     private readonly IServiceProvider _serviceProvider;
-
-    public WindowManagerService(IServiceProvider serviceProvider)
+    private readonly IThemeService _themeService;
+    private readonly List<Window> _openWindows = new();
+    public WindowManagerService(IServiceProvider serviceProvider, IThemeService themeService)
     {
         _serviceProvider = serviceProvider;
+        _themeService = themeService;
+        
+        _themeService.ThemeChanged += OnThemeChanged;
     }
+    private void OnThemeChanged(object? sender, bool isDark)
+    {
+        var theme = isDark ? ElementTheme.Dark : ElementTheme.Light;
+        
+        if (App.MainWindow?.Content is FrameworkElement mainContent)
+            mainContent.RequestedTheme = theme;
 
+        foreach (var window in _openWindows)
+        {
+            if (window.Content is FrameworkElement fe)
+                fe.RequestedTheme = theme;
+        }
+    }
     public void OpenMainWindow()
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
@@ -25,10 +42,19 @@ public class WindowManagerService : IWindowManagerService
             newWindow.SystemBackdrop = new MicaBackdrop();
 
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
-        newWindow.Content = new MainPage(viewModel);
-        newWindow.Title = "WinDirStat - Нове вікно";
-        newWindow.Closed += (_, _) => viewModel.Dispose();
+        var page = new MainPage(viewModel);
 
+        page.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        
+        newWindow.Content = page;
+        newWindow.Title = "WinDirStat - Нове вікно";
+       
+        _openWindows.Add(newWindow);
+        newWindow.Closed += (_, _) =>
+        {
+            _openWindows.Remove(newWindow);
+            viewModel.Dispose();
+        };
         OffsetWindowPosition(newWindow);
 
         newWindow.Activate();
@@ -40,8 +66,11 @@ public class WindowManagerService : IWindowManagerService
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
-
-        var rootGrid = new Grid();
+        
+        var rootGrid = (Grid)XamlReader.Load(
+            "<Grid xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' " +
+            "Background='{ThemeResource ApplicationPageBackgroundThemeBrush}' />");
+        
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
@@ -60,16 +89,22 @@ public class WindowManagerService : IWindowManagerService
         Grid.SetRow(content, 1);
         rootGrid.Children.Add(content);
 
+        rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        
         newWindow.Content = rootGrid;
         newWindow.Title = $"WinDirStat - {title}";
-        newWindow.Closed += (_, _) => viewModel.Dispose();
+        _openWindows.Add(newWindow);
+        newWindow.Closed += (_, _) =>
+        {
+            _openWindows.Remove(newWindow);
+            viewModel.Dispose();
+        };       
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
         OffsetWindowPosition(newWindow);
 
         return newWindow;
     }
-
     private void OffsetWindowPosition(Window newWindow)
     {
         if (App.MainWindow != null)
@@ -103,7 +138,7 @@ public class WindowManagerService : IWindowManagerService
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeMapControl { ViewModel = viewModel };
-        CreateDetachedWindow("TreeMap (Відкріплено)", control,
+        CreateDetachedWindow("Мапа файлів (Відкріплено)", control,
             WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, viewModel).Activate();
     }
 }
