@@ -21,16 +21,16 @@ public class WindowManagerService : IWindowManagerService
     public void OpenMainWindow()
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
-        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000) && MicaController.IsSupported())
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         newWindow.Content = new MainPage(viewModel);
         newWindow.Title = "WinDirStat - Нове вікно";
         newWindow.Closed += (_, _) => viewModel.Dispose();
-            
+
         OffsetWindowPosition(newWindow);
-        
+
         newWindow.Activate();
     }
 
@@ -38,22 +38,25 @@ public class WindowManagerService : IWindowManagerService
         MainPageViewModel viewModel)
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
-        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000) && MicaController.IsSupported())
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
         var rootGrid = new Grid();
-        rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) });
+        rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var titleText = new TextBlock
         {
-            Text = title, VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(16, 0, 0, 0), FontSize = 12, Opacity = 0.6
+            Text = title,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = WindowManagerConstants.TitleTextMargin,
+            FontSize = WindowManagerConstants.TitleTextFontSize,
+            Opacity = WindowManagerConstants.TitleTextOpacity
         };
         Grid.SetRow(titleText, 0);
         rootGrid.Children.Add(titleText);
 
-        content.Margin = new Thickness(16, 0, 16, 16);
+        content.Margin = WindowManagerConstants.ContentMargin;
         Grid.SetRow(content, 1);
         rootGrid.Children.Add(content);
 
@@ -61,9 +64,9 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Title = $"WinDirStat - {title}";
         newWindow.Closed += (_, _) => viewModel.Dispose();
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
-        
+
         OffsetWindowPosition(newWindow);
-        
+
         return newWindow;
     }
 
@@ -73,8 +76,8 @@ public class WindowManagerService : IWindowManagerService
         {
             var mainWindowPos = App.MainWindow.AppWindow.Position;
 
-            int offsetX = mainWindowPos.X + 50;
-            int offsetY = mainWindowPos.Y + 50;
+            var offsetX = mainWindowPos.X + WindowManagerConstants.WindowOffsetX;
+            var offsetY = mainWindowPos.Y + WindowManagerConstants.WindowOffsetY;
 
             newWindow.AppWindow.Move(new Windows.Graphics.PointInt32(offsetX, offsetY));
         }
@@ -84,20 +87,23 @@ public class WindowManagerService : IWindowManagerService
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new StatisticsControl { ViewModel = viewModel };
-        CreateDetachedWindow("Статистика (Відкріплено)", control, 400, 600, viewModel).Activate();
+        CreateDetachedWindow("Статистика (Відкріплено)", control,
+            WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, viewModel).Activate();
     }
 
     public void OpenTreeViewWindow()
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeViewControl { ViewModel = viewModel };
-        CreateDetachedWindow("Дерево файлів (Відкріплено)", control, 700, 500, viewModel).Activate();
+        CreateDetachedWindow("Дерево файлів (Відкріплено)", control,
+            WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, viewModel).Activate();
     }
 
     public void OpenTreeMapWindow()
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeMapControl { ViewModel = viewModel };
-        CreateDetachedWindow("TreeMap (Відкріплено)", control, 800, 500, viewModel).Activate();
+        CreateDetachedWindow("TreeMap (Відкріплено)", control,
+            WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, viewModel).Activate();
     }
 }
