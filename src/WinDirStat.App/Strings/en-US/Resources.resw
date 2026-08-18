@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+    <data name="ToggleGroupBy.OnContent" xml:space="preserve">
+    <value>By Type</value>
+  </data>
+    <data name="ToggleGroupBy.OffContent" xml:space="preserve">
+    <value>By Extension</value>
+  </data>
+    <data name="NoDataText.Text" xml:space="preserve">
+    <value>NO DATA</value>
+  </data>
+    <data name="Category_Development" xml:space="preserve">
+    <value>Development</value>
+  </data>
+    <data name="Category_VirtualDisks" xml:space="preserve">
+    <value>Virtual Disks</value>
+  </data>
+    <data name="Category_System" xml:space="preserve">
+    <value>System Files</value>
+  </data>
+    <data name="Category_Documents" xml:space="preserve">
+    <value>Documents</value>
+  </data>
+    <data name="Category_Videos" xml:space="preserve">
+    <value>Videos</value>
+  </data>
+    <data name="Category_Audio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+    <data name="Category_Images" xml:space="preserve">
+    <value>Images</value>
+  </data>
+    <data name="Category_Archives" xml:space="preserve">
+    <value>Archives</value>
+  </data>
+    <data name="Category_Executables" xml:space="preserve">
+    <value>Executables</value>
+  </data>
+    <data name="Category_Folder" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+    <data name="Category_Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+    <data name="MenuFile.Title" xml:space="preserve">
+    <value>File</value>
+  </data>
+    <data name="MenuFileOpenFolder.Text" xml:space="preserve">
+    <value>Open Folder...</value>
+  </data>
+    <data name="MenuFileExit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+    <data name="MenuWindow.Title" xml:space="preserve">
+    <value>Window</value>
+  </data>
+    <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Open in separate window</value>
+  </data>
+    <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Open in separate window</value>
+  </data>
+    <data name="OpenTreeMapWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Open in separate window</value>
+  </data>
+    <data name="MenuOptions.Title" xml:space="preserve">
+    <value>Options</value>
+  </data>
+    <data name="MenuOptionsShowFreeSpace.Text" xml:space="preserve">
+    <value>Show Free Space</value>
+  </data>
+    <data name="MenuOptionsLanguage.Text" xml:space="preserve">
+    <value>Language</value>
+  </data>
+     <data name="MenuOptionsTheme.Text" xml:space="preserve">
+     <value>Toggle Theme</value>
+  </data>
+    <data name="MenuHelp.Title" xml:space="preserve">
+    <value>Help</value>
+  </data>
+    <data name="MenuHelpAbout.Text" xml:space="preserve">
+    <value>About WinDirStat</value>
+  </data>
+    <data name="TreeViewHeader.Text" xml:space="preserve">
+    <value>Directory Tree</value>
+  </data>
+    <data name="StatisticsHeader.Text" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+    <data name="TreeMapHeader.Text" xml:space="preserve">
+    <value>File Map</value>
+  </data>
+    <data name="CancelScanButton.Content" xml:space="preserve">
+    <value>Cancel Scan</value>
+  </data>
+    <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Go up one level</value>
+  </data>
+</root>

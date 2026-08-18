@@ -20,7 +20,7 @@
                     Visibility="{x:Bind ViewModel.IsTreeMapNavigated, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <Button Command="{x:Bind ViewModel.NavigateUpTreeMapCommand}"
                     Padding="4" Background="Transparent" BorderThickness="0"
-                    ToolTipService.ToolTip="Повернутися на рівень вище">
+                    x:Uid="NavigateUpButton">
                 <FontIcon Glyph="&#xE72B;" FontSize="12" />
             </Button>
             <TextBlock Text="{x:Bind ViewModel.CurrentTreeMapRoot.Name, Mode=OneWay}"
