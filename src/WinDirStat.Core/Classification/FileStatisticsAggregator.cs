@@ -5,21 +5,31 @@ namespace WinDirStat.Core.Classification;
 public static class FileStatisticsAggregator
 {
     public static List<FileTypeStatisticsEntry> ByExtension(FileSystemNode root) =>
-        Aggregate(root, f => string.IsNullOrEmpty(f.Extension) ? "(без розширення)" : f.Extension.ToLowerInvariant());
+        Aggregate(root, f => (
+            Label: string.IsNullOrEmpty(f.Extension) ? "(без розширення)" : f.Extension.ToLowerInvariant(),
+            Category: FileCategoryClassifier.Classify(f.Extension)
+        ));
 
     public static List<FileTypeStatisticsEntry> ByCategory(FileSystemNode root) =>
-        Aggregate(root, f => FileCategoryClassifier.Classify(f.Extension).ToString());
+        Aggregate(root, f =>
+        {
+            var category = FileCategoryClassifier.Classify(f.Extension);
+            return (Label: category.ToString(), Category: category);
+        });
 
-    private static List<FileTypeStatisticsEntry> Aggregate(FileSystemNode root, Func<FileSystemNode, string> keySelector)
+    private static List<FileTypeStatisticsEntry> Aggregate(
+        FileSystemNode root, 
+        Func<FileSystemNode, (string Label, FileCategory Category)> selector)
     {
         var files = EnumerateFiles(root).ToList();
         var totalSize = files.Sum(f => (double)f.SizeLogical);
 
         return files
-            .GroupBy(keySelector)
+            .GroupBy(selector)
             .Select(g => new FileTypeStatisticsEntry
             {
-                Label = g.Key,
+                Label = g.Key.Label,
+                Category = g.Key.Category, // Ініціалізуємо нову властивість
                 TotalSize = g.Sum(f => f.SizeLogical),
                 FileCount = g.Count(),
                 PercentOfTotal = totalSize > 0 ? g.Sum(f => f.SizeLogical) / totalSize * 100 : 0
@@ -44,6 +54,5 @@ public static class FileStatisticsAggregator
                 yield return file;
             }
         }
-    
     }
 }

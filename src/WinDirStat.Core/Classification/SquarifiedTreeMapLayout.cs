@@ -8,20 +8,20 @@ public static class SquarifiedTreeMapLayout
 
     public static List<TreeMapRect> Compute(FileSystemNode node, double x, double y, double width, double height)
     {
-        var children = node.Children
+        var childrenData = node.Children
             .Where(c => c.SizeLogical > 0)
-            .OrderByDescending(c => c.SizeLogical)
+            .Select(c => new { Node = c, Weight = Math.Sqrt(c.SizeLogical) })
+            .OrderByDescending(c => c.Weight)
             .ToList();
 
         var result = new List<TreeMapRect>();
-        if (children.Count == 0 || width <= 0 || height <= 0) return result;
+        if (childrenData.Count == 0 || width <= 0 || height <= 0) return result;
 
-        var totalSize = (double)children.Sum(c => c.SizeLogical);
-        var scale = (width * height) / totalSize;
+        var totalWeight = childrenData.Sum(c => c.Weight);
+        var scale = (width * height) / totalWeight;
 
-        var mappedItems = children.Select(c => new Item(c, c.SizeLogical * scale));
-        var itemsList = mappedItems.ToList();
-        var items = new Queue<Item>(itemsList);
+        var mappedItems = childrenData.Select(c => new Item(c.Node, c.Weight * scale));
+        var items = new Queue<Item>(mappedItems.ToList());
 
         var rect = (X: x, Y: y, W: width, H: height);
         var row = new List<Item>();
@@ -54,6 +54,8 @@ public static class SquarifiedTreeMapLayout
     private static double Worst(List<Item> row, double sideLength)
     {
         var sum = row.Sum(i => i.Area);
+        if (sum == 0) return double.MaxValue; 
+        
         var max = row.Max(i => i.Area);
         var min = row.Min(i => i.Area);
         var s2 = sum * sum;
@@ -65,6 +67,7 @@ public static class SquarifiedTreeMapLayout
         List<Item> row, (double X, double Y, double W, double H) rect, List<TreeMapRect> result)
     {
         var rowArea = row.Sum(i => i.Area);
+        if (rowArea == 0) return rect; 
 
         if (rect.W <= rect.H)
         {
