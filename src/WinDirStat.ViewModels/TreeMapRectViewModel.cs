@@ -30,7 +30,7 @@ public class TreeMapRectViewModel
         SizeFormatted = SizeFormatter.Format(rect.Node.SizeLogical);
         ToolTipText = $"{rect.Node.Name}\n{SizeFormatted}";
 
-        IsTitleVisible = Width > 40 && Height > 20;
-        IsSizeVisible = Width > 60 && Height > 40;
+        IsTitleVisible = Width > TreeMapConstants.MinWidthForTitle && Height > TreeMapConstants.MinHeightForTitle;
+        IsSizeVisible = Width > TreeMapConstants.MinWidthForSize && Height > TreeMapConstants.MinHeightForSize;
     }
 }
