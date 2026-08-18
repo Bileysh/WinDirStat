@@ -14,8 +14,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly IFolderPickerService _folderPickerService;
     private readonly IScanStateService _scanStateService;
     private readonly IWindowManagerService _windowManagerService;
-    
+
+    private readonly Stack<FileSystemNode> _treeMapHistory = new();
+
     private CancellationTokenSource? _scanCts;
+
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService, IWindowManagerService windowManagerService)
     {
@@ -25,25 +28,25 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         _windowManagerService = windowManagerService;
 
         _scanStateService.StateChanged += OnStateChanged;
-        
+
         if (_scanStateService.CurrentResult is not null)
-            OnStateChanged(this, _scanStateService.CurrentResult);   
+            OnStateChanged(this, _scanStateService.CurrentResult);
     }
 
-    [ObservableProperty] 
-    private ObservableCollection<NodeViewModel> _rootNodes = [];
+    [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty] 
-    private bool _isScanning;
+    [ObservableProperty] private bool _isScanning;
 
-    [ObservableProperty]
-    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
-    
-    [ObservableProperty] 
-    private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
+    [ObservableProperty] private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
 
-    [ObservableProperty] 
-    private bool _groupByCategory;
+    [ObservableProperty] private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
+
+    [ObservableProperty] private bool _groupByCategory;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsTreeMapNavigated))]
+    private FileSystemNode? _currentTreeMapRoot;
+
+    public bool IsTreeMapNavigated => _treeMapHistory.Count > 0;
 
     partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
 
@@ -52,10 +55,15 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         if (result is null) return;
 
         RootNodes = [new NodeViewModel(result.RootNode)];
+
+        _treeMapHistory.Clear();
+        CurrentTreeMapRoot = result.RootNode;
+        OnPropertyChanged(nameof(IsTreeMapNavigated));
+
         RefreshStatistics();
         RefreshTreeMap();
     }
-    
+
     private void RefreshStatistics()
     {
         var currentResult = _scanStateService.CurrentResult;
@@ -79,7 +87,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
         CancelScan();
         _scanCts = new CancellationTokenSource();
-        
+
         IsScanning = true;
         RootNodes.Clear();
         TypeStatistics.Clear();
@@ -100,7 +108,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
             _scanCts = null;
         }
     }
-    
+
     [RelayCommand]
     public void CancelScan()
     {
@@ -109,7 +117,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
             _scanCts.Cancel();
         }
     }
-    
+
     private double _treeMapWidth = 600;
     private double _treeMapHeight = 200;
 
@@ -122,27 +130,26 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
     private void RefreshTreeMap()
     {
-        var currentResult = _scanStateService.CurrentResult;
-        if (currentResult is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
+        if (CurrentTreeMapRoot is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
 
-        var rects = SquarifiedTreeMapLayout.Compute(currentResult.RootNode, 0, 0, _treeMapWidth, _treeMapHeight);
+        var rects = SquarifiedTreeMapLayout.Compute(CurrentTreeMapRoot, 0, 0, _treeMapWidth, _treeMapHeight);
         var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
         TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels.ToList());
     }
-    
+
     public void Dispose()
     {
         _scanStateService.StateChanged -= OnStateChanged;
         CancelScan();
         GC.SuppressFinalize(this);
     }
-    
+
     [RelayCommand]
     private void OpenInNewWindow()
     {
         _windowManagerService.OpenMainWindow();
     }
-    
+
     [RelayCommand]
     private void OpenStatisticsWindow()
     {
@@ -159,5 +166,32 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private void OpenTreeMapWindow()
     {
         _windowManagerService.OpenTreeMapWindow();
-    } 
+    }
+
+    [RelayCommand]
+    public void DrillDownTreeMap(TreeMapRectViewModel? clickedRect)
+    {
+        if (clickedRect?.Node != null && clickedRect.Node.Children.Any())
+        {
+            if (CurrentTreeMapRoot != null)
+            {
+                _treeMapHistory.Push(CurrentTreeMapRoot);
+            }
+
+            CurrentTreeMapRoot = clickedRect.Node;
+            OnPropertyChanged(nameof(IsTreeMapNavigated));
+            RefreshTreeMap();
+        }
+    }
+
+    [RelayCommand]
+    private void NavigateUpTreeMap()
+    {
+        if (_treeMapHistory.Count > 0)
+        {
+            CurrentTreeMapRoot = _treeMapHistory.Pop();
+            OnPropertyChanged(nameof(IsTreeMapNavigated));
+            RefreshTreeMap();
+        }
+    }
 }
