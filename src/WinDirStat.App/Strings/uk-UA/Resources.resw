@@ -101,4 +101,61 @@
     <data name="Category_Other" xml:space="preserve">
     <value>Інше</value>
   </data>
+    <data name="MenuFile.Title" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+    <data name="MenuFileOpenFolder.Text" xml:space="preserve">
+    <value>Відкрити папку...</value>
+  </data>
+    <data name="MenuFileExit.Text" xml:space="preserve">
+    <value>Вихід</value>
+  </data>
+    <data name="MenuWindow.Title" xml:space="preserve">
+    <value>Вікно</value>
+  </data>
+    <data name="MenuWindowOpenNew.Text" xml:space="preserve">
+    <value>Відкрити в новому вікні</value>
+  </data>
+    <data name="MenuOptions.Title" xml:space="preserve">
+    <value>Параметри</value>
+  </data>
+    <data name="MenuOptionsShowFreeSpace.Text" xml:space="preserve">
+    <value>Показати вільне місце</value>
+  </data>
+    <data name="MenuOptionsLanguage.Text" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+     <data name="MenuOptionsTheme.Text" xml:space="preserve">
+     <value>Перемкнути тему</value>
+  </data>
+    <data name="MenuHelp.Title" xml:space="preserve">
+    <value>Довідка</value>
+  </data>
+    <data name="MenuHelpAbout.Text" xml:space="preserve">
+    <value>Про WinDirStat</value>
+  </data>
+    <data name="TreeViewHeader.Text" xml:space="preserve">
+    <value>Дерево файлів</value>
+  </data>
+    <data name="StatisticsHeader.Text" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+    <data name="TreeMapHeader.Text" xml:space="preserve">
+    <value>Мапа файлів</value>
+  </data>
+    <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити в окремому вікні</value>
+  </data>
+    <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити в окремому вікні</value>
+  </data>
+    <data name="OpenTreeMapWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити в окремому вікні</value>
+  </data>
+    <data name="CancelScanButton.Content" xml:space="preserve">
+    <value>Скасувати сканування</value>
+  </data>
+    <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Повернутися на рівень вище</value>
+  </data>
 </root>
