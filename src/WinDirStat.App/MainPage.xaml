@@ -46,7 +46,7 @@
             </MenuBarItem>
 
             <MenuBarItem x:Uid="MenuHelp">
-                <MenuFlyoutItem x:Uid="MenuHelpAbout" Icon="Help" />
+                <MenuFlyoutItem x:Uid="MenuHelpAbout" Icon="Help" Command="{x:Bind ViewModel.ShowAboutCommand}"/>
             </MenuBarItem>
         </MenuBar>
 

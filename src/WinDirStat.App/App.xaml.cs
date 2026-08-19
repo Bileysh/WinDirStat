@@ -39,6 +39,7 @@ public partial class App : Application
         services.AddSingleton<IDialogService, WinUIDialogService>();
         services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
         services.AddSingleton<IThemeService, WinUiThemeService>();
+        services.AddSingleton<INotificationService, WinUiNotificationService>(); 
         return services.BuildServiceProvider();
     }
 }

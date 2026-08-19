@@ -18,7 +18,8 @@ public class MainPageViewModelTests
             new FakeWindowManagerService(),
             new FakeDialogService(),
             new FakeLocalizationService(),
-            new FakeThemeService());
+            new FakeThemeService(),
+            new FakeNotificationService());
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
         Assert.Single(vm.RootNodes);
