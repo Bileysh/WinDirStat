@@ -8,8 +8,9 @@ public enum FileCategory
     Images,
     Archives,
     Executables,
-    Development,  
-    VirtualDisks, 
+    Development,
+    VirtualDisks,
     System,
-    Other
+    Folder,
+    Other = 999
 }

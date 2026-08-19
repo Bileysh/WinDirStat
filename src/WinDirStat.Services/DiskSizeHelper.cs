@@ -25,9 +25,13 @@ public static class DiskSizeHelper
         return 4096;
     }
 
-    public static long GetPhysicalSize(string filePath, uint clusterSize)
+    public static long GetPhysicalSize(string fullPath, FileAttributes attributes, long length, uint clusterSize)
     {
-        var low = GetCompressedFileSizeW(filePath, out var high);
+        if (!attributes.HasFlag(FileAttributes.Compressed) &&
+            !attributes.HasFlag(FileAttributes.SparseFile))
+            return RoundUpToCluster(length, clusterSize);
+
+        var low = GetCompressedFileSizeW(fullPath, out var high);
         if (low == INVALID_FILE_SIZE && Marshal.GetLastWin32Error() != 0)
             return -1;
 

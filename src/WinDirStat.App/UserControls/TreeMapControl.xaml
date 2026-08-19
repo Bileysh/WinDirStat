@@ -28,7 +28,7 @@
         </StackPanel>
 
         <Grid x:Name="MapContainer" Grid.Row="1" SizeChanged="MapContainer_SizeChanged">
-            <TextBlock Text="NO DATA" HorizontalAlignment="Center" VerticalAlignment="Center"
+            <TextBlock Grid.Row="1" x:Uid="NoDataText" HorizontalAlignment="Center" VerticalAlignment="Center"
                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                        Visibility="{x:Bind GetNoDataVisibility(ViewModel.TreeMapRects.Count, ViewModel.IsScanning), Mode=OneWay}" />
             

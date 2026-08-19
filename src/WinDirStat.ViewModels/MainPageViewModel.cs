@@ -73,7 +73,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
             ? currentResult.StatisticsByCategory
             : currentResult.StatisticsByExtension;
 
-        var viewModels = stats.Select(s => new FileTypeStatisticsViewModel(s));
+        var viewModels = stats.Select(s => new FileTypeStatisticsViewModel(s, GroupByCategory));
         TypeStatistics = new ObservableCollection<FileTypeStatisticsViewModel>(viewModels.ToList());
     }
 

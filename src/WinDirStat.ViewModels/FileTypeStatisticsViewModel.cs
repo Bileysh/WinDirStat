@@ -3,8 +3,9 @@ using WinDirStat.Core.Entities;
 
 namespace WinDirStat.ViewModels;
 
-public class FileTypeStatisticsViewModel(FileTypeStatisticsEntry statisticsEntry)
+public class FileTypeStatisticsViewModel(FileTypeStatisticsEntry statisticsEntry, bool isCategoryGroup)
 {
+    public bool IsCategoryGroup { get; } = isCategoryGroup; 
     public string Label => statisticsEntry.Label;
     public string TotalSizeFormatted => SizeFormatter.Format(statisticsEntry.TotalSize);
     public string PercentFormatted => $"{statisticsEntry.PercentOfTotal:F1}%";
@@ -20,7 +21,8 @@ public class FileTypeStatisticsViewModel(FileTypeStatisticsEntry statisticsEntry
         FileCategory.Executables => "\uE7B8", 
         FileCategory.Development => "\uE943",  
         FileCategory.VirtualDisks => "\uEDA2", 
-        FileCategory.System => "\uE770",       
+        FileCategory.System => "\uE770",     
+        FileCategory.Folder => "\uE8B7",
         _ => "\uE7C3"                          
     };
 }
