@@ -7,7 +7,7 @@
 
     <UserControl.Resources>
         <converters:FileCategoryToBrushConverter x:Key="CategoryToBrushConverter" />
-        <converters:StatisticsLabelConverter x:Key="StatLabelConverter" />
+        <converters:StatisticsLabelConverter x:Key="StatisticsLabelConverter" />
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto,*">
@@ -34,7 +34,7 @@
                                       FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                       Opacity="0.8" />
 
-                            <TextBlock Text="{x:Bind Mode=OneWay, Converter={StaticResource StatLabelConverter}}" 
+                            <TextBlock Text="{x:Bind Mode=OneWay, Converter={StaticResource StatisticsLabelConverter}}" 
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis" />
                         </StackPanel>
