@@ -6,7 +6,7 @@ using WinDirStat.ViewModels;
 
 namespace WinDirStat_App.Converters;
 
-public class StatLabelConverter : IValueConverter
+public class StatisticsLabelConverter : IValueConverter
 {
     private ResourceLoader? _resourceLoader;
     

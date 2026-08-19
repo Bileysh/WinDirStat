@@ -7,7 +7,7 @@
 
     <UserControl.Resources>
         <converters:FileCategoryToBrushConverter x:Key="CategoryToBrushConverter" />
-        <converters:StatLabelConverter x:Key="StatLabelConverter" />
+        <converters:StatisticsLabelConverter x:Key="StatLabelConverter" />
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto,*">
