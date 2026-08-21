@@ -63,4 +63,8 @@ public sealed partial class MainWindow : Window
     {
         TrayIcon?.ShowNotification(title, message);
     }
+    
+    public MainPage? CurrentPage => RootFrame.Content as MainPage;
+
+    public void SetContent(MainPage page) => RootFrame.Content = page;
 }

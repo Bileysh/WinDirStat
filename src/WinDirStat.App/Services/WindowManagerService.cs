@@ -15,12 +15,14 @@ public class WindowManagerService : IWindowManagerService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IThemeService _themeService;
+    private readonly ILocalizationService _localizationService;
     private readonly List<Window> _openWindows = new();
-    public WindowManagerService(IServiceProvider serviceProvider, IThemeService themeService)
+    public WindowManagerService(IServiceProvider serviceProvider, IThemeService themeService, ILocalizationService localizationService)
     {
         _serviceProvider = serviceProvider;
         _themeService = themeService;
-        
+        _localizationService = localizationService;
+
         _themeService.ThemeChanged += OnThemeChanged;
     }
     private void OnThemeChanged(object? sender, bool isDark)
@@ -48,8 +50,9 @@ public class WindowManagerService : IWindowManagerService
         page.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
         
         newWindow.Content = page;
-        newWindow.Title = "WinDirStat - Нове вікно";
-       
+        
+        newWindow.Title = _localizationService.GetString("WindowTitle_New");
+        
         _openWindows.Add(newWindow);
         newWindow.Closed += (_, _) =>
         {
@@ -123,7 +126,7 @@ public class WindowManagerService : IWindowManagerService
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new StatisticsControl { ViewModel = viewModel };
-        CreateDetachedWindow("Статистика (Відкріплено)", control,
+        CreateDetachedWindow(_localizationService.GetString("WindowTitle_Statistics"), control,
             WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, viewModel).Activate();
     }
 
@@ -131,7 +134,7 @@ public class WindowManagerService : IWindowManagerService
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeViewControl { ViewModel = viewModel };
-        CreateDetachedWindow("Дерево файлів (Відкріплено)", control,
+        CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeView"), control,
             WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, viewModel).Activate();
     }
 
@@ -139,7 +142,24 @@ public class WindowManagerService : IWindowManagerService
     {
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeMapControl { ViewModel = viewModel };
-        CreateDetachedWindow("Мапа файлів (Відкріплено)", control,
+        CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeMap"), control,
             WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, viewModel).Activate();
+    }
+
+    public void ReloadMainWindowContent()
+    {
+        foreach (var win in _openWindows.ToList())
+        {
+            win.Close();
+        }
+        _openWindows.Clear();
+        
+        if (App.MainWindow is not MainWindow window) return;
+
+        window.CurrentPage?.ViewModel.Dispose();
+
+        var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
+
+        window.SetContent(new MainPage(viewModel));
     }
 }

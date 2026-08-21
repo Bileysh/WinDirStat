@@ -6,4 +6,5 @@ public interface IWindowManagerService
     void OpenStatisticsWindow();
     void OpenTreeViewWindow();
     void OpenTreeMapWindow();
+    void ReloadMainWindowContent();
 }

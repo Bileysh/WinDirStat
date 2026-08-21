@@ -164,16 +164,28 @@
     <data name="ScanCompleteMessageFormat" xml:space="preserve">
     <value>Час: {0:F1} сек. Файлів: {1} Папок: {2}</value>
   </data>
-    <data name="LanguageChangedTitle" xml:space="preserve">
-    <value>Зміна мови</value>
-  </data>
-    <data name="LanguageChangedMessage" xml:space="preserve">
-    <value>Мову успішно змінено. Будь ласка, перезапустіть програму, щоб зміни набули чинності.</value>
-  </data>
     <data name="AboutTitle" xml:space="preserve">
     <value>Про програму</value>
   </data>
     <data name="AboutMessage" xml:space="preserve">
     <value>WinDirStat - це безкоштовна програма для аналізу використання дискового простору на вашому комп'ютері. Вона дозволяє візуалізувати структуру файлів та папок, визначати, які файли займають найбільше місця, та ефективно керувати вашим дисковим простором.</value>
+  </data>
+    <data name="FilesText" xml:space="preserve">
+    <value>файлів</value>
+  </data>
+    <data name="FoldersText" xml:space="preserve">
+    <value>папок</value>
+  </data>
+    <data name="AccessDeniedText" xml:space="preserve">
+    <value>Доступ заборонено</value>
+  </data>
+    <data name="ScanErrorText" xml:space="preserve">
+    <value>Помилка сканування</value>
+  </data>
+    <data name="ReparsePointText" xml:space="preserve">
+    <value>Точка з'єднання (Junction) — не сканується для уникнення зациклень</value>
+  </data>
+    <data name="MenuShowInExplorer.Text" xml:space="preserve">
+    <value>Показати в Провіднику</value>
   </data>
 </root>
