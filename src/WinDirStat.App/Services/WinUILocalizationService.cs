@@ -1,3 +1,4 @@
+using Windows.ApplicationModel.Resources;
 using Windows.Globalization;
 using WinDirStat.Core.Interfaces;
 
@@ -11,4 +12,7 @@ public class WinUiLocalizationService : ILocalizationService
     {
         ApplicationLanguages.PrimaryLanguageOverride = cultureCode;
     }
+    private readonly ResourceLoader _resourceLoader = new();
+
+    public string GetString(string key) => _resourceLoader.GetString(key);
 }

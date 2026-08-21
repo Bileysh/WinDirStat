@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Window
     x:Class="WinDirStat_App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="using:H.NotifyIcon"
     Title="WinDirStat.App"
     mc:Ignorable="d">
+    
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
@@ -18,11 +19,20 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="WinDirStat.App">
-            <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
-            </TitleBar.IconSource>
-        </TitleBar>
+        <TitleBar x:Name="AppTitleBar" Title="WinDirStat.App" />
+        
         <Frame x:Name="RootFrame" Grid.Row="1" />
+
+        <tb:TaskbarIcon x:Name="TrayIcon"
+                        ToolTipText="WinDirStat"
+                        DoubleClickCommand="{x:Bind RestoreWindowCommand}">
+            <tb:TaskbarIcon.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="Відкрити" Command="{x:Bind RestoreWindowCommand}" Icon="NewWindow" />
+                    <MenuFlyoutItem Text="Вихід" Command="{x:Bind ExitCommand}" Icon="Cancel" />
+                </MenuFlyout>
+            </tb:TaskbarIcon.ContextFlyout>
+        </tb:TaskbarIcon>
+        
     </Grid>
 </Window>

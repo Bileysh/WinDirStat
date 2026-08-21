@@ -118,4 +118,25 @@
     <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Go up one level</value>
   </data>
+    <data name="MenuWindowOpenNew.Text" xml:space="preserve">
+    <value>Open in new Window</value>
+  </data>
+    <data name="ScanCompleteTitle" xml:space="preserve">
+    <value>Scan Complete</value>
+  </data>
+    <data name="ScanCompleteMessageFormat" xml:space="preserve">
+    <value>Time: {0:F1} sec. Files: {1} Folders: {2}</value>
+  </data>
+    <data name="LanguageChangedTitle" xml:space="preserve">
+    <value>Language Changed</value>
+  </data>
+    <data name="LanguageChangedMessage" xml:space="preserve">
+    <value>Language changed successfully. Please restart the application to apply the changes.</value>
+  </data>
+    <data name="AboutTitle" xml:space="preserve">
+    <value>About</value>
+  </data>
+    <data name="AboutMessage" xml:space="preserve">
+    <value>WinDirStat is a free program for analyzing disk space usage on your computer. It allows you to visualize the structure of files and folders, identify which files take up the most space, and manage your disk space effectively.</value>
+  </data>
 </root>

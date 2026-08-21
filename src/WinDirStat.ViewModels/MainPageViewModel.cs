@@ -17,14 +17,14 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _localizationService;
     private readonly IThemeService _themeService;
-    
+    private readonly INotificationService _notificationService;
     private readonly Stack<FileSystemNode> _treeMapHistory = new();
 
     private CancellationTokenSource? _scanCts;
 
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService, IWindowManagerService windowManagerService, IDialogService dialogService,
-        ILocalizationService localizationService, IThemeService themeService)
+        ILocalizationService localizationService, IThemeService themeService, INotificationService notificationService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -33,6 +33,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         _dialogService = dialogService;
         _localizationService = localizationService;
         _themeService = themeService;
+        _notificationService = notificationService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
@@ -104,6 +105,16 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         {
             var scanResult = await _diskScanService.ScanAsync(path, _scanCts.Token);
             _scanStateService.SetResult(scanResult);
+
+            var fileCount = 0;
+            var folderCount = 0;
+            CountNodes(scanResult.RootNode, ref fileCount, ref folderCount);
+
+            var title = _localizationService.GetString("ScanCompleteTitle");
+            var msg = string.Format(_localizationService.GetString("ScanCompleteMessageFormat"),
+                scanResult.ScanDuration.TotalSeconds, fileCount, folderCount);
+
+            _notificationService.ShowNotification(title, msg);
         }
         catch (OperationCanceledException)
         {
@@ -113,6 +124,17 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
             IsScanning = false;
             _scanCts?.Dispose();
             _scanCts = null;
+        }
+    }
+
+    private void CountNodes(FileSystemNode node, ref int fileCount, ref int folderCount)
+    {
+        if (node.IsDirectory) folderCount++;
+        else fileCount++;
+
+        foreach (var child in node.Children)
+        {
+            CountNodes(child, ref fileCount, ref folderCount);
         }
     }
 
@@ -209,17 +231,23 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
         _localizationService.SetLanguage(cultureCode);
 
-        var title = cultureCode == "uk-UA" ? "Зміна мови" : "Language Changed";
-        var message = cultureCode == "uk-UA"
-            ? "Мову успішно змінено. Будь ласка, перезапустіть програму, щоб зміни набули чинності."
-            : "Language changed successfully. Please restart the application to apply the changes.";
+        var title = _localizationService.GetString("LanguageChangedTitle");
+        var message = _localizationService.GetString("LanguageChangedMessage");
 
         await _dialogService.ShowMessageAsync(title, message);
     }
-    
+
     [RelayCommand]
     private void ToggleTheme()
     {
         _themeService.ToggleTheme();
+    }
+
+    [RelayCommand]
+    private async Task ShowAboutAsync()
+    {
+        var title = _localizationService.GetString("AboutTitle");
+        var message = _localizationService.GetString("AboutMessage");
+        await _dialogService.ShowMessageAsync(title, message);
     }
 }
