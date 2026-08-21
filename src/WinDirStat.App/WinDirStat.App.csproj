@@ -16,9 +16,10 @@
     <DefaultLanguage>uk-UA</DefaultLanguage>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\AppIcon.ico" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="Assets\AppIcon.ico" />
+        <Content Include="Assets\*.png" />
+    </ItemGroup>
 
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
