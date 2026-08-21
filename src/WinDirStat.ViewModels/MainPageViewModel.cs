@@ -87,8 +87,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task OpenFolderAsync()
     {
-        // TODO: (Elevated Support) Замінити FolderPicker на класичний IFileOpenDialog для підтримки режиму Адміністратора. 
-        // Поточний пікер конфліктує з правами Windows і видає помилку при спробі відкрити вікно.
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 

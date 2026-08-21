@@ -16,6 +16,12 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        
+        if (ElevationHelper.IsElevated())
+        {
+            PrivilegeHelper.EnableBackupPrivilege();
+        }
+        
         Services = ConfigureServices();
     }
 

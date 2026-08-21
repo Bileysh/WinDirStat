@@ -16,7 +16,7 @@ public class DiskScanService : IDiskScanService
     {
         RecurseSubdirectories = false,
         AttributesToSkip = 0,
-        IgnoreInaccessible = true
+        IgnoreInaccessible = false
     };
 
     private static FileSystemEnumerable<ScanEntry> EnumerateEntries(string path) =>
@@ -69,42 +69,52 @@ public class DiskScanService : IDiskScanService
         };
 
         if (attributes.HasFlag(FileAttributes.ReparsePoint))
-            return node;
-
-        IEnumerable<ScanEntry> entries;
-        try { entries = EnumerateEntries(fullPath); }
-        catch (IOException) { return node; }
-
-        foreach (var entry in entries)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (entry.IsDirectory)
+            node.Status = ScanStatus.ReparsePoint;
+            return node;
+        }
+        
+        try
+        {
+            foreach (var entry in EnumerateEntries(fullPath))
             {
-                var childNode = ScanDirectory(entry.Name, entry.FullPath, entry.Attributes,
-                    entry.LastWriteTimeUtc, clusterSize, cancellationToken);
-                node.Children.Add(childNode);
-                node.SizeLogical += childNode.SizeLogical;
-                node.SizePhysical += childNode.SizePhysical;
-            }
-            else
-            {
-                var physicalSize = DiskSizeHelper.GetPhysicalSize(entry.FullPath, entry.Attributes, entry.Length, clusterSize);
+                cancellationToken.ThrowIfCancellationRequested();
 
-                var fileNode = new FileSystemNode
+                if (entry.IsDirectory)
                 {
-                    Name = entry.Name,
-                    FullPath = entry.FullPath,
-                    IsDirectory = false,
-                    Extension = Path.GetExtension(entry.Name),
-                    SizeLogical = entry.Length,
-                    SizePhysical = physicalSize >= 0 ? physicalSize : entry.Length,
-                    LastModified = entry.LastWriteTimeUtc
-                };
-                node.Children.Add(fileNode);
-                node.SizeLogical += fileNode.SizeLogical;
-                node.SizePhysical += fileNode.SizePhysical;
+                    var childNode = ScanDirectory(entry.Name, entry.FullPath, entry.Attributes,
+                        entry.LastWriteTimeUtc, clusterSize, cancellationToken);
+                    node.Children.Add(childNode);
+                    node.SizeLogical += childNode.SizeLogical;
+                    node.SizePhysical += childNode.SizePhysical;
+                }
+                else
+                {
+                    var physicalSize = DiskSizeHelper.GetPhysicalSize(entry.FullPath, entry.Attributes, entry.Length, clusterSize);
+                    var fileNode = new FileSystemNode
+                    {
+                        Name = entry.Name,
+                        FullPath = entry.FullPath,
+                        IsDirectory = false,
+                        Extension = Path.GetExtension(entry.Name),
+                        SizeLogical = entry.Length,
+                        SizePhysical = physicalSize >= 0 ? physicalSize : entry.Length,
+                        LastModified = entry.LastWriteTimeUtc
+                    };
+                    node.Children.Add(fileNode);
+                    node.SizeLogical += fileNode.SizeLogical;
+                    node.SizePhysical += fileNode.SizePhysical;
+                }
             }
+        }
+        catch (UnauthorizedAccessException)
+        {
+            node.Status = ScanStatus.AccessDenied;
+        }
+        catch (IOException)
+        {
+            node.Status = ScanStatus.Error;
+            node.ErrorMessage = "IO error while enumerating";
         }
 
         return node;
