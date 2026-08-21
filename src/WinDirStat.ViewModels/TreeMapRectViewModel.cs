@@ -1,9 +1,11 @@
+using System.Diagnostics;
+using CommunityToolkit.Mvvm.Input;
 using WinDirStat.Core.Classification;
 using WinDirStat.Core.Entities;
 
 namespace WinDirStat.ViewModels;
 
-public class TreeMapRectViewModel
+public partial class TreeMapRectViewModel
 {
     public FileSystemNode Node { get; }
     public double X { get; }
@@ -36,5 +38,36 @@ public class TreeMapRectViewModel
 
         IsTitleVisible = Width > TreeMapConstants.MinWidthForTitle && Height > TreeMapConstants.MinHeightForTitle;
         IsSizeVisible = !IsFolder && Width > TreeMapConstants.MinWidthForSize && Height > TreeMapConstants.MinHeightForSize;
+    }
+    
+    [RelayCommand]
+    private void OpenInExplorer()
+    {
+        if (string.IsNullOrEmpty(Node.FullPath)) return;
+
+        try
+        {
+            if (IsFolder)
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Node.FullPath,
+                    UseShellExecute = true,
+                    Verb = "open"
+                });
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "explorer.exe",
+                    Arguments = $"/select,\"{Node.FullPath}\"",
+                    UseShellExecute = true
+                });
+            }
+        }
+        catch
+        {
+        }
     }
 }
