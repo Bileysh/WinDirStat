@@ -65,13 +65,20 @@
                                 BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
                                 ToolTipService.ToolTip="{x:Bind ToolTipText}"
                                 Tapped="OnRectTapped">
-                            
+
                             <Border.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem x:Uid="MenuShowInExplorer"
                                                     Command="{x:Bind OpenInExplorerCommand}">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xEC50;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem x:Uid="MenuShowProperties"
+                                                    Command="{x:Bind ShowPropertiesCommand}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE946;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                 </MenuFlyout>

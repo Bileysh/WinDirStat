@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.Input;
 using WinDirStat.Core.Classification;
 using WinDirStat.Core.Entities;
@@ -19,6 +20,7 @@ public partial class TreeMapRectViewModel
     public string SizeFormatted { get; }
     public bool IsSizeVisible { get; }
     public bool IsFolder { get; }
+
     public TreeMapRectViewModel(TreeMapRect rect)
     {
         Node = rect.Node;
@@ -27,19 +29,20 @@ public partial class TreeMapRectViewModel
         Width = rect.Width;
         Height = rect.Height;
         Name = rect.Node.Name;
-        
+
         IsFolder = rect.Node.IsDirectory;
-        Category = IsFolder 
-            ? FileCategory.Folder 
+        Category = IsFolder
+            ? FileCategory.Folder
             : FileCategoryClassifier.Classify(rect.Node.Extension);
-        
+
         SizeFormatted = SizeFormatter.Format(rect.Node.SizeLogical);
         ToolTipText = $"{rect.Node.Name}\n{SizeFormatted}";
 
         IsTitleVisible = Width > TreeMapConstants.MinWidthForTitle && Height > TreeMapConstants.MinHeightForTitle;
-        IsSizeVisible = !IsFolder && Width > TreeMapConstants.MinWidthForSize && Height > TreeMapConstants.MinHeightForSize;
+        IsSizeVisible = !IsFolder && Width > TreeMapConstants.MinWidthForSize &&
+                        Height > TreeMapConstants.MinHeightForSize;
     }
-    
+
     [RelayCommand]
     private void OpenInExplorer()
     {
@@ -69,5 +72,28 @@ public partial class TreeMapRectViewModel
         catch
         {
         }
+    }
+
+    [RelayCommand]
+    private void ShowProperties()
+    {
+        if (string.IsNullOrEmpty(Node.FullPath)) return;
+
+        try
+        {
+            ShellInterop.SHObjectProperties(IntPtr.Zero, ShellInterop.SHOP_FILEPATH, Node.FullPath, null);
+        }
+        catch
+        {
+        }
+    }
+
+    private static class ShellInterop
+    {
+        public const uint SHOP_FILEPATH = 0x2;
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool SHObjectProperties(
+            IntPtr hwnd, uint shopObjectType, string pszObjectName, string? pszPropertyPage);
     }
 }
