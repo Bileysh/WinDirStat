@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Windows.ApplicationModel;
 
 namespace WinDirStat_App.Services;
 
 internal static class ElevatedRelauncher
 {
     private const string ApplicationActivationManagerClsid = "45BA127D-10A8-46EA-8AB7-56EA9078943C";
+    private static readonly Guid IidApplicationActivationManager = new("2E941141-7F97-4756-BA1D-9DECDE894A3D");
 
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -42,8 +44,54 @@ internal static class ElevatedRelauncher
         [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
 
     private const int CLSCTX_LOCAL_SERVER = 0x4;
-    
+
     public static bool TryLaunchElevatedClassic()
+    {
+        var aumid = GetCurrentAppUserModelId();
+        return aumid is not null
+            ? TryLaunchViaActivationManager(aumid)
+            : TryLaunchViaProcessStart();
+    }
+
+    private static string? GetCurrentAppUserModelId()
+    {
+        try
+        {
+            return $"{Package.Current.Id.FamilyName}!App";
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    private static bool TryLaunchViaActivationManager(string appUserModelId)
+    {
+        try
+        {
+            var bindOptions = new BIND_OPTS3
+            {
+                cbStruct = Marshal.SizeOf<BIND_OPTS3>(),
+                dwClassContext = CLSCTX_LOCAL_SERVER
+            };
+
+            var moniker = $"Elevation:Administrator!new:{{{ApplicationActivationManagerClsid}}}";
+            var iid = IidApplicationActivationManager;
+
+            var hr = CoGetObject(moniker, ref bindOptions, ref iid, out var comObject);
+            if (hr != 0 || comObject is not IApplicationActivationManager manager)
+                return false;
+
+            hr = manager.ActivateApplication(appUserModelId, string.Empty, 0, out _);
+            return hr == 0;
+        }
+        catch (COMException)
+        {
+            return false;
+        }
+    }
+
+    private static bool TryLaunchViaProcessStart()
     {
         try
         {
@@ -62,7 +110,7 @@ internal static class ElevatedRelauncher
         }
         catch (System.ComponentModel.Win32Exception)
         {
-            return false; // користувач відхилив UAC або інша системна помилка
+            return false;
         }
     }
 }

@@ -188,4 +188,25 @@
     <data name="MenuShowInExplorer.Text" xml:space="preserve">
     <value>Показати в Провіднику</value>
   </data>
+    <data name="SelectDriveHeader.Text" xml:space="preserve">
+    <value>Оберіть диск для сканування</value>
+  </data>
+    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
+    <value>Обрати іншу папку…</value>
+  </data>
+    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Оновити список дисків</value>
+  </data>
+    <data name="SelectDriveHeader.Text" xml:space="preserve">
+    <value>Оберіть диск для сканування</value>
+  </data>
+    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
+    <value>Обрати іншу папку…</value>
+  </data>
+    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Оновити список дисків</value>
+  </data>
+    <data name="MenuShowProperties.Text" xml:space="preserve">
+    <value>Властивості</value>
+  </data>
 </root>
