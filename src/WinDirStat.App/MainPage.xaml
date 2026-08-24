@@ -14,6 +14,8 @@
     <Page.Resources>
         <converters:FileCategoryToBrushConverter x:Key="CategoryToBrushConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <!-- 🟢 Додаємо конвертер для видимості шляху -->
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     </Page.Resources>
 
     <Grid>
@@ -52,12 +54,25 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="6*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="4*" />
+                <RowDefinition Height="Auto" /> <!-- 🟢 Рядок 0: Для глобального шляху -->
+                <RowDefinition Height="6*" />   <!-- 🟢 Рядок 1: Дерево і статистика -->
+                <RowDefinition Height="Auto" /> <!-- 🟢 Рядок 2: Спліттер -->
+                <RowDefinition Height="4*" />   <!-- 🟢 Рядок 3: Мапа файлів -->
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
+            <!-- 🟢 ПАНЕЛЬ ГЛОБАЛЬНОГО ШЛЯХУ -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8,8,8,0"
+                        Visibility="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
+                <FontIcon Glyph="&#xE8B7;" FontSize="14" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Text="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay}" 
+                           FontSize="14" FontWeight="SemiBold" 
+                           Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTipService.ToolTip="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="6*" />
                     <ColumnDefinition Width="Auto" />
@@ -102,10 +117,10 @@
                 </Border>
             </Grid>
 
-            <sizers:GridSplitter Grid.Row="1" Height="8" Cursor="SizeNorthSouth" Background="Transparent"
+            <sizers:GridSplitter Grid.Row="2" Height="8" Cursor="SizeNorthSouth" Background="Transparent"
                                  ResizeBehavior="BasedOnAlignment" />
 
-            <Border Grid.Row="2" Margin="8" CornerRadius="4" BorderThickness="1"
+            <Border Grid.Row="3" Margin="8" CornerRadius="4" BorderThickness="1"
                     BorderBrush="{ThemeResource SystemControlForegroundChromeDisabledLowBrush}"
                     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
                 <Grid RowDefinitions="Auto,*">
@@ -121,7 +136,7 @@
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Row="0" Grid.RowSpan="3" 
+            <StackPanel Grid.Row="0" Grid.RowSpan="4" 
                         HorizontalAlignment="Center" VerticalAlignment="Center"
                         Spacing="16"
                         Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">

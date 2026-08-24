@@ -127,16 +127,40 @@
     <data name="ScanCompleteMessageFormat" xml:space="preserve">
     <value>Time: {0:F1} sec. Files: {1} Folders: {2}</value>
   </data>
-    <data name="LanguageChangedTitle" xml:space="preserve">
-    <value>Language Changed</value>
-  </data>
-    <data name="LanguageChangedMessage" xml:space="preserve">
-    <value>Language changed successfully. Please restart the application to apply the changes.</value>
-  </data>
     <data name="AboutTitle" xml:space="preserve">
     <value>About</value>
   </data>
     <data name="AboutMessage" xml:space="preserve">
     <value>WinDirStat is a free program for analyzing disk space usage on your computer. It allows you to visualize the structure of files and folders, identify which files take up the most space, and manage your disk space effectively.</value>
+  </data>
+    <data name="FilesText" xml:space="preserve">
+    <value>files</value>
+  </data>
+    <data name="FoldersText" xml:space="preserve">
+    <value>folders</value>
+  </data>
+    <data name="AccessDeniedText" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+    <data name="ScanErrorText" xml:space="preserve">
+    <value>Scan error</value>
+  </data>
+    <data name="ReparsePointText" xml:space="preserve">
+    <value>Junction/reparse point — not scanned to avoid double-counting or infinite recursion</value>
+  </data>
+    <data name="WindowTitle_New" xml:space="preserve">
+    <value>WinDirStat - New window</value>
+  </data>
+    <data name="WindowTitle_Statistics" xml:space="preserve">
+    <value>Statistics (Detached)</value>
+  </data>
+    <data name="WindowTitle_TreeView" xml:space="preserve">
+    <value>Directory Tree (Detached)</value>
+  </data>
+    <data name="WindowTitle_TreeMap" xml:space="preserve">
+    <value>File Map (Detached)</value>
+  </data>
+    <data name="MenuShowInExplorer.Text" xml:space="preserve">
+    <value>Show in Explorer</value>
   </data>
 </root>

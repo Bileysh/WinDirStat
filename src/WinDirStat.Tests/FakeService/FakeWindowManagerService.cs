@@ -9,4 +9,5 @@ public class FakeWindowManagerService : IWindowManagerService
     
     public void OpenTreeViewWindow() { }
     public void OpenTreeMapWindow() { }
+    public void ReloadMainWindowContent() { }
 }

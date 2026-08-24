@@ -51,7 +51,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private bool _groupByCategory;
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsTreeMapNavigated))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTreeMapNavigated))]
+    [NotifyPropertyChangedFor(nameof(TreeMapRelativePath))]
+    [NotifyPropertyChangedFor(nameof(TreeMapAbsoluteRootPath))]
     private FileSystemNode? _currentTreeMapRoot;
 
     public bool IsTreeMapNavigated => _treeMapHistory.Count > 0;
@@ -223,16 +226,13 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task ChangeLanguageAsync(string cultureCode)
+    private void ChangeLanguage(string cultureCode)
     {
         if (_localizationService.CurrentLanguage == cultureCode) return;
 
         _localizationService.SetLanguage(cultureCode);
 
-        var title = _localizationService.GetString("LanguageChangedTitle");
-        var message = _localizationService.GetString("LanguageChangedMessage");
-
-        await _dialogService.ShowMessageAsync(title, message);
+        _windowManagerService.ReloadMainWindowContent();
     }
 
     [RelayCommand]
@@ -248,4 +248,20 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         var message = _localizationService.GetString("AboutMessage");
         await _dialogService.ShowMessageAsync(title, message);
     }
+    
+    public string TreeMapAbsoluteRootPath => _scanStateService.CurrentResult?.RootPath ?? string.Empty;
+
+    public string TreeMapRelativePath
+    {
+        get
+        {
+            var root = TreeMapAbsoluteRootPath;
+            var current = CurrentTreeMapRoot?.FullPath ?? string.Empty;
+            if (string.IsNullOrEmpty(root) || !current.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                return string.Empty;
+            return current[root.Length..];
+            
+        }
+    }
+
 }
