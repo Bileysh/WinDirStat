@@ -18,13 +18,15 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly ILocalizationService _localizationService;
     private readonly IThemeService _themeService;
     private readonly INotificationService _notificationService;
+    private readonly IDriveInfoService _driveInfoService;
     private readonly Stack<FileSystemNode> _treeMapHistory = new();
 
     private CancellationTokenSource? _scanCts;
 
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService, IWindowManagerService windowManagerService, IDialogService dialogService,
-        ILocalizationService localizationService, IThemeService themeService, INotificationService notificationService)
+        ILocalizationService localizationService, IThemeService themeService, INotificationService notificationService,
+        IDriveInfoService driveInfoService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -34,16 +36,31 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         _localizationService = localizationService;
         _themeService = themeService;
         _notificationService = notificationService;
+        _driveInfoService = driveInfoService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
         if (_scanStateService.CurrentResult is not null)
+        {
             OnStateChanged(this, _scanStateService.CurrentResult);
+        }
+        else
+        {
+            LoadAvailableDrives();
+        }
     }
 
     [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty] private bool _isScanning;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
+    private bool _isScanning;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
+    private bool _hasScanResult;
+
+    [ObservableProperty] private ObservableCollection<DriveItemViewModel> _availableDrives = [];
+
+    public bool ShowDriveSelector => !IsScanning && !HasScanResult;
 
     [ObservableProperty] private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
 
@@ -66,6 +83,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         if (result is null) return;
 
         RootNodes = [new NodeViewModel(result.RootNode)];
+        HasScanResult = true;
 
         _treeMapHistory.Clear();
         CurrentTreeMapRoot = result.RootNode;
@@ -74,6 +92,15 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         RefreshStatistics();
         RefreshTreeMap();
     }
+
+    private void LoadAvailableDrives()
+    {
+        var drives = _driveInfoService.GetDrives().Select(d => new DriveItemViewModel(d));
+        AvailableDrives = new ObservableCollection<DriveItemViewModel>(drives);
+    }
+
+    [RelayCommand]
+    private void RefreshDrives() => LoadAvailableDrives();
 
     private void RefreshStatistics()
     {
@@ -94,6 +121,19 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         var path = await _folderPickerService.PickFolderAsync();
         if (path is null) return;
 
+        await ScanPathAsync(path);
+    }
+
+    [RelayCommand]
+    private async Task SelectDriveAsync(DriveItemViewModel? drive)
+    {
+        if (drive is null) return;
+
+        await ScanPathAsync(drive.RootPath);
+    }
+
+    private async Task ScanPathAsync(string path)
+    {
         CancelScan();
         _scanCts = new CancellationTokenSource();
 
@@ -248,7 +288,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         var message = _localizationService.GetString("AboutMessage");
         await _dialogService.ShowMessageAsync(title, message);
     }
-    
+
     public string TreeMapAbsoluteRootPath => _scanStateService.CurrentResult?.RootPath ?? string.Empty;
 
     public string TreeMapRelativePath
@@ -260,8 +300,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
             if (string.IsNullOrEmpty(root) || !current.StartsWith(root, StringComparison.OrdinalIgnoreCase))
                 return string.Empty;
             return current[root.Length..];
-            
         }
     }
-
 }

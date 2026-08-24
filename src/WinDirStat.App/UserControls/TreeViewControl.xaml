@@ -8,7 +8,7 @@
     <UserControl.Resources>
         <converters:NodeSummaryConverter x:Key="NodeSummaryConverter" />
     </UserControl.Resources>
-    
+
     <Grid>
         <TextBlock Grid.Row="1" x:Uid="NoDataText" HorizontalAlignment="Center" VerticalAlignment="Center"
                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
@@ -28,7 +28,8 @@
                             <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7" />
                             <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5" />
                             <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50" />
-                            <TextBlock Text="{x:Bind Converter={StaticResource NodeSummaryConverter}}" />                        </StackPanel>
+                            <TextBlock Text="{x:Bind Converter={StaticResource NodeSummaryConverter}}" />
+                        </StackPanel>
                     </TreeViewItem>
                 </DataTemplate>
             </TreeView.ItemTemplate>

@@ -7,7 +7,7 @@ namespace WinDirStat_App.Services;
 
 public class WinUiLocalizationService : ILocalizationService
 {
-    private readonly ResourceLoader _resourceLoader = new();
+    private readonly ResourceManager _resourceManager = new();
 
     public string CurrentLanguage
     {
@@ -24,17 +24,13 @@ public class WinUiLocalizationService : ILocalizationService
         CultureInfo.CurrentUICulture = culture;
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
-
-        CurrentLanguage = cultureCode;
     }
 
     public string GetString(string key)
     {
-        var resourceManager = new ResourceManager();
-        var resourceContext = resourceManager.CreateResourceContext();
+        var resourceContext = _resourceManager.CreateResourceContext();
         resourceContext.QualifierValues["Language"] = CurrentLanguage;
-        
-        return resourceManager.MainResourceMap.GetValue($"Resources/{key}", resourceContext).ValueAsString;
+
+        return _resourceManager.MainResourceMap.GetValue($"Resources/{key}", resourceContext).ValueAsString;
     }
-    
 }

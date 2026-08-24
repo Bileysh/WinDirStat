@@ -10,6 +10,6 @@ public class FakeLocalizationService : ILocalizationService
     {
         CurrentLanguage = cultureCode;
     }
-    
+
     public string GetString(string key) => key;
 }

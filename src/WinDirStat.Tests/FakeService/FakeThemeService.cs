@@ -2,7 +2,7 @@ using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.Tests.FakeService;
 
-public class FakeThemeService: IThemeService
+public class FakeThemeService : IThemeService
 {
     public bool IsDarkTheme { get; private set; } = false;
 
@@ -12,5 +12,5 @@ public class FakeThemeService: IThemeService
     {
         IsDarkTheme = !IsDarkTheme;
         ThemeChanged?.Invoke(this, IsDarkTheme);
-    }   
+    }
 }

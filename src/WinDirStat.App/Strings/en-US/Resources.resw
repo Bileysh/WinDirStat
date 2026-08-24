@@ -163,4 +163,25 @@
     <data name="MenuShowInExplorer.Text" xml:space="preserve">
     <value>Show in Explorer</value>
   </data>
+    <data name="SelectDriveHeader.Text" xml:space="preserve">
+    <value>Select a drive to scan</value>
+  </data>
+    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
+    <value>Select custom folder…</value>
+  </data>
+    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh drive list</value>
+  </data>
+    <data name="SelectDriveHeader.Text" xml:space="preserve">
+    <value>Select a drive to scan</value>
+  </data>
+    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
+    <value>Select custom folder…</value>
+  </data>
+    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh drive list</value>
+  </data>
+    <data name="MenuShowProperties.Text" xml:space="preserve">
+    <value>Properties</value>
+  </data>
 </root>

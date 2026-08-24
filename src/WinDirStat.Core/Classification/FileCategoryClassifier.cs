@@ -20,14 +20,16 @@ public static class FileCategoryClassifier
             foreach (var ext in extensions) map[ext] = category;
         }
 
-        Add(FileCategory.Development, ".cs", ".cpp", ".h", ".hpp", ".js", ".ts", ".json", ".xml", ".csproj", ".sln", ".ipch", ".pdb", ".obj", ".bin", ".vsix");
+        Add(FileCategory.Development, ".cs", ".cpp", ".h", ".hpp", ".js", ".ts", ".json", ".xml", ".csproj", ".sln",
+            ".ipch", ".pdb", ".obj", ".bin", ".vsix");
         Add(FileCategory.VirtualDisks, ".vhd", ".vhdx", ".vmdk", ".vdi", ".ova");
-        Add(FileCategory.System, ".dll", ".sys", ".ini", ".log", ".tmp", ".cache", ".nvph", ".dat", ".db", ".sqlite", ".bak");        
+        Add(FileCategory.System, ".dll", ".sys", ".ini", ".log", ".tmp", ".cache", ".nvph", ".dat", ".db", ".sqlite",
+            ".bak");
         Add(FileCategory.Documents, ".doc", ".docx", ".pdf", ".txt", ".xls", ".xlsx", ".rtf", ".ppt", ".pptx", ".csv");
         Add(FileCategory.Videos, ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm");
         Add(FileCategory.Audio, ".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a");
         Add(FileCategory.Images, ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".tiff", ".ico");
-        Add(FileCategory.Archives, ".zip", ".rar", ".7z", ".tar", ".gz", ".iso", ".nupkg");       
+        Add(FileCategory.Archives, ".zip", ".rar", ".7z", ".tar", ".gz", ".iso", ".nupkg");
         Add(FileCategory.Executables, ".exe", ".msi", ".bat", ".cmd", ".sh", ".apk", ".app", ".jar");
         return map;
     }

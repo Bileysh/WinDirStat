@@ -4,7 +4,8 @@ namespace WinDirStat.Core.Classification;
 
 public static class FileStatisticsAggregator
 {
-    public static (List<FileTypeStatisticsEntry> ByExtension, List<FileTypeStatisticsEntry> ByCategory) ComputeAll(FileSystemNode root)
+    public static (List<FileTypeStatisticsEntry> ByExtension, List<FileTypeStatisticsEntry> ByCategory) ComputeAll(
+        FileSystemNode root)
     {
         var files = EnumerateFiles(root).ToList();
 
@@ -42,7 +43,12 @@ public static class FileStatisticsAggregator
 
     private static IEnumerable<FileSystemNode> EnumerateFiles(FileSystemNode node)
     {
-        if (!node.IsDirectory) { yield return node; yield break; }
+        if (!node.IsDirectory)
+        {
+            yield return node;
+            yield break;
+        }
+
         foreach (var child in node.Children)
         foreach (var file in EnumerateFiles(child))
             yield return file;

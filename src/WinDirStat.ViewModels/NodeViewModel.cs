@@ -52,9 +52,9 @@ public partial class NodeViewModel : ObservableObject
 
     public string StatusGlyph => _node.Status switch
     {
-        ScanStatus.AccessDenied => "\uE72E", 
-        ScanStatus.Error => "\uE783", 
-        ScanStatus.ReparsePoint => "\uE71B", 
+        ScanStatus.AccessDenied => "\uE72E",
+        ScanStatus.Error => "\uE783",
+        ScanStatus.ReparsePoint => "\uE71B",
         _ => string.Empty
     };
 

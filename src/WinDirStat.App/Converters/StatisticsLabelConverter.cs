@@ -9,7 +9,7 @@ namespace WinDirStat_App.Converters;
 public class StatisticsLabelConverter : IValueConverter
 {
     private ResourceLoader? _resourceLoader;
-    
+
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is FileTypeStatisticsViewModel vm)
@@ -17,7 +17,7 @@ public class StatisticsLabelConverter : IValueConverter
             if (vm.IsCategoryGroup)
             {
                 _resourceLoader ??= new ResourceLoader();
-                
+
                 return vm.Category switch
                 {
                     FileCategory.Documents => _resourceLoader.GetString("Category_Documents"),
@@ -34,12 +34,13 @@ public class StatisticsLabelConverter : IValueConverter
                     _ => vm.Category.ToString()
                 };
             }
-            
+
             return vm.Label;
         }
+
         return string.Empty;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language) => 
+    public object ConvertBack(object value, Type targetType, object parameter, string language) =>
         throw new NotSupportedException();
 }

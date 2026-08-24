@@ -7,13 +7,21 @@ namespace WinDirStat_App.Services;
 
 public class FolderPickerService : IFolderPickerService
 {
+    private readonly ILocalizationService _localizationService;
+
+    public FolderPickerService(ILocalizationService localizationService)
+    {
+        _localizationService = localizationService;
+    }
+
     public Task<string?> PickFolderAsync()
     {
         var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
 
         if (ElevationHelper.IsElevated())
         {
-            return Task.FromResult(ClassicFolderPicker.Show(hwnd, "Оберіть папку для сканування"));
+            var title = _localizationService.GetString("FolderPickerTitle");
+            return Task.FromResult(ClassicFolderPicker.Show(hwnd, title));
         }
 
         return PickFolderNormalAsync(hwnd);

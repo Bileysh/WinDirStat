@@ -16,12 +16,12 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        
+
         if (ElevationHelper.IsElevated())
         {
             PrivilegeHelper.EnableBackupPrivilege();
         }
-        
+
         Services = ConfigureServices();
     }
 
@@ -29,7 +29,7 @@ public partial class App : Application
     {
         var mainPage = Services.GetRequiredService<MainPage>();
         _mWindow = new MainWindow(mainPage);
-        MainWindow = _mWindow; 
+        MainWindow = _mWindow;
         _mWindow.Activate();
     }
 
@@ -39,13 +39,14 @@ public partial class App : Application
         services.AddTransient<MainPageViewModel>();
         services.AddTransient<MainPage>();
         services.AddSingleton<IDiskScanService, DiskScanService>();
-        services.AddSingleton<IFolderPickerService, FolderPickerService>(); 
+        services.AddSingleton<IFolderPickerService, FolderPickerService>();
         services.AddSingleton<IScanStateService, ScanStateService>();
         services.AddSingleton<IWindowManagerService, WindowManagerService>();
-        services.AddSingleton<IDialogService, WinUIDialogService>();
+        services.AddSingleton<IDialogService, WinUiDialogService>();
         services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
         services.AddSingleton<IThemeService, WinUiThemeService>();
-        services.AddSingleton<INotificationService, WinUiNotificationService>(); 
+        services.AddSingleton<INotificationService, WinUiNotificationService>();
+        services.AddSingleton<IDriveInfoService, DriveInfoService>();
         return services.BuildServiceProvider();
     }
 }

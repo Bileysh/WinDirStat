@@ -1,23 +1,25 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
-using Microsoft.Windows.ApplicationModel.Resources;
 using System;
+using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
 
 namespace WinDirStat_App.Converters;
 
 public class NodeSummaryConverter : IValueConverter
 {
-    private readonly ResourceLoader _resourceLoader = new();
-
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is NodeViewModel node && node.IsDirectory)
         {
-            var filesText = _resourceLoader.GetString("FilesText");
-            var foldersText = _resourceLoader.GetString("FoldersText");
-            
+            var localizationService = ((App)Application.Current).Services.GetRequiredService<ILocalizationService>();
+            var filesText = localizationService.GetString("FilesText");
+            var foldersText = localizationService.GetString("FoldersText");
+
             return $"{node.ChildFileCount} {filesText}, {node.ChildDirectoryCount} {foldersText}";
         }
+
         return string.Empty;
     }
 
