@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <Page
     x:Class="WinDirStat_App.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -14,7 +15,6 @@
     <Page.Resources>
         <converters:FileCategoryToBrushConverter x:Key="CategoryToBrushConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <!-- 🟢 Додаємо конвертер для видимості шляху -->
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     </Page.Resources>
 
@@ -31,45 +31,47 @@
                 <MenuFlyoutItem x:Uid="MenuFileExit" Icon="Cancel" />
             </MenuBarItem>
             <MenuBarItem x:Uid="MenuWindow">
-                <MenuFlyoutItem x:Uid="MenuWindowOpenNew" Icon="NewWindow" Command="{x:Bind ViewModel.OpenInNewWindowCommand}" />
+                <MenuFlyoutItem x:Uid="MenuWindowOpenNew" Icon="NewWindow"
+                                Command="{x:Bind ViewModel.OpenInNewWindowCommand}" />
             </MenuBarItem>
             <MenuBarItem x:Uid="MenuOptions">
                 <MenuFlyoutItem x:Uid="MenuOptionsShowFreeSpace" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutSubItem x:Uid="MenuOptionsLanguage" Icon="Globe">
-                    <MenuFlyoutItem Text="Українська" 
-                                    Command="{x:Bind ViewModel.ChangeLanguageCommand}" 
+                    <MenuFlyoutItem Text="Українська"
+                                    Command="{x:Bind ViewModel.ChangeLanguageCommand}"
                                     CommandParameter="uk-UA" />
-                    <MenuFlyoutItem Text="English" 
-                                    Command="{x:Bind ViewModel.ChangeLanguageCommand}" 
+                    <MenuFlyoutItem Text="English"
+                                    Command="{x:Bind ViewModel.ChangeLanguageCommand}"
                                     CommandParameter="en-US" />
                 </MenuFlyoutSubItem>
-                <MenuFlyoutItem x:Uid="MenuOptionsTheme" Icon="Highlight" Command="{x:Bind ViewModel.ToggleThemeCommand}" />
+                <MenuFlyoutItem x:Uid="MenuOptionsTheme" Icon="Highlight"
+                                Command="{x:Bind ViewModel.ToggleThemeCommand}" />
             </MenuBarItem>
 
             <MenuBarItem x:Uid="MenuHelp">
-                <MenuFlyoutItem x:Uid="MenuHelpAbout" Icon="Help" Command="{x:Bind ViewModel.ShowAboutCommand}"/>
+                <MenuFlyoutItem x:Uid="MenuHelpAbout" Icon="Help" Command="{x:Bind ViewModel.ShowAboutCommand}" />
             </MenuBarItem>
         </MenuBar>
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" /> <!-- 🟢 Рядок 0: Для глобального шляху -->
-                <RowDefinition Height="6*" />   <!-- 🟢 Рядок 1: Дерево і статистика -->
-                <RowDefinition Height="Auto" /> <!-- 🟢 Рядок 2: Спліттер -->
-                <RowDefinition Height="4*" />   <!-- 🟢 Рядок 3: Мапа файлів -->
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="6*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="4*" />
             </Grid.RowDefinitions>
 
-            <!-- 🟢 ПАНЕЛЬ ГЛОБАЛЬНОГО ШЛЯХУ -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8,8,8,0"
                         Visibility="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
-                <FontIcon Glyph="&#xE8B7;" FontSize="14" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
-                <TextBlock Text="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay}" 
-                           FontSize="14" FontWeight="SemiBold" 
+                <FontIcon Glyph="&#xE8B7;" FontSize="14"
+                          Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Text="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay}"
+                           FontSize="14" FontWeight="SemiBold"
                            Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
                            VerticalAlignment="Center"
                            TextTrimming="CharacterEllipsis"
-                           ToolTipService.ToolTip="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay}"/>
+                           ToolTipService.ToolTip="{x:Bind ViewModel.TreeMapAbsoluteRootPath, Mode=OneWay}" />
             </StackPanel>
 
             <Grid Grid.Row="1">
@@ -84,13 +86,14 @@
                         Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
                     <Grid RowDefinitions="Auto,*">
                         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="8,8,8,0">
-                            <TextBlock x:Uid="TreeViewHeader" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock x:Uid="TreeViewHeader" FontWeight="SemiBold" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Padding="4" Background="Transparent" BorderThickness="0"
-                                    x:Uid="OpenTreeViewWindowButton" Command="{x:Bind ViewModel.OpenTreeViewWindowCommand}">
-                                <FontIcon Glyph="&#xE8A7;" FontSize="14"/>
+                                    x:Uid="OpenTreeViewWindowButton"
+                                    Command="{x:Bind ViewModel.OpenTreeViewWindowCommand}">
+                                <FontIcon Glyph="&#xE8A7;" FontSize="14" />
                             </Button>
                         </Grid>
-                        
+
                         <uc:TreeViewControl Grid.Row="1" ViewModel="{x:Bind ViewModel}" />
                     </Grid>
                 </Border>
@@ -104,10 +107,11 @@
                     <Grid>
                         <Grid RowDefinitions="Auto,*">
                             <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="8,8,8,0">
-                                <TextBlock x:Uid="StatisticsHeader" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock x:Uid="StatisticsHeader" FontWeight="SemiBold" VerticalAlignment="Center" />
                                 <Button Grid.Column="1" Padding="4" Background="Transparent" BorderThickness="0"
-                                        x:Uid="OpenStatisticsWindowButton" Command="{x:Bind ViewModel.OpenStatisticsWindowCommand}">
-                                         <FontIcon Glyph="&#xE8A7;" FontSize="14"/>
+                                        x:Uid="OpenStatisticsWindowButton"
+                                        Command="{x:Bind ViewModel.OpenStatisticsWindowCommand}">
+                                    <FontIcon Glyph="&#xE8A7;" FontSize="14" />
                                 </Button>
                             </Grid>
 
@@ -125,30 +129,35 @@
                     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
                 <Grid RowDefinitions="Auto,*">
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="8,8,8,0">
-                        <TextBlock x:Uid="TreeMapHeader" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock x:Uid="TreeMapHeader" FontWeight="SemiBold" VerticalAlignment="Center" />
                         <Button Grid.Column="1" Padding="4" Background="Transparent" BorderThickness="0"
                                 x:Uid="OpenTreeMapWindowButton" Command="{x:Bind ViewModel.OpenTreeMapWindowCommand}">
-                                <FontIcon Glyph="&#xE8A7;" FontSize="14"/>
+                            <FontIcon Glyph="&#xE8A7;" FontSize="14" />
                         </Button>
                     </Grid>
-                    
+
                     <uc:TreeMapControl Grid.Row="1" ViewModel="{x:Bind ViewModel}" />
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Row="0" Grid.RowSpan="4" 
+            <StackPanel Grid.Row="0" Grid.RowSpan="4"
                         HorizontalAlignment="Center" VerticalAlignment="Center"
                         Spacing="16"
                         Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-            
-                <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" 
-                              Width="64" Height="64" 
-                              HorizontalAlignment="Center"/>
-            
-                <Button x:Uid="CancelScanButton" Command="{x:Bind ViewModel.CancelScanCommand}" HorizontalAlignment="Center" />
-            
+
+                <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}"
+                              Width="64" Height="64"
+                              HorizontalAlignment="Center" />
+
+                <Button x:Uid="CancelScanButton" Command="{x:Bind ViewModel.CancelScanCommand}"
+                        HorizontalAlignment="Center" />
+
             </StackPanel>
-            
+
+            <uc:DriveSelectorControl Grid.Row="0" Grid.RowSpan="4"
+                                     ViewModel="{x:Bind ViewModel}"
+                                     Visibility="{x:Bind ViewModel.ShowDriveSelector, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
         </Grid>
     </Grid>
 </Page>
