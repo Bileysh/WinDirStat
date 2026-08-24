@@ -15,6 +15,10 @@
                     <TreeViewItem ItemsSource="{x:Bind Children}">
                         <StackPanel Orientation="Horizontal" Spacing="12">
                             <TextBlock Text="{x:Bind Name}" Width="220" />
+                            <TextBlock Text="{x:Bind StatusGlyph}" FontFamily="Segoe MDL2 Assets"
+                                       Width="16" Opacity="0.7"
+                                       Visibility="{x:Bind HasStatusIcon, Mode=OneWay}"
+                                       ToolTipService.ToolTip="{x:Bind StatusTooltip, Mode=OneWay}" />
                             <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7" />
                             <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7" />
                             <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5" />

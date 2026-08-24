@@ -10,4 +10,6 @@ public class FileSystemNode
     public long SizePhysical { get; set; }
     public DateTime LastModified { get; init; }
     public List<FileSystemNode> Children { get; } = [];
+    public ScanStatus Status { get; set; } = ScanStatus.Ok;
+    public string? ErrorMessage { get; set; }
 }

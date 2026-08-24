@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
 using WinDirStat_App.UserControls;
+using System.Diagnostics;
 
 namespace WinDirStat_App.Services;
 
