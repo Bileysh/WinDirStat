@@ -14,11 +14,11 @@
         <ToggleSwitch Grid.Row="0" Margin="8"
                       x:Uid="ToggleGroupBy"
                       IsOn="{x:Bind ViewModel.GroupByCategory, Mode=TwoWay}" />
-        
+
         <TextBlock Grid.Row="1" x:Uid="NoDataText" HorizontalAlignment="Center" VerticalAlignment="Center"
                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                    Visibility="{x:Bind GetNoDataVisibility(ViewModel.TypeStatistics.Count, ViewModel.IsScanning), Mode=OneWay}" />
-        
+
         <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.TypeStatistics, Mode=OneWay}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:FileTypeStatisticsViewModel">
@@ -34,7 +34,7 @@
                                       FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                       Opacity="0.8" />
 
-                            <TextBlock Text="{x:Bind Mode=OneWay, Converter={StaticResource StatisticsLabelConverter}}" 
+                            <TextBlock Text="{x:Bind Mode=OneWay, Converter={StaticResource StatisticsLabelConverter}}"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis" />
                         </StackPanel>

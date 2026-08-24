@@ -15,7 +15,8 @@ public static class PrivilegeHelper
     private static extern bool LookupPrivilegeValue(string? lpSystemName, string lpName, out LUID lpLuid);
 
     [DllImport("advapi32.dll", SetLastError = true)]
-    private static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TOKEN_PRIVILEGES NewState, int BufferLength, IntPtr PreviousState, IntPtr ReturnLength);
+    private static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges,
+        ref TOKEN_PRIVILEGES NewState, int BufferLength, IntPtr PreviousState, IntPtr ReturnLength);
 
     private const int TOKEN_ADJUST_PRIVILEGES = 0x0020;
     private const int TOKEN_QUERY = 0x0008;
@@ -36,7 +37,7 @@ public static class PrivilegeHelper
         public LUID Luid;
         public int Attributes;
     }
-    
+
     public static bool EnableBackupPrivilege()
     {
         try
@@ -55,7 +56,7 @@ public static class PrivilegeHelper
             };
 
             var result = AdjustTokenPrivileges(tokenHandle, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero);
-            
+
             return result && Marshal.GetLastWin32Error() == 0;
         }
         catch

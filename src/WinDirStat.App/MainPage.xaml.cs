@@ -12,9 +12,8 @@ public sealed partial class MainPage : Page
         ViewModel = viewModel;
         InitializeComponent();
         Unloaded += (_, _) => ViewModel.Dispose();
-
     }
-    
+
     private void TreeMapContainer_SizeChanged(object sender, Microsoft.UI.Xaml.SizeChangedEventArgs e)
     {
         if (e.NewSize.Width > 0 && e.NewSize.Height > 0)
@@ -22,11 +21,11 @@ public sealed partial class MainPage : Page
             ViewModel.UpdateTreeMapSize(e.NewSize.Width, e.NewSize.Height);
         }
     }
-    
+
     public Microsoft.UI.Xaml.Visibility GetNoDataVisibility(int count, bool isScanning)
     {
-        return (count == 0 && !isScanning) 
-            ? Microsoft.UI.Xaml.Visibility.Visible 
+        return (count == 0 && !isScanning)
+            ? Microsoft.UI.Xaml.Visibility.Visible
             : Microsoft.UI.Xaml.Visibility.Collapsed;
     }
 }

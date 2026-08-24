@@ -27,7 +27,7 @@ public class DiskScanServiceTests
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
 
         var service = new DiskScanService();
-        
+
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 

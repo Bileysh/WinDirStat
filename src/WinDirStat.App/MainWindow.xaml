@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <Window
     x:Class="WinDirStat_App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,7 +9,7 @@
     xmlns:tb="using:H.NotifyIcon"
     Title="WinDirStat.App"
     mc:Ignorable="d">
-    
+
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
@@ -20,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <TitleBar x:Name="AppTitleBar" Title="WinDirStat.App" />
-        
+
         <Frame x:Name="RootFrame" Grid.Row="1" />
 
         <tb:TaskbarIcon x:Name="TrayIcon"
@@ -33,6 +34,6 @@
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
-        
+
     </Grid>
 </Window>

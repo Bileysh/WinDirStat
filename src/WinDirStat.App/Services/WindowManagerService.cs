@@ -17,7 +17,9 @@ public class WindowManagerService : IWindowManagerService
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
     private readonly List<Window> _openWindows = new();
-    public WindowManagerService(IServiceProvider serviceProvider, IThemeService themeService, ILocalizationService localizationService)
+
+    public WindowManagerService(IServiceProvider serviceProvider, IThemeService themeService,
+        ILocalizationService localizationService)
     {
         _serviceProvider = serviceProvider;
         _themeService = themeService;
@@ -25,10 +27,11 @@ public class WindowManagerService : IWindowManagerService
 
         _themeService.ThemeChanged += OnThemeChanged;
     }
+
     private void OnThemeChanged(object? sender, bool isDark)
     {
         var theme = isDark ? ElementTheme.Dark : ElementTheme.Light;
-        
+
         if (App.MainWindow?.Content is FrameworkElement mainContent)
             mainContent.RequestedTheme = theme;
 
@@ -38,21 +41,23 @@ public class WindowManagerService : IWindowManagerService
                 fe.RequestedTheme = theme;
         }
     }
+
     public void OpenMainWindow()
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
-        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
+            MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var page = new MainPage(viewModel);
 
         page.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
-        
+
         newWindow.Content = page;
-        
+
         newWindow.Title = _localizationService.GetString("WindowTitle_New");
-        
+
         _openWindows.Add(newWindow);
         newWindow.Closed += (_, _) =>
         {
@@ -68,14 +73,16 @@ public class WindowManagerService : IWindowManagerService
         MainPageViewModel viewModel)
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
-        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
+            MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
-        
+
         var rootGrid = (Grid)XamlReader.Load(
             "<Grid xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' " +
             "Background='{ThemeResource ApplicationPageBackgroundThemeBrush}' />");
-        
-        rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
+
+        rootGrid.RowDefinitions.Add(new RowDefinition
+            { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var titleText = new TextBlock
@@ -94,7 +101,7 @@ public class WindowManagerService : IWindowManagerService
         rootGrid.Children.Add(content);
 
         rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
-        
+
         newWindow.Content = rootGrid;
         newWindow.Title = $"WinDirStat - {title}";
         _openWindows.Add(newWindow);
@@ -102,13 +109,14 @@ public class WindowManagerService : IWindowManagerService
         {
             _openWindows.Remove(newWindow);
             viewModel.Dispose();
-        };       
+        };
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
         OffsetWindowPosition(newWindow);
 
         return newWindow;
     }
+
     private void OffsetWindowPosition(Window newWindow)
     {
         if (App.MainWindow != null)
@@ -127,7 +135,8 @@ public class WindowManagerService : IWindowManagerService
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new StatisticsControl { ViewModel = viewModel };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_Statistics"), control,
-            WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, viewModel).Activate();
+                WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, viewModel)
+            .Activate();
     }
 
     public void OpenTreeViewWindow()
@@ -135,7 +144,8 @@ public class WindowManagerService : IWindowManagerService
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeViewControl { ViewModel = viewModel };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeView"), control,
-            WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, viewModel).Activate();
+                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, viewModel)
+            .Activate();
     }
 
     public void OpenTreeMapWindow()
@@ -143,7 +153,8 @@ public class WindowManagerService : IWindowManagerService
         var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
         var control = new TreeMapControl { ViewModel = viewModel };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeMap"), control,
-            WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, viewModel).Activate();
+                WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, viewModel)
+            .Activate();
     }
 
     public void ReloadMainWindowContent()
@@ -152,8 +163,9 @@ public class WindowManagerService : IWindowManagerService
         {
             win.Close();
         }
+
         _openWindows.Clear();
-        
+
         if (App.MainWindow is not MainWindow window) return;
 
         window.CurrentPage?.ViewModel.Dispose();

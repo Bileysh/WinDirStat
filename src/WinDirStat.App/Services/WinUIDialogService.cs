@@ -6,11 +6,11 @@ using WinDirStat.Services;
 
 namespace WinDirStat_App.Services;
 
-public class WinUIDialogService : IDialogService
+public class WinUiDialogService : IDialogService
 {
     public async Task ShowMessageAsync(string title, string message, string closeButtonText = "OK")
     {
-        var window = App.MainWindow; 
+        var window = App.MainWindow;
 
         if (window?.Content?.XamlRoot == null) return;
 

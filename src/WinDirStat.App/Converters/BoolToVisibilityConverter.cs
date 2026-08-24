@@ -12,6 +12,7 @@ public class BoolToVisibilityConverter : IValueConverter
         {
             return isVisible ? Visibility.Visible : Visibility.Collapsed;
         }
+
         return Visibility.Collapsed;
     }
 

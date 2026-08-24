@@ -9,8 +9,12 @@ namespace WinDirStat.Services;
 public class DiskScanService : IDiskScanService
 {
     private readonly record struct ScanEntry(
-        string Name, string FullPath, bool IsDirectory,
-        FileAttributes Attributes, long Length, DateTime LastWriteTimeUtc);
+        string Name,
+        string FullPath,
+        bool IsDirectory,
+        FileAttributes Attributes,
+        long Length,
+        DateTime LastWriteTimeUtc);
 
     private static readonly EnumerationOptions ScanOptions = new()
     {
@@ -21,12 +25,12 @@ public class DiskScanService : IDiskScanService
 
     private static FileSystemEnumerable<ScanEntry> EnumerateEntries(string path) =>
         new(path, (ref FileSystemEntry entry) => new ScanEntry(
-            entry.FileName.ToString(),
-            entry.ToFullPath(),
-            entry.IsDirectory,
-            entry.Attributes,
-            entry.Length,
-            entry.LastWriteTimeUtc.UtcDateTime),
+                entry.FileName.ToString(),
+                entry.ToFullPath(),
+                entry.IsDirectory,
+                entry.Attributes,
+                entry.Length,
+                entry.LastWriteTimeUtc.UtcDateTime),
             ScanOptions);
 
     public Task<ScanResult> ScanAsync(string rootPath, CancellationToken cancellationToken = default)
@@ -73,7 +77,7 @@ public class DiskScanService : IDiskScanService
             node.Status = ScanStatus.ReparsePoint;
             return node;
         }
-        
+
         try
         {
             foreach (var entry in EnumerateEntries(fullPath))
@@ -90,7 +94,8 @@ public class DiskScanService : IDiskScanService
                 }
                 else
                 {
-                    var physicalSize = DiskSizeHelper.GetPhysicalSize(entry.FullPath, entry.Attributes, entry.Length, clusterSize);
+                    var physicalSize =
+                        DiskSizeHelper.GetPhysicalSize(entry.FullPath, entry.Attributes, entry.Length, clusterSize);
                     var fileNode = new FileSystemNode
                     {
                         Name = entry.Name,

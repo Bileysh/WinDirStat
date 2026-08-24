@@ -6,7 +6,7 @@ namespace WinDirStat_App.Services;
 public class WinUiThemeService : IThemeService
 {
     public bool IsDarkTheme { get; private set; } = Application.Current.RequestedTheme == ApplicationTheme.Dark;
-    
+
     public event EventHandler<bool>? ThemeChanged;
 
     public void ToggleTheme()
