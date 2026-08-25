@@ -43,6 +43,8 @@
                                     Command="{x:Bind ViewModel.ChangeLanguageCommand}"
                                     CommandParameter="en-US" />
                 </MenuFlyoutSubItem>
+                <MenuFlyoutItem x:Uid="MenuOptionsTheme" Icon="Highlight"
+                                Command="{x:Bind ViewModel.ToggleThemeCommand}" />
             </MenuBarItem>
 
             <MenuBarItem x:Uid="MenuHelp">
