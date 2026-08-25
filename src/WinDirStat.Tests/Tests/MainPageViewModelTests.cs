@@ -12,7 +12,7 @@ public class MainPageViewModelTests
         var tempFolder = Directory.CreateTempSubdirectory();
 
         var vm = new MainPageViewModel(
-            new DiskScanService(),
+            new DiskScanService(new FileIdentityService()),
             new FakeFolderPickerService { PathToReturn = tempFolder.FullName },
             new ScanStateService(),
             new FakeWindowManagerService(),
