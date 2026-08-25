@@ -47,6 +47,7 @@ public partial class App : Application
         services.AddSingleton<IThemeService, WinUiThemeService>();
         services.AddSingleton<INotificationService, WinUiNotificationService>();
         services.AddSingleton<IDriveInfoService, DriveInfoService>();
+        services.AddSingleton<IFileIdentityService, FileIdentityService>();
         return services.BuildServiceProvider();
     }
 }

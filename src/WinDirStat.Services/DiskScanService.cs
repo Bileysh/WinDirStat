@@ -8,6 +8,13 @@ namespace WinDirStat.Services;
 
 public class DiskScanService : IDiskScanService
 {
+    private readonly IFileIdentityService _fileIdentityService;
+
+    public DiskScanService(IFileIdentityService fileIdentityService)
+    {
+        _fileIdentityService = fileIdentityService;
+    }
+
     private readonly record struct ScanEntry(
         string Name,
         string FullPath,
@@ -41,9 +48,10 @@ public class DiskScanService : IDiskScanService
 
             var rootInfo = new DirectoryInfo(rootPath);
             var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
+            var seenHardLinks = new HashSet<FileIdentity>();
 
             var rootNode = ScanDirectory(rootInfo.Name, rootInfo.FullName, rootInfo.Attributes,
-                rootInfo.LastWriteTimeUtc, clusterSize, cancellationToken);
+                rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, cancellationToken);
 
             stopwatch.Stop();
 
@@ -60,7 +68,8 @@ public class DiskScanService : IDiskScanService
     }
 
     private FileSystemNode ScanDirectory(string name, string fullPath, FileAttributes attributes,
-        DateTime lastWriteTimeUtc, uint clusterSize, CancellationToken cancellationToken)
+        DateTime lastWriteTimeUtc, uint clusterSize, HashSet<FileIdentity> seenHardLinks,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -87,7 +96,7 @@ public class DiskScanService : IDiskScanService
                 if (entry.IsDirectory)
                 {
                     var childNode = ScanDirectory(entry.Name, entry.FullPath, entry.Attributes,
-                        entry.LastWriteTimeUtc, clusterSize, cancellationToken);
+                        entry.LastWriteTimeUtc, clusterSize, seenHardLinks, cancellationToken);
                     node.Children.Add(childNode);
                     node.SizeLogical += childNode.SizeLogical;
                     node.SizePhysical += childNode.SizePhysical;
@@ -106,6 +115,15 @@ public class DiskScanService : IDiskScanService
                         SizePhysical = physicalSize >= 0 ? physicalSize : entry.Length,
                         LastModified = entry.LastWriteTimeUtc
                     };
+
+                   
+                    var identity = _fileIdentityService.GetIdentity(entry.FullPath);
+                    if (identity is { LinkCount: > 1 } id && !seenHardLinks.Add(id))
+                    {
+                        fileNode.IsDuplicateHardLink = true;
+                        fileNode.SizePhysical = 0;
+                    }
+
                     node.Children.Add(fileNode);
                     node.SizeLogical += fileNode.SizeLogical;
                     node.SizePhysical += fileNode.SizePhysical;

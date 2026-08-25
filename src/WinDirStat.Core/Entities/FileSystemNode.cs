@@ -12,4 +12,5 @@ public class FileSystemNode
     public List<FileSystemNode> Children { get; } = [];
     public ScanStatus Status { get; set; } = ScanStatus.Ok;
     public string? ErrorMessage { get; set; }
+    public bool IsDuplicateHardLink { get; set; }
 }
