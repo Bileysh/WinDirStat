@@ -174,4 +174,18 @@ public class WindowManagerService : IWindowManagerService
 
         window.SetContent(new MainPage(viewModel));
     }
+
+    public void ExitApplication()
+    {
+        foreach (var win in _openWindows.ToList())
+        {
+            win.Close();
+        }
+
+        _openWindows.Clear();
+
+        App.MainWindow?.Close();
+
+        Application.Current.Exit();
+    }
 }

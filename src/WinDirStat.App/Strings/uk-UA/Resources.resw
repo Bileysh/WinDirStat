@@ -119,11 +119,11 @@
     <data name="MenuOptions.Title" xml:space="preserve">
     <value>Параметри</value>
   </data>
-    <data name="MenuOptionsShowFreeSpace.Text" xml:space="preserve">
-    <value>Показати вільне місце</value>
-  </data>
     <data name="MenuOptionsLanguage.Text" xml:space="preserve">
     <value>Мова</value>
+  </data>
+    <data name="MenuOptionsAccountForHardLinks.Text" xml:space="preserve">
+    <value>Враховувати hard link'и</value>
   </data>
      <data name="MenuOptionsTheme.Text" xml:space="preserve">
      <value>Перемкнути тему</value>
@@ -136,6 +136,27 @@
   </data>
     <data name="TreeViewHeader.Text" xml:space="preserve">
     <value>Дерево файлів</value>
+  </data>
+    <data name="TreeColumnName.Text" xml:space="preserve">
+    <value>Ім'я</value>
+  </data>
+    <data name="TreeColumnSizeLogical.Text" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
+    <data name="TreeColumnSizeLogical.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Сума розмірів файлів за даними файлової системи (Logical)</value>
+  </data>
+    <data name="TreeColumnSizePhysical.Text" xml:space="preserve">
+    <value>На диску</value>
+  </data>
+    <data name="TreeColumnSizePhysical.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Реально зайняте місце на диску з урахуванням округлення по кластерах і hard link'ів (Physical)</value>
+  </data>
+    <data name="TreeColumnLastModified.Text" xml:space="preserve">
+    <value>Змінено</value>
+  </data>
+    <data name="TreeColumnPercent.Text" xml:space="preserve">
+    <value>%</value>
   </data>
     <data name="StatisticsHeader.Text" xml:space="preserve">
     <value>Статистика</value>
@@ -187,15 +208,6 @@
   </data>
     <data name="MenuShowInExplorer.Text" xml:space="preserve">
     <value>Показати в Провіднику</value>
-  </data>
-    <data name="SelectDriveHeader.Text" xml:space="preserve">
-    <value>Оберіть диск для сканування</value>
-  </data>
-    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
-    <value>Обрати іншу папку…</value>
-  </data>
-    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Оновити список дисків</value>
   </data>
     <data name="SelectDriveHeader.Text" xml:space="preserve">
     <value>Оберіть диск для сканування</value>

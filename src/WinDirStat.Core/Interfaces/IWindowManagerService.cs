@@ -7,4 +7,5 @@ public interface IWindowManagerService
     void OpenTreeViewWindow();
     void OpenTreeMapWindow();
     void ReloadMainWindowContent();
+    void ExitApplication();
 }

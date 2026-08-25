@@ -23,4 +23,8 @@ public class FakeWindowManagerService : IWindowManagerService
     public void ReloadMainWindowContent()
     {
     }
+    
+    public void ExitApplication()
+    {
+    }
 }
