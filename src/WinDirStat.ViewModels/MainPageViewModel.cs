@@ -22,6 +22,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private readonly Stack<FileSystemNode> _treeMapHistory = new();
 
     private CancellationTokenSource? _scanCts;
+    private string? _lastScanPath;
 
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService, IWindowManagerService windowManagerService, IDialogService dialogService,
@@ -78,6 +79,8 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
     partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
 
+    partial void OnIsScanningChanged(bool value) => RescanCommand.NotifyCanExecuteChanged();
+
     private void OnStateChanged(object? sender, ScanResult? result)
     {
         if (result is null) return;
@@ -132,10 +135,23 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
         await ScanPathAsync(drive.RootPath);
     }
 
+    [RelayCommand(CanExecute = nameof(CanRescan))]
+    private async Task RescanAsync()
+    {
+        if (_lastScanPath is not null)
+        {
+            await ScanPathAsync(_lastScanPath);
+        }
+    }
+
+    private bool CanRescan() => !IsScanning && _lastScanPath is not null;
+
     private async Task ScanPathAsync(string path)
     {
         CancelScan();
         _scanCts = new CancellationTokenSource();
+        _lastScanPath = path;
+        RescanCommand.NotifyCanExecuteChanged();
 
         IsScanning = true;
         RootNodes.Clear();
@@ -279,6 +295,12 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     private void ToggleTheme()
     {
         _themeService.ToggleTheme();
+    }
+
+    [RelayCommand]
+    private void OpenSettings()
+    {
+        _windowManagerService.OpenSettingsWindow();
     }
 
     [RelayCommand]
