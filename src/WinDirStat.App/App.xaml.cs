@@ -31,6 +31,9 @@ public partial class App : Application
         _mWindow = new MainWindow(mainPage);
         MainWindow = _mWindow;
         _mWindow.Activate();
+
+        Services.GetRequiredService<INotificationService>();
+        Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
     }
 
     private static IServiceProvider ConfigureServices()
@@ -45,9 +48,15 @@ public partial class App : Application
         services.AddSingleton<IDialogService, WinUiDialogService>();
         services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
         services.AddSingleton<IThemeService, WinUiThemeService>();
-        services.AddSingleton<INotificationService, WinUiNotificationService>();
+        services.AddSingleton<INotificationService, AppNotificationService>();
         services.AddSingleton<IDriveInfoService, DriveInfoService>();
         services.AddSingleton<IFileIdentityService, FileIdentityService>();
+        services.AddSingleton<IBackgroundScanSettingsService, BackgroundScanSettingsService>();
+        services.AddSingleton<IBackgroundScanTaskRegistrar, BackgroundTaskRegistrar>();
+        services.AddSingleton<ISettingsFileService, SettingsFileService>();
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<SettingsWindow>();
+        services.AddSingleton<IBackgroundScanTestRunner, BackgroundScanTestRunner>();
         return services.BuildServiceProvider();
     }
 }

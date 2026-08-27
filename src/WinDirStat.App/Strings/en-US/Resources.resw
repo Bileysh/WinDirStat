@@ -196,4 +196,61 @@
     <data name="MenuShowProperties.Text" xml:space="preserve">
     <value>Properties</value>
   </data>
+    <data name="MenuOptionsSettings.Text" xml:space="preserve">
+    <value>Settings...</value>
+  </data>
+    <data name="WindowTitle_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+    <data name="SettingsScanIntervalNumberBox.Header" xml:space="preserve">
+    <value>Background scan interval (minutes)</value>
+  </data>
+    <data name="SettingsThresholdSliderLabel.Text" xml:space="preserve">
+    <value>Low free space warning threshold (%)</value>
+  </data>
+    <data name="SettingsExportButton.Content" xml:space="preserve">
+    <value>Export...</value>
+  </data>
+    <data name="SettingsImportButton.Content" xml:space="preserve">
+    <value>Import...</value>
+  </data>
+    <data name="MenuOptionsSettings.Text" xml:space="preserve">
+    <value>Settings...</value>
+  </data>
+    <data name="WindowTitle_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+    <data name="SettingsScanIntervalNumberBox.Header" xml:space="preserve">
+    <value>Background scan interval (minutes)</value>
+  </data>
+    <data name="SettingsThresholdSliderLabel.Text" xml:space="preserve">
+    <value>Low free space warning threshold (%)</value>
+  </data>
+    <data name="SettingsExportButton.Content" xml:space="preserve">
+    <value>Export...</value>
+  </data>
+    <data name="SettingsImportButton.Content" xml:space="preserve">
+    <value>Import...</value>
+  </data>
+    <data name="MenuOptionsSettings.Text" xml:space="preserve">
+    <value>Settings...</value>
+  </data>
+    <data name="WindowTitle_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+    <data name="SettingsScanIntervalNumberBox.Header" xml:space="preserve">
+    <value>Background scan interval (minutes)</value>
+  </data>
+    <data name="SettingsThresholdSliderLabel.Text" xml:space="preserve">
+    <value>Low free space warning threshold (%)</value>
+  </data>
+    <data name="SettingsExportButton.Content" xml:space="preserve">
+    <value>Export...</value>
+  </data>
+    <data name="SettingsImportButton.Content" xml:space="preserve">
+    <value>Import...</value>
+  </data>
+    <data name="SettingsTestScanButton.Content" xml:space="preserve">
+    <value>Test scan now</value>
+  </data>
 </root>
