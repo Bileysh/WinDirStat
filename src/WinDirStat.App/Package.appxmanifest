@@ -1,53 +1,96 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Package
-  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
-  IgnorableNamespaces="uap rescap systemai">
+        xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+        xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+        xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+        xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+        xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
+        xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+        xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+        IgnorableNamespaces="uap rescap systemai com desktop">
 
-  <Identity
-    Name="4B18DC31-5920-4065-AAE7-05908E7C027E"
-    Publisher="CN=AppPublisher"
-    Version="1.0.0.0" />
+    <Identity
+            Name="4B18DC31-5920-4065-AAE7-05908E7C027E"
+            Publisher="CN=AppPublisher"
+            Version="1.0.0.0"/>
 
-  <mp:PhoneIdentity PhoneProductId="4B18DC31-5920-4065-AAE7-05908E7C027E" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+    <mp:PhoneIdentity PhoneProductId="4B18DC31-5920-4065-AAE7-05908E7C027E"
+                      PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
-  <Properties>
-    <DisplayName>WinDirStat.App</DisplayName>
-    <PublisherDisplayName>AppPublisher</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
-  </Properties>
+    <Properties>
+        <DisplayName>WinDirStat.App</DisplayName>
+        <PublisherDisplayName>AppPublisher</PublisherDisplayName>
+        <Logo>Assets\StoreLogo.png</Logo>
+    </Properties>
 
-  <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" />
-  </Dependencies>
+    <Dependencies>
+        <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0"/>
+        <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0"/>
+    </Dependencies>
 
-  <Resources>
-    <Resource Language="x-generate"/>
-  </Resources>
+    <Resources>
+        <Resource Language="x-generate"/>
+    </Resources>
 
-  <Applications>
-    <Application Id="App"
-      Executable="$targetnametoken$.exe"
-      EntryPoint="$targetentrypoint$">
-      <uap:VisualElements
-        DisplayName="WinDirStat.App"
-        Description="WinDirStat.App"
-        BackgroundColor="transparent"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
-      </uap:VisualElements>
-    </Application>
-  </Applications>
+    <Applications>
+        <Application Id="App"
+                     Executable="$targetnametoken$.exe"
+                     EntryPoint="$targetentrypoint$">
+            <uap:VisualElements
+                    DisplayName="WinDirStat.App"
+                    Description="WinDirStat.App"
+                    BackgroundColor="transparent"
+                    Square150x150Logo="Assets\Square150x150Logo.png"
+                    Square44x44Logo="Assets\Square44x44Logo.png">
+                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+                <uap:SplashScreen Image="Assets\SplashScreen.png"/>
+            </uap:VisualElements>
+            <Extensions>
+                <Extension Category="windows.backgroundTasks" EntryPoint="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.Task">
+                    <BackgroundTasks>
+                        <Task Type="timer"/>
+                    </BackgroundTasks>
+                </Extension>
 
-  <Capabilities>
-    <rescap:Capability Name="runFullTrust" />
-    <systemai:Capability Name="systemAIModels"/>
-  </Capabilities>
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="WinDirStat.App.exe" DisplayName="WinDirStat Background Scan"
+                                       LaunchAndActivationPermission="O:PSG:BUD:(A;;11;;;IU)(A;;11;;;S-1-15-2-1)S:(ML;;NX;;;LW)">
+                            <com:Class Id="F14A5D3E-9B71-4C82-8E2A-6D9F3C1B7A44" DisplayName="WinDirStat Background Scan Task" />
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+
+                <desktop:Extension Category="windows.toastNotificationActivation">
+                    <desktop:ToastNotificationActivation ToastActivatorCLSID="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03" />
+                </desktop:Extension>
+
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="WinDirStat.App.exe" DisplayName="WinDirStat"
+                                       Arguments="----AppNotificationActivated:">
+                            <com:Class Id="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03" DisplayName="WinDirStat Toast Activator" />
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+            </Extensions>
+        </Application>
+    </Applications>
+
+    <Extensions>
+        <Extension Category="windows.activatableClass.inProcessServer">
+            <InProcessServer>
+                <Path>Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.dll</Path>
+                <ActivatableClass
+                        ActivatableClassId="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.Task"
+                        ThreadingModel="both"/>
+            </InProcessServer>
+        </Extension>
+    </Extensions>
+
+    <Capabilities>
+        <rescap:Capability Name="runFullTrust"/>
+        <systemai:Capability Name="systemAIModels"/>
+    </Capabilities>
 </Package>
