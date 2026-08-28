@@ -88,11 +88,11 @@
     <data name="MenuOptions.Title" xml:space="preserve">
     <value>Options</value>
   </data>
-    <data name="MenuOptionsShowFreeSpace.Text" xml:space="preserve">
-    <value>Show Free Space</value>
-  </data>
     <data name="MenuOptionsLanguage.Text" xml:space="preserve">
     <value>Language</value>
+  </data>
+    <data name="MenuOptionsAccountForHardLinks.Text" xml:space="preserve">
+    <value>Account for hard links</value>
   </data>
      <data name="MenuOptionsTheme.Text" xml:space="preserve">
      <value>Toggle Theme</value>
@@ -105,6 +105,27 @@
   </data>
     <data name="TreeViewHeader.Text" xml:space="preserve">
     <value>Directory Tree</value>
+  </data>
+    <data name="TreeColumnName.Text" xml:space="preserve">
+    <value>Name</value>
+  </data>
+    <data name="TreeColumnSizeLogical.Text" xml:space="preserve">
+    <value>Size</value>
+  </data>
+    <data name="TreeColumnSizeLogical.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sum of file sizes as reported by the file system (Logical size)</value>
+  </data>
+    <data name="TreeColumnSizePhysical.Text" xml:space="preserve">
+    <value>On disk</value>
+  </data>
+    <data name="TreeColumnSizePhysical.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Actual space occupied on disk, accounting for cluster rounding and hard links (Physical size)</value>
+  </data>
+    <data name="TreeColumnLastModified.Text" xml:space="preserve">
+    <value>Modified</value>
+  </data>
+    <data name="TreeColumnPercent.Text" xml:space="preserve">
+    <value>%</value>
   </data>
     <data name="StatisticsHeader.Text" xml:space="preserve">
     <value>Statistics</value>
@@ -162,15 +183,6 @@
   </data>
     <data name="MenuShowInExplorer.Text" xml:space="preserve">
     <value>Show in Explorer</value>
-  </data>
-    <data name="SelectDriveHeader.Text" xml:space="preserve">
-    <value>Select a drive to scan</value>
-  </data>
-    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
-    <value>Select custom folder…</value>
-  </data>
-    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Refresh drive list</value>
   </data>
     <data name="SelectDriveHeader.Text" xml:space="preserve">
     <value>Select a drive to scan</value>

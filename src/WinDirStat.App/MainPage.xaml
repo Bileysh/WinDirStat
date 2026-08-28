@@ -28,15 +28,13 @@
             <MenuBarItem x:Uid="MenuFile">
                 <MenuFlyoutItem x:Uid="MenuFileOpenFolder" Icon="Folder" Command="{x:Bind ViewModel.OpenFolderCommand}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem x:Uid="MenuFileExit" Icon="Cancel" />
+                <MenuFlyoutItem x:Uid="MenuFileExit" Icon="Cancel" Command="{x:Bind ViewModel.ExitCommand}" />
             </MenuBarItem>
             <MenuBarItem x:Uid="MenuWindow">
                 <MenuFlyoutItem x:Uid="MenuWindowOpenNew" Icon="NewWindow"
                                 Command="{x:Bind ViewModel.OpenInNewWindowCommand}" />
             </MenuBarItem>
             <MenuBarItem x:Uid="MenuOptions">
-                <MenuFlyoutItem x:Uid="MenuOptionsShowFreeSpace" />
-                <MenuFlyoutSeparator />
                 <MenuFlyoutSubItem x:Uid="MenuOptionsLanguage" Icon="Globe">
                     <MenuFlyoutItem Text="Українська"
                                     Command="{x:Bind ViewModel.ChangeLanguageCommand}"

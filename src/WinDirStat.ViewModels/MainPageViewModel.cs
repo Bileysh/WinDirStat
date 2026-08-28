@@ -282,6 +282,12 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void Exit()
+    {
+        _windowManagerService.ExitApplication();
+    }
+
+    [RelayCommand]
     private async Task ShowAboutAsync()
     {
         var title = _localizationService.GetString("AboutTitle");

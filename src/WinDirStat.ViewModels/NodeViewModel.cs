@@ -50,22 +50,28 @@ public partial class NodeViewModel : ObservableObject
         _ => "—"
     };
 
-    public string StatusGlyph => _node.Status switch
-    {
-        ScanStatus.AccessDenied => "\uE72E",
-        ScanStatus.Error => "\uE783",
-        ScanStatus.ReparsePoint => "\uE71B",
-        _ => string.Empty
-    };
+    public bool IsDuplicateHardLink => _node.IsDuplicateHardLink;
 
-    public bool HasStatusIcon => _node.Status != ScanStatus.Ok;
+    public string StatusGlyph => IsDuplicateHardLink
+        ? "\uE71B"
+        : _node.Status switch
+        {
+            ScanStatus.AccessDenied => "\uE72E",
+            ScanStatus.Error => "\uE783",
+            ScanStatus.ReparsePoint => "\uE71B",
+            _ => string.Empty
+        };
 
-    public string StatusTooltip => _node.Status switch
-    {
-        ScanStatus.AccessDenied => _node.ErrorMessage ?? "Access denied",
-        ScanStatus.Error => _node.ErrorMessage ?? "Scan error",
-        ScanStatus.ReparsePoint =>
-            "Junction/reparse point — not scanned to avoid double-counting or infinite recursion",
-        _ => string.Empty
-    };
+    public bool HasStatusIcon => IsDuplicateHardLink || _node.Status != ScanStatus.Ok;
+
+    public string StatusTooltip => IsDuplicateHardLink
+        ? "Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0"
+        : _node.Status switch
+        {
+            ScanStatus.AccessDenied => _node.ErrorMessage ?? "Access denied",
+            ScanStatus.Error => _node.ErrorMessage ?? "Scan error",
+            ScanStatus.ReparsePoint =>
+                "Junction/reparse point — not scanned to avoid double-counting or infinite recursion",
+            _ => string.Empty
+        };
 }

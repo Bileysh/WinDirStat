@@ -1,4 +1,5 @@
 ﻿using WinDirStat.Services;
+using WinDirStat.Tests.FakeService;
 
 namespace WinDirStat.Tests.Tests;
 
@@ -12,7 +13,7 @@ public class DiskScanServiceTests
         var subDir = tempRoot.CreateSubdirectory("sub");
         await File.WriteAllBytesAsync(Path.Combine(subDir.FullName, "b.txt"), new byte[200]);
 
-        var service = new DiskScanService();
+        var service = new DiskScanService(new FileIdentityService());
 
         var result = await service.ScanAsync(tempRoot.FullName);
 
@@ -26,7 +27,7 @@ public class DiskScanServiceTests
         var tempRoot = Directory.CreateTempSubdirectory();
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
 
-        var service = new DiskScanService();
+        var service = new DiskScanService(new FileIdentityService());
 
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
