@@ -28,4 +28,34 @@ public sealed partial class MainPage : Page
             ? Microsoft.UI.Xaml.Visibility.Visible
             : Microsoft.UI.Xaml.Visibility.Collapsed;
     }
+
+    private void OpenFolderAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender,
+        Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        if (ViewModel.OpenFolderCommand.CanExecute(null))
+        {
+            ViewModel.OpenFolderCommand.Execute(null);
+        }
+    }
+
+    private void RescanAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender,
+        Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        if (ViewModel.RescanCommand.CanExecute(null))
+        {
+            ViewModel.RescanCommand.Execute(null);
+        }
+    }
+
+    private void CancelScanAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender,
+        Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        if (ViewModel.CancelScanCommand.CanExecute(null))
+        {
+            ViewModel.CancelScanCommand.Execute(null);
+        }
+    }
 }

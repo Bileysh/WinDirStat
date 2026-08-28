@@ -157,6 +157,16 @@ public class WindowManagerService : IWindowManagerService
             .Activate();
     }
 
+    public void OpenSettingsWindow()
+    {
+        var window = _serviceProvider.GetRequiredService<SettingsWindow>();
+        window.Title = _localizationService.GetString("WindowTitle_Settings");
+        _openWindows.Add(window);
+        window.Closed += (_, _) => _openWindows.Remove(window);
+        OffsetWindowPosition(window);
+        window.Activate();
+    }
+
     public void ReloadMainWindowContent()
     {
         foreach (var win in _openWindows.ToList())

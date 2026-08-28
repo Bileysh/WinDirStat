@@ -12,6 +12,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator Key="O" Modifiers="Control" Invoked="OpenFolderAccelerator_Invoked" />
+        <KeyboardAccelerator Key="F5" Invoked="RescanAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Escape" Invoked="CancelScanAccelerator_Invoked" />
+    </Page.KeyboardAccelerators>
+
     <Page.Resources>
         <converters:FileCategoryToBrushConverter x:Key="CategoryToBrushConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
@@ -26,7 +32,8 @@
 
         <MenuBar Grid.Row="0">
             <MenuBarItem x:Uid="MenuFile">
-                <MenuFlyoutItem x:Uid="MenuFileOpenFolder" Icon="Folder" Command="{x:Bind ViewModel.OpenFolderCommand}" />
+                <MenuFlyoutItem x:Uid="MenuFileOpenFolder" Icon="Folder" Command="{x:Bind ViewModel.OpenFolderCommand}"
+                                KeyboardAcceleratorTextOverride="Ctrl+O" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem x:Uid="MenuFileExit" Icon="Cancel" Command="{x:Bind ViewModel.ExitCommand}" />
             </MenuBarItem>
@@ -45,6 +52,9 @@
                 </MenuFlyoutSubItem>
                 <MenuFlyoutItem x:Uid="MenuOptionsTheme" Icon="Highlight"
                                 Command="{x:Bind ViewModel.ToggleThemeCommand}" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem x:Uid="MenuOptionsSettings" Icon="Setting"
+                                Command="{x:Bind ViewModel.OpenSettingsCommand}" />
             </MenuBarItem>
 
             <MenuBarItem x:Uid="MenuHelp">
