@@ -13,9 +13,19 @@ namespace WinDirStat.WinRT;
 [ComSourceInterfaces(typeof(IBackgroundTask))]
 public sealed class BackgroundScanTask : IBackgroundTask
 {
-    // TODO: винести в майбутню сторінку налаштувань (пункт "Reserve" плану) — поки що
-    // хардкод, як і інтервал таймера в реєстрації задачі.
-    private const double LowFreeSpacePercentThreshold = 10.0;
+    private const string ThresholdKey = "BackgroundScan.LowFreeSpaceThresholdPercent";
+    private const double DefaultLowFreeSpacePercentThreshold = 10.0;
+
+    private static double LowFreeSpacePercentThreshold
+    {
+        get
+        {
+            var values = ApplicationData.Current.LocalSettings.Values;
+            return values.TryGetValue(ThresholdKey, out var v) && v is double stored
+                ? stored
+                : DefaultLowFreeSpacePercentThreshold;
+        }
+    }
 
 
     public static event EventHandler? Completed;
