@@ -79,7 +79,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
     partial void OnGroupByCategoryChanged(bool value) => RefreshStatistics();
 
-    partial void OnIsScanningChanged(bool value) => RescanCommand.NotifyCanExecuteChanged();
+    partial void OnIsScanningChanged(bool value)
+    {
+        RescanCommand.NotifyCanExecuteChanged();
+        RescanElevatedCommand.NotifyCanExecuteChanged();
+    }
 
     private void OnStateChanged(object? sender, ScanResult? result)
     {
@@ -143,15 +147,25 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
             await ScanPathAsync(_lastScanPath);
         }
     }
+    
+    [RelayCommand(CanExecute = nameof(CanRescan))]
+    private async Task RescanElevatedAsync()
+    {
+        if (_lastScanPath is not null)
+        {
+            await ScanPathAsync(_lastScanPath, useElevatedFallbackForAccessDenied: true);
+        }
+    }
 
     private bool CanRescan() => !IsScanning && _lastScanPath is not null;
 
-    private async Task ScanPathAsync(string path)
+    private async Task ScanPathAsync(string path, bool useElevatedFallbackForAccessDenied = false)
     {
         CancelScan();
         _scanCts = new CancellationTokenSource();
         _lastScanPath = path;
         RescanCommand.NotifyCanExecuteChanged();
+        RescanElevatedCommand.NotifyCanExecuteChanged();
 
         IsScanning = true;
         RootNodes.Clear();
@@ -160,7 +174,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
 
         try
         {
-            var scanResult = await _diskScanService.ScanAsync(path, _scanCts.Token);
+            var scanResult = await _diskScanService.ScanAsync(path, _scanCts.Token, useElevatedFallbackForAccessDenied);
             _scanStateService.SetResult(scanResult);
 
             var fileCount = 0;

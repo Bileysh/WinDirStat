@@ -34,6 +34,12 @@
             <MenuBarItem x:Uid="MenuFile">
                 <MenuFlyoutItem x:Uid="MenuFileOpenFolder" Icon="Folder" Command="{x:Bind ViewModel.OpenFolderCommand}"
                                 KeyboardAcceleratorTextOverride="Ctrl+O" />
+                <MenuFlyoutItem x:Uid="MenuFileRescanElevated"
+                                Command="{x:Bind ViewModel.RescanElevatedCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE7EF;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem x:Uid="MenuFileExit" Icon="Cancel" Command="{x:Bind ViewModel.ExitCommand}" />
             </MenuBarItem>
