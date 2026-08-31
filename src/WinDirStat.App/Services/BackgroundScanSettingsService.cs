@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Storage;
+using WinDirStat.Core.BackgroundScan;
 using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat_App.Services;
@@ -9,7 +10,6 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
 {
     private const string IntervalKey = "BackgroundScan.IntervalMinutes";
     private const string ThresholdKey = "BackgroundScan.LowFreeSpaceThresholdPercent";
-    private const uint MinIntervalMinutes = 15; 
  
     private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
  
@@ -17,8 +17,8 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
     {
         get => _localSettings.Values.TryGetValue(IntervalKey, out var v) && v is uint stored
             ? stored
-            : MinIntervalMinutes;
-        set => _localSettings.Values[IntervalKey] = Math.Max(value, MinIntervalMinutes);
+            : BackgroundScanSettingsValidator.MinIntervalMinutes;
+        set => _localSettings.Values[IntervalKey] = BackgroundScanSettingsValidator.ClampInterval(value);
     }
  
     public double LowFreeSpaceThresholdPercent
@@ -26,7 +26,7 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
         get => _localSettings.Values.TryGetValue(ThresholdKey, out var v) && v is double stored
             ? stored
             : 10.0;
-        set => _localSettings.Values[ThresholdKey] = Math.Clamp(value, 1.0, 50.0);
+        set => _localSettings.Values[ThresholdKey] = BackgroundScanSettingsValidator.ClampThreshold(value);
     }
  
     public string ExportToJson()
@@ -40,16 +40,7 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
         var dto = JsonSerializer.Deserialize(json, SettingsJsonContext.Default.SettingsDto)
                   ?? throw new FormatException("Порожній або невалідний JSON налаштувань.");
  
-        if (dto.ScanIntervalMinutes < MinIntervalMinutes)
-        {
-            throw new FormatException(
-                $"ScanIntervalMinutes не може бути менше {MinIntervalMinutes} (обмеження Windows TimeTrigger).");
-        }
- 
-        if (dto.LowFreeSpaceThresholdPercent is < 1.0 or > 50.0)
-        {
-            throw new FormatException("LowFreeSpaceThresholdPercent має бути в межах 1–50.");
-        }
+        BackgroundScanSettingsValidator.ValidateImport(dto.ScanIntervalMinutes, dto.LowFreeSpaceThresholdPercent);
  
         ScanIntervalMinutes = dto.ScanIntervalMinutes;
         LowFreeSpaceThresholdPercent = dto.LowFreeSpaceThresholdPercent;

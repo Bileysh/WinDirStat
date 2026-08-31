@@ -17,11 +17,6 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        if (ElevationHelper.IsElevated())
-        {
-            PrivilegeHelper.EnableBackupPrivilege();
-        }
-
         Services = ConfigureServices();
     }
 
@@ -42,6 +37,7 @@ public partial class App : Application
         services.AddTransient<MainPageViewModel>();
         services.AddTransient<MainPage>();
         services.AddSingleton<IDiskScanService, DiskScanService>();
+        services.AddSingleton<IElevatedScanHelper, ElevatedScanHelperClient>();
         services.AddSingleton<IFolderPickerService, FolderPickerService>();
         services.AddSingleton<IScanStateService, ScanStateService>();
         services.AddSingleton<IWindowManagerService, WindowManagerService>();

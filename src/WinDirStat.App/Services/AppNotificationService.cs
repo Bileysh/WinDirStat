@@ -1,26 +1,18 @@
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using WinDirStat.Core.Interfaces;
+using WinDirStat.WinRT;
 
 namespace WinDirStat_App.Services;
 
 public class AppNotificationService : INotificationService, IDisposable
 {
-    private bool _isRegistered;
+    private readonly bool _isRegistered;
 
     public AppNotificationService()
     {
         AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
-
-        try
-        {
-            AppNotificationManager.Default.Register();
-            _isRegistered = true;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[AppNotificationService] Register failed: {ex}");
-        }
+        _isRegistered = NotificationRegistration.TryRegister("AppNotificationService");
     }
 
     private void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)

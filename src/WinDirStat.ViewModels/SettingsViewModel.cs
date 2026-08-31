@@ -68,7 +68,6 @@ public partial class SettingsViewModel : ObservableObject
 
             ScanIntervalMinutes = _settings.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = _settings.LowFreeSpaceThresholdPercent;
-            _registrar.ReRegister();
 
             StatusMessage = $"Налаштування імпортовано з {result.Value.FileName}.";
         }

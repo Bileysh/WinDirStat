@@ -1,7 +1,8 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.Windows.AppNotifications;
 using WinDirStat_App.Services;
+using WinDirStat.Core.Entities;
+using WinDirStat.Services;
 using WinDirStat.WinRT;
 
 namespace WinDirStat_App;
@@ -15,6 +16,13 @@ public static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        if (args.Length >= 3 &&
+            args[0].Equals(ElevatedScanHelperClient.ElevatedScanArg, StringComparison.OrdinalIgnoreCase))
+        {
+            Environment.ExitCode = RunAsElevatedScanHelper(inputFile: args[1], outputFile: args[2]);
+            return;
+        }
+
         if (args.Any(a => a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase)
                           || a.Equals(RegisterForBgTaskServerArg, StringComparison.OrdinalIgnoreCase)))
         {
@@ -25,12 +33,47 @@ public static class Program
         RunAsInteractiveApp();
     }
 
+    private static int RunAsElevatedScanHelper(string inputFile, string outputFile)
+    {
+        try
+        {
+            PrivilegeHelper.EnableBackupPrivilege();
+
+            var paths = File.ReadAllLines(inputFile).Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+            var results = new Dictionary<string, FileSystemNode>();
+            var scanService = new DiskScanService(new FileIdentityService());
+
+            foreach (var path in paths)
+            {
+                try
+                {
+                    var result = scanService.ScanAsync(path).GetAwaiter().GetResult();
+                    results[path] = result.RootNode;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ElevatedScanHelper] Scan of '{path}' failed: {ex}");
+                }
+            }
+
+            var json = System.Text.Json.JsonSerializer.Serialize(
+                results, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode);
+            File.WriteAllText(outputFile, json);
+
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ElevatedScanHelper] Batch scan failed: {ex}");
+            return 1;
+        }
+    }
+
     private static void RunAsBackgroundTaskServer()
     {
         var taskGuid = typeof(BackgroundScanTask).GUID;
 
-        try { AppNotificationManager.Default.Register(); }
-        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[BGTask] Notification register failed: {ex}"); }
+        NotificationRegistration.TryRegister("BGTask");
 
         BackgroundScanTask.Completed += OnBackgroundScanTaskCompleted;
 

@@ -1,5 +1,6 @@
 using System.Linq;
 using Windows.ApplicationModel.Background;
+using WinDirStat.Core.BackgroundScan;
 using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat_App.Services;
@@ -10,7 +11,8 @@ public sealed class BackgroundTaskRegistrar(IBackgroundScanSettingsService setti
 
     public void EnsureRegistered()
     {
-        if (BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == TaskName))
+        var existingNames = BackgroundTaskRegistration.AllTasks.Values.Select(t => t.Name);
+        if (BackgroundTaskRegistrationPolicy.IsAlreadyRegistered(existingNames, TaskName))
         {
             return;
         }
