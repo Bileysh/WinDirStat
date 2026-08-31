@@ -172,6 +172,9 @@
     <data name="ReparsePointText" xml:space="preserve">
     <value>Junction/reparse point — not scanned to avoid double-counting or infinite recursion</value>
   </data>
+    <data name="HardLinkTooltipText" xml:space="preserve">
+    <value>Hard link — physical disk space is already accounted for by another file in this tree, SizePhysical is intentionally 0 here</value>
+  </data>
     <data name="WindowTitle_New" xml:space="preserve">
     <value>WinDirStat - New window</value>
   </data>

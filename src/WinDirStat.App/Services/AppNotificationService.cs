@@ -17,19 +17,7 @@ public class AppNotificationService : INotificationService, IDisposable
 
     private void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
     {
-        // TODO: маршрутизація за args.Argument, коли з'являться клікабельні дії в тостах.
-    }
-
-    public void ShowScanComplete(TimeSpan elapsed, int fileCount, int folderCount)
-    {
-        if (!_isRegistered) return;
-
-        var notification = new AppNotificationBuilder()
-            .AddText("Сканування завершено")
-            .AddText($"Час: {elapsed.TotalSeconds:F1} сек. Файлів: {fileCount} Папок: {folderCount}")
-            .BuildNotification();
-
-        AppNotificationManager.Default.Show(notification);
+        // TODO: route based on args.Argument once clickable toast actions are added.
     }
 
     public void ShowNotification(string title, string message)

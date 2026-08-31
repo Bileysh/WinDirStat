@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using WinDirStat.Core.Classification;
 using WinDirStat.Core.Entities;
+using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.ViewModels;
 
@@ -8,12 +9,14 @@ public partial class NodeViewModel : ObservableObject
 {
     private readonly FileSystemNode _node;
     private readonly long _parentSizeLogical;
+    private readonly ILocalizationService? _localizationService;
     private List<NodeViewModel>? _children;
 
-    public NodeViewModel(FileSystemNode node, long parentSizeLogical = 0)
+    public NodeViewModel(FileSystemNode node, long parentSizeLogical = 0, ILocalizationService? localizationService = null)
     {
         _node = node;
         _parentSizeLogical = parentSizeLogical;
+        _localizationService = localizationService;
     }
 
     public string Name => _node.Name;
@@ -29,11 +32,11 @@ public partial class NodeViewModel : ObservableObject
 
     public IReadOnlyList<NodeViewModel> Children =>
         _children ??= _node.Children
-            .Select(c => new NodeViewModel(c, _node.SizeLogical))
+            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService))
             .ToList();
 
     public string ChildSummaryFormatted => IsDirectory
-        ? $"{ChildFileCount} файлів, {ChildDirectoryCount} папок"
+        ? $"{ChildFileCount} {_localizationService?.GetString("FilesText")}, {ChildDirectoryCount} {_localizationService?.GetString("FoldersText")}"
         : string.Empty;
 
     public string SizeLogicalFormatted => _node.Status switch
@@ -65,13 +68,12 @@ public partial class NodeViewModel : ObservableObject
     public bool HasStatusIcon => IsDuplicateHardLink || _node.Status != ScanStatus.Ok;
 
     public string StatusTooltip => IsDuplicateHardLink
-        ? "Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0"
+        ? _localizationService?.GetString("HardLinkTooltipText") ?? string.Empty
         : _node.Status switch
         {
-            ScanStatus.AccessDenied => _node.ErrorMessage ?? "Access denied",
-            ScanStatus.Error => _node.ErrorMessage ?? "Scan error",
-            ScanStatus.ReparsePoint =>
-                "Junction/reparse point — not scanned to avoid double-counting or infinite recursion",
+            ScanStatus.AccessDenied => _node.ErrorMessage ?? _localizationService?.GetString("AccessDeniedText") ?? string.Empty,
+            ScanStatus.Error => _node.ErrorMessage ?? _localizationService?.GetString("ScanErrorText") ?? string.Empty,
+            ScanStatus.ReparsePoint => _localizationService?.GetString("ReparsePointText") ?? string.Empty,
             _ => string.Empty
         };
 }

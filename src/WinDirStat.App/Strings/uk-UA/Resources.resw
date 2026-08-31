@@ -209,6 +209,9 @@
     <data name="ReparsePointText" xml:space="preserve">
     <value>Точка з'єднання (Junction) — не сканується для уникнення зациклень</value>
   </data>
+    <data name="HardLinkTooltipText" xml:space="preserve">
+    <value>Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0</value>
+  </data>
     <data name="WindowTitle_New" xml:space="preserve">
     <value>WinDirStat - Нове вікно</value>
   </data>

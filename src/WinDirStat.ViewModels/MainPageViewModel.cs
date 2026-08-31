@@ -94,7 +94,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     {
         if (result is null) return;
 
-        RootNodes = [new NodeViewModel(result.RootNode)];
+        RootNodes = [new NodeViewModel(result.RootNode, localizationService: _localizationService)];
         HasScanResult = true;
 
         _treeMapHistory.Clear();
