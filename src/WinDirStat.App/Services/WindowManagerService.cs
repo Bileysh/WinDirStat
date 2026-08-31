@@ -112,7 +112,6 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Closed += (_, _) =>
         {
             _openWindows.Remove(newWindow);
-            viewModel.Dispose();
         };
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
