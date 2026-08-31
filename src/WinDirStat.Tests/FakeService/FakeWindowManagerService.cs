@@ -8,15 +8,15 @@ public class FakeWindowManagerService : IWindowManagerService
     {
     }
 
-    public void OpenStatisticsWindow()
+    public void OpenStatisticsWindow(IMainPageViewModel viewModel)
     {
     }
 
-    public void OpenTreeViewWindow()
+    public void OpenTreeViewWindow(IMainPageViewModel viewModel)
     {
     }
 
-    public void OpenTreeMapWindow()
+    public void OpenTreeMapWindow(IMainPageViewModel viewModel)
     {
     }
 
