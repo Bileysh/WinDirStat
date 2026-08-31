@@ -3,11 +3,15 @@ using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.Input;
 using WinDirStat.Core.Classification;
 using WinDirStat.Core.Entities;
+using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.ViewModels;
 
 public partial class TreeMapRectViewModel
 {
+    private readonly INotificationService? _notificationService;
+    private readonly ILocalizationService? _localizationService;
+
     public FileSystemNode Node { get; }
     public double X { get; }
     public double Y { get; }
@@ -21,8 +25,11 @@ public partial class TreeMapRectViewModel
     public bool IsSizeVisible { get; }
     public bool IsFolder { get; }
 
-    public TreeMapRectViewModel(TreeMapRect rect)
+    public TreeMapRectViewModel(TreeMapRect rect, INotificationService? notificationService = null,
+        ILocalizationService? localizationService = null)
     {
+        _notificationService = notificationService;
+        _localizationService = localizationService;
         Node = rect.Node;
         X = rect.X;
         Y = rect.Y;
@@ -69,8 +76,12 @@ public partial class TreeMapRectViewModel
                 });
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[TreeMapRectViewModel] OpenInExplorer failed for '{Node.FullPath}': {ex}");
+            _notificationService?.ShowNotification(
+                GetLocalizedOrFallback("OpenInExplorerFailedTitle", "Failed to open Explorer"),
+                $"'{Node.Name}': {ex.Message}");
         }
     }
 
@@ -81,12 +92,29 @@ public partial class TreeMapRectViewModel
 
         try
         {
-            ShellInterop.SHObjectProperties(IntPtr.Zero, ShellInterop.SHOP_FILEPATH, Node.FullPath, null);
+            var succeeded = ShellInterop.SHObjectProperties(
+                IntPtr.Zero, ShellInterop.SHOP_FILEPATH, Node.FullPath, null);
+
+            if (!succeeded)
+            {
+                var error = Marshal.GetLastWin32Error();
+                Debug.WriteLine(
+                    $"[TreeMapRectViewModel] SHObjectProperties returned false for '{Node.FullPath}' " +
+                    $"(Win32 error {error}).");
+                _notificationService?.ShowNotification(
+                    GetLocalizedOrFallback("ShowPropertiesFailedTitle", "Failed to open properties"), Node.Name);
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[TreeMapRectViewModel] ShowProperties failed for '{Node.FullPath}': {ex}");
+            _notificationService?.ShowNotification(
+                GetLocalizedOrFallback("ShowPropertiesFailedTitle", "Failed to open properties"),
+                $"'{Node.Name}': {ex.Message}");
         }
     }
+    private string GetLocalizedOrFallback(string key, string fallback) =>
+        _localizationService?.GetString(key) ?? fallback;
 
     private static class ShellInterop
     {

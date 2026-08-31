@@ -49,44 +49,70 @@ public class DiskScanService : IDiskScanService
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var rootInfo = new DirectoryInfo(rootPath);
-            var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
-            var seenHardLinks = new HashSet<FileIdentity>();
-
-            var deniedNodes = new List<FileSystemNode>();
-            var rootNode = ScanDirectory(rootInfo.Name, rootInfo.FullName, rootInfo.Attributes,
-                rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, cancellationToken);
-
-            if (useElevatedFallbackForAccessDenied && deniedNodes.Count > 0 && _elevatedScanHelper is not null)
+            try
             {
-                var paths = deniedNodes.Select(n => n.FullPath).ToList();
-                if (_elevatedScanHelper.TryScanElevated(paths, out var elevatedResults))
+                var rootInfo = new DirectoryInfo(rootPath);
+                var clusterSize = DiskSizeHelper.GetClusterSize(Path.GetPathRoot(rootPath) ?? rootPath);
+                var seenHardLinks = new HashSet<FileIdentity>();
+
+                var deniedNodes = new List<FileSystemNode>();
+                var rootNode = ScanDirectory(rootInfo.Name, rootInfo.FullName, rootInfo.Attributes,
+                    rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, cancellationToken);
+
+                if (useElevatedFallbackForAccessDenied && deniedNodes.Count > 0 && _elevatedScanHelper is not null)
                 {
-                    foreach (var deniedNode in deniedNodes)
+                    var paths = deniedNodes.Select(n => n.FullPath).ToList();
+                    if (_elevatedScanHelper.TryScanElevated(paths, out var elevatedResults))
                     {
-                        if (!elevatedResults.TryGetValue(deniedNode.FullPath, out var elevatedNode)) continue;
+                        foreach (var deniedNode in deniedNodes)
+                        {
+                            if (!elevatedResults.TryGetValue(deniedNode.FullPath, out var elevatedNode)) continue;
 
-                        deniedNode.Children.Clear();
-                        deniedNode.Children.AddRange(elevatedNode.Children);
-                        deniedNode.Status = elevatedNode.Status;
-                        deniedNode.ErrorMessage = elevatedNode.ErrorMessage;
+                            deniedNode.Children.Clear();
+                            deniedNode.Children.AddRange(elevatedNode.Children);
+                            deniedNode.Status = elevatedNode.Status;
+                            deniedNode.ErrorMessage = elevatedNode.ErrorMessage;
+                        }
+
+                        RecomputeSizes(rootNode);
                     }
-
-                    RecomputeSizes(rootNode);
                 }
+
+                stopwatch.Stop();
+
+                var (statsByExtension, statsByCategory) = FileStatisticsAggregator.ComputeAll(rootNode);
+
+                return new ScanResult(
+                    rootPath,
+                    rootNode,
+                    statsByCategory,
+                    statsByExtension,
+                    stopwatch.Elapsed
+                );
             }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                stopwatch.Stop();
 
-            stopwatch.Stop();
+                var errorNode = new FileSystemNode
+                {
+                    Name = Path.GetFileName(rootPath.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } name
+                        ? name
+                        : rootPath,
+                    FullPath = rootPath,
+                    IsDirectory = true,
+                    Status = ScanStatus.Error,
+                    ErrorMessage = ex.Message
+                };
 
-            var (statsByExtension, statsByCategory) = FileStatisticsAggregator.ComputeAll(rootNode);
-
-            return new ScanResult(
-                rootPath,
-                rootNode,
-                statsByCategory,
-                statsByExtension,
-                stopwatch.Elapsed
-            );
+                return new ScanResult(
+                    rootPath,
+                    errorNode,
+                    Array.Empty<FileTypeStatisticsEntry>(),
+                    Array.Empty<FileTypeStatisticsEntry>(),
+                    stopwatch.Elapsed
+                );
+            }
         }, cancellationToken);
     }
 
