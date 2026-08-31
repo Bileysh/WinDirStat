@@ -8,7 +8,7 @@ using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.ViewModels;
 
-public partial class MainPageViewModel : ObservableObject, IDisposable
+public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPageViewModel 
 {
     private readonly IDiskScanService _diskScanService;
     private readonly IFolderPickerService _folderPickerService;
@@ -249,25 +249,25 @@ public partial class MainPageViewModel : ObservableObject, IDisposable
     {
         _windowManagerService.OpenMainWindow();
     }
-
+    
     [RelayCommand]
     private void OpenStatisticsWindow()
     {
-        _windowManagerService.OpenStatisticsWindow();
+        _windowManagerService.OpenStatisticsWindow(this);
     }
 
     [RelayCommand]
     private void OpenTreeViewWindow()
     {
-        _windowManagerService.OpenTreeViewWindow();
+        _windowManagerService.OpenTreeViewWindow(this);
     }
 
     [RelayCommand]
     private void OpenTreeMapWindow()
     {
-        _windowManagerService.OpenTreeMapWindow();
+        _windowManagerService.OpenTreeMapWindow(this);
     }
-
+    
     [RelayCommand]
     public void DrillDownTreeMap(TreeMapRectViewModel? clickedRect)
     {
