@@ -8,7 +8,7 @@ using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.ViewModels;
 
-public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPageViewModel 
+public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPageViewModel
 {
     private readonly IDiskScanService _diskScanService;
     private readonly IFolderPickerService _folderPickerService;
@@ -53,7 +53,9 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
+    [NotifyPropertyChangedFor(nameof(IsNoDataVisible))]
     private bool _isScanning;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
@@ -63,7 +65,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public bool ShowDriveSelector => !IsScanning && !HasScanResult;
 
-    [ObservableProperty] private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsNoDataVisible))]
+    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
+
+    public bool IsNoDataVisible => TypeStatistics.Count == 0 && !IsScanning;
 
     [ObservableProperty] private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
 
@@ -147,7 +152,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             await ScanPathAsync(_lastScanPath);
         }
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanRescan))]
     private async Task RescanElevatedAsync()
     {
@@ -230,10 +235,12 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private void RefreshTreeMap()
     {
-        if (CurrentTreeMapRoot is null || _treeMapWidth <= 0 || _treeMapHeight <= 0) return;
+        if (CurrentTreeMapRoot is null) return;
+        if (_treeMapWidth <= 0) return;
+        if (_treeMapHeight <= 0) return;
 
         var rects = SquarifiedTreeMapLayout.Compute(CurrentTreeMapRoot, 0, 0, _treeMapWidth, _treeMapHeight);
-        var viewModels = rects.Select(r => new TreeMapRectViewModel(r));
+        var viewModels = rects.Select(r => new TreeMapRectViewModel(r, _notificationService, _localizationService));
         TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels.ToList());
     }
 
@@ -249,7 +256,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     {
         _windowManagerService.OpenMainWindow();
     }
-    
+
     [RelayCommand]
     private void OpenStatisticsWindow()
     {
@@ -267,7 +274,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     {
         _windowManagerService.OpenTreeMapWindow(this);
     }
-    
+
     [RelayCommand]
     public void DrillDownTreeMap(TreeMapRectViewModel? clickedRect)
     {
