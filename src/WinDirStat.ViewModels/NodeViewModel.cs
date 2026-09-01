@@ -14,9 +14,8 @@ public partial class NodeViewModel : ObservableObject
     private readonly long _parentSizeLogical;
     private readonly ILocalizationService? _localizationService;
     private readonly INotificationService? _notificationService;
-    private List<NodeViewModel>? _children;
-
     private readonly IClipboardService? _clipboardService;
+    private List<NodeViewModel>? _children;
 
     public NodeViewModel(FileSystemNode node, long parentSizeLogical = 0,
         ILocalizationService? localizationService = null, INotificationService? notificationService = null, IClipboardService? clipboardService = null)
@@ -41,7 +40,7 @@ public partial class NodeViewModel : ObservableObject
 
     public IReadOnlyList<NodeViewModel> Children =>
         _children ??= _node.Children
-            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService))
+            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService, _clipboardService ))
             .ToList();
 
     public string ChildSummaryFormatted => IsDirectory
