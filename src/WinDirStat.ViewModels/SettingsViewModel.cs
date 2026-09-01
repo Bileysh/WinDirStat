@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinDirStat.Core.BackgroundScan;
 using WinDirStat.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace WinDirStat.ViewModels;
 
@@ -10,6 +12,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IBackgroundScanTaskRegistrar _registrar;
     private readonly ISettingsFileService _fileService;
     private readonly IBackgroundScanTestRunner _testRunner;
+    private readonly ILocalizationService _localizationService;
 
     [ObservableProperty]
     private uint _scanIntervalMinutes;
@@ -24,12 +27,14 @@ public partial class SettingsViewModel : ObservableObject
         IBackgroundScanSettingsService settings,
         IBackgroundScanTaskRegistrar registrar,
         ISettingsFileService fileService,
-        IBackgroundScanTestRunner testRunner)
+        IBackgroundScanTestRunner testRunner,
+        ILocalizationService localizationService)
     {
         _settings = settings;
         _registrar = registrar;
         _fileService = fileService;
         _testRunner = testRunner;
+        _localizationService = localizationService;
         _scanIntervalMinutes = settings.ScanIntervalMinutes;
         _lowFreeSpaceThresholdPercent = settings.LowFreeSpaceThresholdPercent;
     }
@@ -38,13 +43,13 @@ public partial class SettingsViewModel : ObservableObject
     {
         _settings.ScanIntervalMinutes = value;
         _registrar.ReRegister();
-        StatusMessage = $"Інтервал сканування: {_settings.ScanIntervalMinutes} хв.";
+        StatusMessage = string.Format(_localizationService.GetString("ScanIntervalStatus"), _settings.ScanIntervalMinutes);
     }
 
     partial void OnLowFreeSpaceThresholdPercentChanged(double value)
     {
         _settings.LowFreeSpaceThresholdPercent = value;
-        StatusMessage = $"Поріг попередження: {_settings.LowFreeSpaceThresholdPercent:F0}%.";
+        StatusMessage = string.Format(_localizationService.GetString("LowSpaceThresholdStatus"), _settings.LowFreeSpaceThresholdPercent.ToString("F0"));
     }
 
     [RelayCommand]
@@ -53,7 +58,7 @@ public partial class SettingsViewModel : ObservableObject
         var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "windirstat-settings");
         if (fileName is null) return;
 
-        StatusMessage = $"Налаштування збережено у {fileName}.";
+        StatusMessage = string.Format(_localizationService.GetString("SettingsExportedStatus"), fileName);
     }
 
     [RelayCommand]
@@ -62,18 +67,17 @@ public partial class SettingsViewModel : ObservableObject
         var result = await _fileService.ImportAsync();
         if (result is null) return;
 
-        try
-        {
-            _settings.ImportFromJson(result.Value.Json);
+        var validationResult = _settings.ImportFromJson(result.Value.Json);
 
+        if (validationResult == SettingsValidationError.None)
+        {
             ScanIntervalMinutes = _settings.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = _settings.LowFreeSpaceThresholdPercent;
-
-            StatusMessage = $"Налаштування імпортовано з {result.Value.FileName}.";
+            StatusMessage = string.Format(_localizationService.GetString("SettingsImportedStatus"), result.Value.FileName);
         }
-        catch (FormatException ex)
+        else
         {
-            StatusMessage = $"Не вдалось імпортувати: {ex.Message}";
+            StatusMessage = _localizationService.GetString($"SettingsError_{validationResult}");
         }
     }
 
@@ -81,6 +85,6 @@ public partial class SettingsViewModel : ObservableObject
     private void TestScanNow()
     {
         _testRunner.RunNow();
-        StatusMessage = "Тестовий скан виконано — перевір тост.";
+        StatusMessage = _localizationService.GetString("TestScanCompletedStatus");
     }
 }

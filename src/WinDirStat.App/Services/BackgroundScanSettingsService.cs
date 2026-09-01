@@ -35,15 +35,24 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
         return JsonSerializer.Serialize(dto, SettingsJsonContext.Default.SettingsDto);
     }
  
-    public void ImportFromJson(string json)
+    public SettingsValidationError ImportFromJson(string json)
     {
-        var dto = JsonSerializer.Deserialize(json, SettingsJsonContext.Default.SettingsDto)
-                  ?? throw new FormatException("Порожній або невалідний JSON налаштувань.");
+        try
+        {
+            var dto = JsonSerializer.Deserialize(json, SettingsJsonContext.Default.SettingsDto);
+            if (dto is null) return SettingsValidationError.InvalidFormat;
  
-        BackgroundScanSettingsValidator.ValidateImport(dto.ScanIntervalMinutes, dto.LowFreeSpaceThresholdPercent);
+            var validation = BackgroundScanSettingsValidator.ValidateImport(dto.ScanIntervalMinutes, dto.LowFreeSpaceThresholdPercent);
+            if (validation != SettingsValidationError.None) return validation;
  
-        ScanIntervalMinutes = dto.ScanIntervalMinutes;
-        LowFreeSpaceThresholdPercent = dto.LowFreeSpaceThresholdPercent;
+            ScanIntervalMinutes = dto.ScanIntervalMinutes;
+            LowFreeSpaceThresholdPercent = dto.LowFreeSpaceThresholdPercent;
+            return SettingsValidationError.None;
+        }
+        catch (JsonException)
+        {
+            return SettingsValidationError.InvalidFormat;
+        }
     }
  
     private record SettingsDto(uint ScanIntervalMinutes, double LowFreeSpaceThresholdPercent);

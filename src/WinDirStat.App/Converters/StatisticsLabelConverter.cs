@@ -35,7 +35,9 @@ public class StatisticsLabelConverter : IValueConverter
                 };
             }
 
-            return vm.Label;
+            return string.IsNullOrEmpty(vm.Label)
+                ? (_resourceLoader ??= new ResourceLoader()).GetString("NoExtensionLabel")
+                : vm.Label;
         }
 
         return string.Empty;

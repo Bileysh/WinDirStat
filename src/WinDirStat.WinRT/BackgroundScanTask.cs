@@ -3,6 +3,8 @@ using System.Linq;
 using Windows.ApplicationModel.Background;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
+using Microsoft.Windows.ApplicationModel.Resources;
+using Microsoft.Windows.Globalization;
 using Windows.Storage;
 
 namespace WinDirStat.WinRT;
@@ -15,6 +17,15 @@ public sealed class BackgroundScanTask : IBackgroundTask
 {
     private const string ThresholdKey = "BackgroundScan.LowFreeSpaceThresholdPercent";
     private const double DefaultLowFreeSpacePercentThreshold = 10.0;
+
+    private static readonly ResourceManager ResourceManager = new();
+
+    private static string GetString(string key)
+    {
+        var context = ResourceManager.CreateResourceContext();
+        context.QualifierValues["Language"] = ApplicationLanguages.PrimaryLanguageOverride;
+        return ResourceManager.MainResourceMap.GetValue($"Resources/{key}", context).ValueAsString;
+    }
 
     private static double LowFreeSpacePercentThreshold
     {
@@ -86,10 +97,10 @@ public sealed class BackgroundScanTask : IBackgroundTask
         if (results.Count == 0) return;
 
         var summaryLines = results.Select(r =>
-            $"{r.DriveName} — вільно {FormatBytes(r.FreeBytes)} з {FormatBytes(r.TotalBytes)}");
+            string.Format(GetString("DriveStatusSummaryLine"), r.DriveName, FormatBytes(r.FreeBytes), FormatBytes(r.TotalBytes)));
 
         var summary = new AppNotificationBuilder()
-            .AddText("Стан дисків")
+            .AddText(GetString("DriveStatusNotificationTitle"))
             .AddText(string.Join("\n", summaryLines))
             .BuildNotification();
         AppNotificationManager.Default.Show(summary);
@@ -97,9 +108,9 @@ public sealed class BackgroundScanTask : IBackgroundTask
         foreach (var drive in results.Where(r => 100.0 - r.UsedPercent < LowFreeSpacePercentThreshold))
         {
             var warning = new AppNotificationBuilder()
-                .AddText("Мало вільного місця")
-                .AddText($"{drive.DriveName}: залишилось лише {FormatBytes(drive.FreeBytes)} " +
-                         $"({100.0 - drive.UsedPercent:F0}% вільно)")
+                .AddText(GetString("LowSpaceNotificationTitle"))
+                .AddText(string.Format(GetString("LowSpaceNotificationBody"), drive.DriveName,
+                    FormatBytes(drive.FreeBytes), (100.0 - drive.UsedPercent).ToString("F0")))
                 .BuildNotification();
             AppNotificationManager.Default.Show(warning);
         }
