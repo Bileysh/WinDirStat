@@ -2,12 +2,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
 using WinDirStat_App.UserControls;
 using System.Diagnostics;
+using WinRT.Interop;
 
 namespace WinDirStat_App.Services;
 
@@ -55,7 +55,8 @@ public class WindowManagerService : IWindowManagerService
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var page = new MainPage(viewModel);
 
-        page.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
+            WindowNative.GetWindowHandle(newWindow);
 
         newWindow.Content = page;
 
@@ -71,6 +72,11 @@ public class WindowManagerService : IWindowManagerService
         OffsetWindowPosition(newWindow);
 
         newWindow.Activate();
+        
+        if (newWindow.Content is FrameworkElement fe)
+        {
+            fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        }
     }
 
     private Window CreateDetachedWindow(string title, FrameworkElement content, int width, int height,
@@ -81,9 +87,8 @@ public class WindowManagerService : IWindowManagerService
             MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
-        var rootGrid = (Grid)XamlReader.Load(
-            "<Grid xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' " +
-            "Background='{ThemeResource ApplicationPageBackgroundThemeBrush}' />");
+        var rootGrid = new Grid();
+        rootGrid.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
 
         rootGrid.RowDefinitions.Add(new RowDefinition
             { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
@@ -104,8 +109,6 @@ public class WindowManagerService : IWindowManagerService
         Grid.SetRow(content, 1);
         rootGrid.Children.Add(content);
 
-        rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
-
         newWindow.Content = rootGrid;
         newWindow.Title = $"WinDirStat - {title}";
         _openWindows.Add(newWindow);
@@ -116,6 +119,8 @@ public class WindowManagerService : IWindowManagerService
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
         OffsetWindowPosition(newWindow);
+        
+        rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
 
         return newWindow;
     }
@@ -164,6 +169,13 @@ public class WindowManagerService : IWindowManagerService
     {
         var window = _serviceProvider.GetRequiredService<SettingsWindow>();
         window.Title = _localizationService.GetString("WindowTitle_Settings");
+
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
+            window.SystemBackdrop = new MicaBackdrop();
+
+        if (window.Content is FrameworkElement fe)
+            fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+
         _openWindows.Add(window);
         window.Closed += (_, _) => _openWindows.Remove(window);
         OffsetWindowPosition(window);
@@ -179,7 +191,21 @@ public class WindowManagerService : IWindowManagerService
         _rootWindowScope = scope;
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
-        return new MainPage(viewModel);
+        var mainPage = new MainPage(viewModel);
+        return mainPage;
+    }
+    
+    public void SetRootWindowHandle(Window window)
+    {
+        if (_rootWindowScope is null) return;
+
+        var handleProvider = _rootWindowScope.ServiceProvider.GetRequiredService<IWindowHandleProvider>();
+        handleProvider.Hwnd = WindowNative.GetWindowHandle(window);
+        
+        if (window.Content is FrameworkElement fe)
+        {
+            fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        }
     }
 
     public void ReloadMainWindowContent()
@@ -200,8 +226,15 @@ public class WindowManagerService : IWindowManagerService
         _rootWindowScope = scope;
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
+        scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
-        window.SetContent(new MainPage(viewModel));
+        var mainPage = new MainPage(viewModel);
+        window.SetContent(mainPage);
+        
+        if (window.Content is FrameworkElement fe)
+        {
+            fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        }
     }
 
     public void ExitApplication()

@@ -8,15 +8,17 @@ namespace WinDirStat_App.Services;
 public class FolderPickerService : IFolderPickerService
 {
     private readonly ILocalizationService _localizationService;
+    private readonly IWindowHandleProvider _windowHandleProvider;
 
-    public FolderPickerService(ILocalizationService localizationService)
+    public FolderPickerService(ILocalizationService localizationService, IWindowHandleProvider windowHandleProvider)
     {
         _localizationService = localizationService;
+        _windowHandleProvider = windowHandleProvider;
     }
 
     public Task<string?> PickFolderAsync()
-    {
-        var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
+    { 
+        var hwnd = _windowHandleProvider.Hwnd;
 
         if (ElevationHelper.IsElevated())
         {

@@ -26,6 +26,7 @@ public partial class App : Application
         var mainPage = windowManager.CreateScopedMainPage();
         _mWindow = new MainWindow(mainPage);
         MainWindow = _mWindow;
+        windowManager.SetRootWindowHandle(_mWindow);
         _mWindow.Activate();
 
         Services.GetRequiredService<INotificationService>();
@@ -39,7 +40,8 @@ public partial class App : Application
         services.AddTransient<MainPage>();
         services.AddSingleton<IDiskScanService, DiskScanService>();
         services.AddSingleton<IElevatedScanHelper, ElevatedScanHelperClient>();
-        services.AddSingleton<IFolderPickerService, FolderPickerService>();
+        services.AddScoped<IFolderPickerService, FolderPickerService>();
+        services.AddScoped<IWindowHandleProvider, WindowHandleProvider>();
         services.AddScoped<IScanStateService, ScanStateService>();
         services.AddSingleton<WindowManagerService>();
         services.AddSingleton<IWindowManagerService>(sp => sp.GetRequiredService<WindowManagerService>());
@@ -55,6 +57,7 @@ public partial class App : Application
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<SettingsWindow>();
         services.AddSingleton<IBackgroundScanTestRunner, BackgroundScanTestRunner>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
         return services.BuildServiceProvider();
     }
 }
