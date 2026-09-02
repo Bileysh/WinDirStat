@@ -209,8 +209,32 @@
     <data name="ReparsePointText" xml:space="preserve">
     <value>Точка з'єднання (Junction) — не сканується для уникнення зациклень</value>
   </data>
+    <data name="HardLinkTooltipText" xml:space="preserve">
+    <value>Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0</value>
+  </data>
+    <data name="WindowTitle_New" xml:space="preserve">
+    <value>WinDirStat - Нове вікно</value>
+  </data>
+    <data name="WindowTitle_Statistics" xml:space="preserve">
+    <value>Статистика (окреме вікно)</value>
+  </data>
+    <data name="WindowTitle_TreeView" xml:space="preserve">
+    <value>Дерево каталогів (окреме вікно)</value>
+  </data>
+    <data name="WindowTitle_TreeMap" xml:space="preserve">
+    <value>Карта файлів (окреме вікно)</value>
+  </data>
+    <data name="FolderPickerTitle" xml:space="preserve">
+    <value>Виберіть папку для сканування</value>
+  </data>
     <data name="MenuShowInExplorer.Text" xml:space="preserve">
     <value>Показати в Провіднику</value>
+  </data>
+    <data name="OpenInExplorerFailedTitle" xml:space="preserve">
+    <value>Не вдалося відкрити провідник</value>
+  </data>
+    <data name="ShowPropertiesFailedTitle" xml:space="preserve">
+    <value>Не вдалося відкрити властивості</value>
   </data>
     <data name="SelectDriveHeader.Text" xml:space="preserve">
     <value>Оберіть диск для сканування</value>

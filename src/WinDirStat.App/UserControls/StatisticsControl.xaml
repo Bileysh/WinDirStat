@@ -17,8 +17,7 @@
 
         <TextBlock Grid.Row="1" x:Uid="NoDataText" HorizontalAlignment="Center" VerticalAlignment="Center"
                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                   Visibility="{x:Bind GetNoDataVisibility(ViewModel.TypeStatistics.Count, ViewModel.IsScanning), Mode=OneWay}" />
-
+                   Visibility="{x:Bind ViewModel.IsNoDataVisible, Mode=OneWay}" />
         <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.TypeStatistics, Mode=OneWay}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:FileTypeStatisticsViewModel">
