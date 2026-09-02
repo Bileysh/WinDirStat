@@ -14,14 +14,16 @@ namespace WinDirStat_App.Services;
 public class WindowManagerService : IWindowManagerService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
     private readonly List<Window> _openWindows = new();
 
-    public WindowManagerService(IServiceProvider serviceProvider, IThemeService themeService,
-        ILocalizationService localizationService)
+    public WindowManagerService(IServiceProvider serviceProvider, IServiceScopeFactory scopeFactory,
+        IThemeService themeService, ILocalizationService localizationService)
     {
         _serviceProvider = serviceProvider;
+        _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
 
@@ -49,7 +51,8 @@ public class WindowManagerService : IWindowManagerService
             MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
-        var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
+        var scope = _scopeFactory.CreateScope();
+        var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var page = new MainPage(viewModel);
 
         page.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
@@ -63,6 +66,7 @@ public class WindowManagerService : IWindowManagerService
         {
             _openWindows.Remove(newWindow);
             viewModel.Dispose();
+            scope.Dispose();
         };
         OffsetWindowPosition(newWindow);
 
@@ -108,7 +112,6 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Closed += (_, _) =>
         {
             _openWindows.Remove(newWindow);
-            viewModel.Dispose();
         };
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
@@ -130,30 +133,30 @@ public class WindowManagerService : IWindowManagerService
         }
     }
 
-    public void OpenStatisticsWindow()
+    public void OpenStatisticsWindow(IMainPageViewModel viewModel)
     {
-        var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
-        var control = new StatisticsControl { ViewModel = viewModel };
+        var vm = (MainPageViewModel)viewModel;
+        var control = new StatisticsControl { ViewModel = vm };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_Statistics"), control,
-                WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, viewModel)
+                WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, vm)
             .Activate();
     }
 
-    public void OpenTreeViewWindow()
+    public void OpenTreeViewWindow(IMainPageViewModel viewModel)
     {
-        var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
-        var control = new TreeViewControl { ViewModel = viewModel };
+        var vm = (MainPageViewModel)viewModel;
+        var control = new TreeViewControl { ViewModel = vm };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeView"), control,
-                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, viewModel)
+                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, vm)
             .Activate();
     }
 
-    public void OpenTreeMapWindow()
+    public void OpenTreeMapWindow(IMainPageViewModel viewModel)
     {
-        var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
-        var control = new TreeMapControl { ViewModel = viewModel };
+        var vm = (MainPageViewModel)viewModel;
+        var control = new TreeMapControl { ViewModel = vm };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeMap"), control,
-                WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, viewModel)
+                WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, vm)
             .Activate();
     }
 
@@ -165,6 +168,18 @@ public class WindowManagerService : IWindowManagerService
         window.Closed += (_, _) => _openWindows.Remove(window);
         OffsetWindowPosition(window);
         window.Activate();
+    }
+
+    private IServiceScope? _rootWindowScope;
+    
+    public MainPage CreateScopedMainPage()
+    {
+        _rootWindowScope?.Dispose();
+        var scope = _scopeFactory.CreateScope();
+        _rootWindowScope = scope;
+
+        var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
+        return new MainPage(viewModel);
     }
 
     public void ReloadMainWindowContent()
@@ -180,7 +195,11 @@ public class WindowManagerService : IWindowManagerService
 
         window.CurrentPage?.ViewModel.Dispose();
 
-        var viewModel = _serviceProvider.GetRequiredService<MainPageViewModel>();
+        _rootWindowScope?.Dispose();
+        var scope = _scopeFactory.CreateScope();
+        _rootWindowScope = scope;
+
+        var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
 
         window.SetContent(new MainPage(viewModel));
     }

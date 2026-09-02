@@ -25,4 +25,39 @@ public class MainPageViewModelTests
 
         Assert.Single(vm.RootNodes);
     }
+
+    [Fact]
+    public async Task TwoViewModels_WithIndependentScanStateServices_DoNotLeakResultsIntoEachOther()
+    {
+        var folderA = Directory.CreateTempSubdirectory();
+        var folderB = Directory.CreateTempSubdirectory();
+
+        var vmA = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService { PathToReturn = folderA.FullName },
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService());
+
+        var vmB = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService { PathToReturn = folderB.FullName },
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService());
+
+        await vmA.OpenFolderCommand.ExecuteAsync(null);
+
+        Assert.Single(vmA.RootNodes);
+        Assert.Empty(vmB.RootNodes);
+        Assert.False(vmB.IsScanning);
+    }
 }

@@ -22,7 +22,8 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var mainPage = Services.GetRequiredService<MainPage>();
+        var windowManager = Services.GetRequiredService<WindowManagerService>();
+        var mainPage = windowManager.CreateScopedMainPage();
         _mWindow = new MainWindow(mainPage);
         MainWindow = _mWindow;
         _mWindow.Activate();
@@ -34,13 +35,14 @@ public partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        services.AddTransient<MainPageViewModel>();
+        services.AddScoped<MainPageViewModel>();
         services.AddTransient<MainPage>();
         services.AddSingleton<IDiskScanService, DiskScanService>();
         services.AddSingleton<IElevatedScanHelper, ElevatedScanHelperClient>();
         services.AddSingleton<IFolderPickerService, FolderPickerService>();
-        services.AddSingleton<IScanStateService, ScanStateService>();
-        services.AddSingleton<IWindowManagerService, WindowManagerService>();
+        services.AddScoped<IScanStateService, ScanStateService>();
+        services.AddSingleton<WindowManagerService>();
+        services.AddSingleton<IWindowManagerService>(sp => sp.GetRequiredService<WindowManagerService>());
         services.AddSingleton<IDialogService, WinUiDialogService>();
         services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
         services.AddSingleton<IThemeService, WinUiThemeService>();
