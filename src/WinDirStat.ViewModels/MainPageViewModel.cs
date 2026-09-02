@@ -58,7 +58,8 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         }
     }
 
-    [ObservableProperty] public partial ObservableCollection<NodeViewModel> RootNodes { get; set; } = [];
+    [ObservableProperty] 
+    public partial ObservableCollection<NodeViewModel> RootNodes { get; set; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
@@ -84,8 +85,9 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     public string ScanProgressText => ScanFilesCount == 0 && ScanFoldersCount == 0
         ? string.Empty
         : string.Format(_localizationService.GetString("ScanProgressFormat"), ScanFilesCount, ScanFoldersCount);
-
-    [ObservableProperty] public partial ObservableCollection<DriveItemViewModel> AvailableDrives { get; set; } = [];
+    
+    [ObservableProperty]
+    public partial ObservableCollection<DriveItemViewModel> AvailableDrives { get; set; } = [];
 
     public bool ShowDriveSelector => !IsScanning && !HasScanResult;
 
@@ -95,9 +97,12 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public bool IsNoDataVisible => TypeStatistics.Count == 0 && !IsScanning;
 
-    [ObservableProperty] public partial ObservableCollection<TreeMapRectViewModel> TreeMapRects { get; set; } = [];
 
-    [ObservableProperty] public partial bool GroupByCategory { get; set; }
+    [ObservableProperty]
+    public partial ObservableCollection<TreeMapRectViewModel> TreeMapRects { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool GroupByCategory { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTreeMapNavigated))]
