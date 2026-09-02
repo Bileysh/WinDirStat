@@ -13,15 +13,17 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISettingsFileService _fileService;
     private readonly IBackgroundScanTestRunner _testRunner;
     private readonly ILocalizationService _localizationService;
+    
+    private readonly bool _isInitialized;
 
     [ObservableProperty]
-    private uint _scanIntervalMinutes;
+    public partial uint ScanIntervalMinutes { get; set; }
 
     [ObservableProperty]
-    private double _lowFreeSpaceThresholdPercent;
+    public partial double LowFreeSpaceThresholdPercent { get; set; }
 
     [ObservableProperty]
-    private string? _statusMessage;
+    public partial string? StatusMessage { get; set; }
 
     public SettingsViewModel(
         IBackgroundScanSettingsService settings,
@@ -35,12 +37,17 @@ public partial class SettingsViewModel : ObservableObject
         _fileService = fileService;
         _testRunner = testRunner;
         _localizationService = localizationService;
-        _scanIntervalMinutes = settings.ScanIntervalMinutes;
-        _lowFreeSpaceThresholdPercent = settings.LowFreeSpaceThresholdPercent;
+
+        ScanIntervalMinutes = settings.ScanIntervalMinutes;
+        LowFreeSpaceThresholdPercent = settings.LowFreeSpaceThresholdPercent;
+
+        _isInitialized = true;
     }
 
     partial void OnScanIntervalMinutesChanged(uint value)
     {
+        if (!_isInitialized) return;
+
         _settings.ScanIntervalMinutes = value;
         _registrar.ReRegister();
         StatusMessage = string.Format(_localizationService.GetString("ScanIntervalStatus"), _settings.ScanIntervalMinutes);
@@ -48,6 +55,8 @@ public partial class SettingsViewModel : ObservableObject
 
     partial void OnLowFreeSpaceThresholdPercentChanged(double value)
     {
+        if (!_isInitialized) return;
+
         _settings.LowFreeSpaceThresholdPercent = value;
         StatusMessage = string.Format(_localizationService.GetString("LowSpaceThresholdStatus"), _settings.LowFreeSpaceThresholdPercent.ToString("F0"));
     }

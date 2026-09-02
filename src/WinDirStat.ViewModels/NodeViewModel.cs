@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinDirStat.Core.Classification;
@@ -15,16 +14,19 @@ public partial class NodeViewModel : ObservableObject
     private readonly ILocalizationService? _localizationService;
     private readonly INotificationService? _notificationService;
     private readonly IClipboardService? _clipboardService;
+    private readonly IFileExplorerService? _fileExplorerService;
     private List<NodeViewModel>? _children;
 
     public NodeViewModel(FileSystemNode node, long parentSizeLogical = 0,
-        ILocalizationService? localizationService = null, INotificationService? notificationService = null, IClipboardService? clipboardService = null)
+        ILocalizationService? localizationService = null, INotificationService? notificationService = null,
+        IClipboardService? clipboardService = null, IFileExplorerService? fileExplorerService = null)
     {
         _node = node;
         _parentSizeLogical = parentSizeLogical;
         _localizationService = localizationService;
         _notificationService = notificationService;
         _clipboardService = clipboardService;
+        _fileExplorerService = fileExplorerService;
     }
 
     public string Name => _node.Name;
@@ -40,7 +42,8 @@ public partial class NodeViewModel : ObservableObject
 
     public IReadOnlyList<NodeViewModel> Children =>
         _children ??= _node.Children
-            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService, _clipboardService ))
+            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService,
+                _clipboardService, _fileExplorerService))
             .ToList();
 
     public string ChildSummaryFormatted => IsDirectory
@@ -61,6 +64,25 @@ public partial class NodeViewModel : ObservableObject
         _ => "—"
     };
 
+    public string AccessibleName
+    {
+        get
+        {
+            var parts = new List<string> { Name };
+
+            if (HasStatusIcon && !string.IsNullOrEmpty(StatusTooltip))
+                parts.Add(StatusTooltip);
+
+            parts.Add(SizeLogicalFormatted);
+            parts.Add(PercentOfParentFormatted);
+
+            if (IsDirectory && !string.IsNullOrEmpty(ChildSummaryFormatted))
+                parts.Add(ChildSummaryFormatted);
+
+            return string.Join(", ", parts);
+        }
+    }
+
     public bool IsDuplicateHardLink => _node.IsDuplicateHardLink;
 
     public string StatusGlyph => IsDuplicateHardLink
@@ -79,7 +101,8 @@ public partial class NodeViewModel : ObservableObject
         ? _localizationService?.GetString("HardLinkTooltipText") ?? string.Empty
         : _node.Status switch
         {
-            ScanStatus.AccessDenied => _node.ErrorMessage ?? _localizationService?.GetString("AccessDeniedText") ?? string.Empty,
+            ScanStatus.AccessDenied => _node.ErrorMessage ??
+                                       _localizationService?.GetString("AccessDeniedText") ?? string.Empty,
             ScanStatus.Error => _node.ErrorMessage ?? _localizationService?.GetString("ScanErrorText") ?? string.Empty,
             ScanStatus.ReparsePoint => _localizationService?.GetString("ReparsePointText") ?? string.Empty,
             _ => string.Empty
@@ -92,24 +115,7 @@ public partial class NodeViewModel : ObservableObject
 
         try
         {
-            if (IsDirectory)
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = _node.FullPath,
-                    UseShellExecute = true,
-                    Verb = "open"
-                });
-            }
-            else
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "explorer.exe",
-                    Arguments = $"/select,\"{_node.FullPath}\"",
-                    UseShellExecute = true
-                });
-            }
+            _fileExplorerService?.OpenInExplorer(_node.FullPath, IsDirectory);
         }
         catch (Exception ex)
         {
@@ -127,18 +133,7 @@ public partial class NodeViewModel : ObservableObject
 
         try
         {
-            var succeeded = ShellInterop.SHObjectProperties(
-                IntPtr.Zero, ShellInterop.SHOP_FILEPATH, _node.FullPath, null);
-
-            if (!succeeded)
-            {
-                var error = Marshal.GetLastWin32Error();
-                Debug.WriteLine(
-                    $"[NodeViewModel] SHObjectProperties returned false for '{_node.FullPath}' " +
-                    $"(Win32 error {error}).");
-                _notificationService?.ShowNotification(
-                    GetLocalizedOrFallback("ShowPropertiesFailedTitle", "Failed to open properties"), Name);
-            }
+            _fileExplorerService?.ShowProperties(_node.FullPath);
         }
         catch (Exception ex)
         {
@@ -152,15 +147,6 @@ public partial class NodeViewModel : ObservableObject
     private string GetLocalizedOrFallback(string key, string fallback) =>
         _localizationService?.GetString(key) ?? fallback;
 
-    private static class ShellInterop
-    {
-        public const uint SHOP_FILEPATH = 0x2;
-
-        [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool SHObjectProperties(
-            IntPtr hwnd, uint shopObjectType, string pszObjectName, string? pszPropertyPage);
-    }
-    
     [RelayCommand]
     private void CopyPath()
     {
