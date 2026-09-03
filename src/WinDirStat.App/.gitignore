@@ -40,7 +40,7 @@ PublishScripts/
 _ReSharper*/
 *.DotSettings.user
 *.dotCover
-.idea/яя
+.idea/
 
 Generated\ Files/
 *_wpftmp.csproj

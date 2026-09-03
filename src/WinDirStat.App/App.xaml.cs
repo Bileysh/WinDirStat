@@ -26,6 +26,7 @@ public partial class App : Application
         var mainPage = windowManager.CreateScopedMainPage();
         _mWindow = new MainWindow(mainPage);
         MainWindow = _mWindow;
+        _mWindow.Closed += (_, _) => MainWindow = null;
         windowManager.SetRootWindowHandle(_mWindow);
         _mWindow.Activate();
 
