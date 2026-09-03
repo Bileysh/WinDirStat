@@ -389,7 +389,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         {
             var root = TreeMapAbsoluteRootPath;
             var current = CurrentTreeMapRoot?.FullPath ?? string.Empty;
-            if (string.IsNullOrEmpty(root) || !current.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(root) || !current.StartsWith(root,  StringComparison.OrdinalIgnoreCase))
                 return string.Empty;
             return current[root.Length..];
         }

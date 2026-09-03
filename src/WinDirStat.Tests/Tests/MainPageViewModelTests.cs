@@ -24,6 +24,7 @@ public class MainPageViewModelTests
             new FakeClipboardService(), 
             new FakeFileExplorerService(),
             new FakeBackgroundScanSettingsService());
+            
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
         Assert.Single(vm.RootNodes);
