@@ -29,8 +29,8 @@
                         DoubleClickCommand="{x:Bind RestoreWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Відкрити" Command="{x:Bind RestoreWindowCommand}" Icon="NewWindow" />
-                    <MenuFlyoutItem Text="Вихід" Command="{x:Bind ExitCommand}" Icon="Cancel" />
+                    <MenuFlyoutItem x:Uid="TrayMenuOpen" Command="{x:Bind RestoreWindowCommand}" Icon="NewWindow" />
+                    <MenuFlyoutItem x:Uid="TrayMenuExit" Command="{x:Bind ExitCommand}" Icon="Cancel" />
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
