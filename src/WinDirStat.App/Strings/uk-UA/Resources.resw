@@ -215,7 +215,6 @@
     <data name="HardLinkTooltipText" xml:space="preserve">
     <value>Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0</value>
   </data>
-<<<<<<< HEAD
     <data name="ScanIntervalStatus" xml:space="preserve">
     <value>Інтервал сканування: {0} хв.</value>
   </data>
@@ -249,8 +248,6 @@
     <data name="LowSpaceNotificationBody" xml:space="preserve">
     <value>{0}: залишилось лише {1} ({2}% вільно)</value>
   </data>
-=======
->>>>>>> origin/fix/scan-error-handling-and-cleanup
     <data name="WindowTitle_New" xml:space="preserve">
     <value>WinDirStat - Нове вікно</value>
   </data>

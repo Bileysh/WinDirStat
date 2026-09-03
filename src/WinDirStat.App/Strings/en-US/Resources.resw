@@ -178,7 +178,6 @@
     <data name="HardLinkTooltipText" xml:space="preserve">
     <value>Hard link — physical disk space is already accounted for by another file in this tree, SizePhysical is intentionally 0 here</value>
   </data>
-<<<<<<< HEAD
     <data name="ScanIntervalStatus" xml:space="preserve">
     <value>Scan interval: {0} min.</value>
   </data>
@@ -212,8 +211,6 @@
     <data name="LowSpaceNotificationBody" xml:space="preserve">
     <value>{0}: only {1} left ({2}% free)</value>
   </data>
-=======
->>>>>>> origin/fix/scan-error-handling-and-cleanup
     <data name="WindowTitle_New" xml:space="preserve">
     <value>WinDirStat - New window</value>
   </data>
