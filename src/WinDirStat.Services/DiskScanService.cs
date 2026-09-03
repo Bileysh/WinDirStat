@@ -42,8 +42,26 @@ public class DiskScanService : IDiskScanService
                 entry.LastWriteTimeUtc.UtcDateTime),
             ScanOptions);
 
+    private sealed class ScanProgressTracker
+    {
+        private const int ReportEveryNItems = 64;
+
+        public long FilesScanned;
+        public long FoldersScanned;
+        private long _itemsSinceLastReport;
+
+        public void OnItemScanned(string currentPath, IProgress<ScanProgress>? progress)
+        {
+            if (progress is null) return;
+            if (++_itemsSinceLastReport < ReportEveryNItems) return;
+
+            _itemsSinceLastReport = 0;
+            progress.Report(new ScanProgress(currentPath, FilesScanned, FoldersScanned));
+        }
+    }
+
     public Task<ScanResult> ScanAsync(string rootPath, CancellationToken cancellationToken = default,
-        bool useElevatedFallbackForAccessDenied = false)
+        bool useElevatedFallbackForAccessDenied = false, IProgress<ScanProgress>? progress = null)
     {
         return Task.Run(() =>
         {
@@ -56,8 +74,10 @@ public class DiskScanService : IDiskScanService
                 var seenHardLinks = new HashSet<FileIdentity>();
 
                 var deniedNodes = new List<FileSystemNode>();
+                var tracker = new ScanProgressTracker();
                 var rootNode = ScanDirectory(rootInfo.Name, rootInfo.FullName, rootInfo.Attributes,
-                    rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, cancellationToken);
+                    rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, tracker, progress,
+                    cancellationToken);
 
                 if (useElevatedFallbackForAccessDenied && deniedNodes.Count > 0 && _elevatedScanHelper is not null)
                 {
@@ -118,7 +138,8 @@ public class DiskScanService : IDiskScanService
 
     private FileSystemNode ScanDirectory(string name, string fullPath, FileAttributes attributes,
         DateTime lastWriteTimeUtc, uint clusterSize, HashSet<FileIdentity> seenHardLinks,
-        List<FileSystemNode> deniedNodes, CancellationToken cancellationToken)
+        List<FileSystemNode> deniedNodes, ScanProgressTracker tracker, IProgress<ScanProgress>? progress,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -145,11 +166,15 @@ public class DiskScanService : IDiskScanService
                 if (entry.IsDirectory)
                 {
                     var childNode = ScanDirectory(entry.Name, entry.FullPath, entry.Attributes,
-                        entry.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, cancellationToken);
+                        entry.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, tracker, progress,
+                        cancellationToken);
 
                     node.Children.Add(childNode);
                     node.SizeLogical += childNode.SizeLogical;
                     node.SizePhysical += childNode.SizePhysical;
+
+                    tracker.FoldersScanned++;
+                    tracker.OnItemScanned(entry.FullPath, progress);
                 }
                 else
                 {
@@ -177,6 +202,9 @@ public class DiskScanService : IDiskScanService
                     node.Children.Add(fileNode);
                     node.SizeLogical += fileNode.SizeLogical;
                     node.SizePhysical += fileNode.SizePhysical;
+
+                    tracker.FilesScanned++;
+                    tracker.OnItemScanned(entry.FullPath, progress);
                 }
             }
         }

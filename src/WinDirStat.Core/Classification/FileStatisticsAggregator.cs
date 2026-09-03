@@ -10,7 +10,7 @@ public static class FileStatisticsAggregator
         var files = EnumerateFiles(root).ToList();
 
         var byExtension = Aggregate(files, f => (
-            Label: string.IsNullOrEmpty(f.Extension) ? "(без розширення)" : f.Extension.ToLowerInvariant(),
+            Label: string.IsNullOrEmpty(f.Extension) ? string.Empty : f.Extension.ToLowerInvariant(),
             Category: FileCategoryClassifier.Classify(f.Extension)));
 
         var byCategory = Aggregate(files, f =>

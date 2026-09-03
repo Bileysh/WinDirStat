@@ -8,7 +8,6 @@
     <UserControl.Resources>
         <converters:NodeSummaryConverter x:Key="NodeSummaryConverter" />
     </UserControl.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -36,21 +35,34 @@
                     <DataTemplate x:DataType="vm:NodeViewModel">
                         <TreeViewItem ItemsSource="{x:Bind Children}">
                             <StackPanel Orientation="Horizontal" Spacing="12">
-                                <TextBlock Text="{x:Bind Name}" Width="220" IsTextSelectionEnabled="True" />
+                               <StackPanel.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem x:Uid="MenuShowInExplorer"
+                                                        Command="{x:Bind OpenInExplorerCommand}">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xEC50;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem x:Uid="MenuShowProperties"
+                                                        Command="{x:Bind ShowPropertiesCommand}">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE946;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </StackPanel.ContextFlyout>
+                                
+                                <TextBlock Text="{x:Bind Name}" Width="220" />
                                 <TextBlock Text="{x:Bind StatusGlyph}" FontFamily="Segoe MDL2 Assets"
                                            Width="16" Opacity="0.7"
                                            Visibility="{x:Bind HasStatusIcon, Mode=OneWay}"
                                            ToolTipService.ToolTip="{x:Bind StatusTooltip, Mode=OneWay}" />
-                                <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7"
-                                           IsTextSelectionEnabled="True" />
-                                <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7"
-                                           IsTextSelectionEnabled="True" />
-                                <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5"
-                                           IsTextSelectionEnabled="True" />
-                                <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50"
-                                           IsTextSelectionEnabled="True" />
-                                <TextBlock Text="{x:Bind Converter={StaticResource NodeSummaryConverter}}"
-                                           IsTextSelectionEnabled="True" />
+                                <TextBlock Text="{x:Bind SizeLogicalFormatted}" Width="80" Opacity="0.7" />
+                                <TextBlock Text="{x:Bind SizePhysicalFormatted}" Width="80" Opacity="0.7" />
+                                <TextBlock Text="{x:Bind LastModified}" Width="140" Opacity="0.5" />
+                                <TextBlock Text="{x:Bind PercentOfParentFormatted}" Width="50" />
+                                <TextBlock Text="{x:Bind Converter={StaticResource NodeSummaryConverter}}" />
                             </StackPanel>
                         </TreeViewItem>
                     </DataTemplate>

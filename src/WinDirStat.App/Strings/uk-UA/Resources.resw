@@ -188,6 +188,9 @@
     <data name="ScanCompleteMessageFormat" xml:space="preserve">
     <value>Час: {0:F1} сек. Файлів: {1} Папок: {2}</value>
   </data>
+    <data name="ScanProgressFormat" xml:space="preserve">
+    <value>Файлів: {0:N0}  Папок: {1:N0}</value>
+  </data>
     <data name="AboutTitle" xml:space="preserve">
     <value>Про програму</value>
   </data>
@@ -211,6 +214,39 @@
   </data>
     <data name="HardLinkTooltipText" xml:space="preserve">
     <value>Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0</value>
+  </data>
+    <data name="ScanIntervalStatus" xml:space="preserve">
+    <value>Інтервал сканування: {0} хв.</value>
+  </data>
+    <data name="LowSpaceThresholdStatus" xml:space="preserve">
+    <value>Поріг попередження: {0}%.</value>
+  </data>
+    <data name="SettingsExportedStatus" xml:space="preserve">
+    <value>Налаштування збережено у {0}.</value>
+  </data>
+    <data name="SettingsImportedStatus" xml:space="preserve">
+    <value>Налаштування імпортовано з {0}.</value>
+  </data>
+    <data name="SettingsImportFailedStatus" xml:space="preserve">
+    <value>Не вдалось імпортувати: {0}</value>
+  </data>
+    <data name="TestScanCompletedStatus" xml:space="preserve">
+    <value>Тестовий скан виконано — перевір тост.</value>
+  </data>
+    <data name="NoExtensionLabel" xml:space="preserve">
+    <value>(без розширення)</value>
+  </data>
+    <data name="DriveStatusNotificationTitle" xml:space="preserve">
+    <value>Стан дисків</value>
+  </data>
+    <data name="DriveStatusSummaryLine" xml:space="preserve">
+    <value>{0} — вільно {1} з {2}</value>
+  </data>
+    <data name="LowSpaceNotificationTitle" xml:space="preserve">
+    <value>Мало вільного місця</value>
+  </data>
+    <data name="LowSpaceNotificationBody" xml:space="preserve">
+    <value>{0}: залишилось лише {1} ({2}% вільно)</value>
   </data>
     <data name="WindowTitle_New" xml:space="preserve">
     <value>WinDirStat - Нове вікно</value>

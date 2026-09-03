@@ -20,14 +20,15 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private readonly INotificationService _notificationService;
     private readonly IDriveInfoService _driveInfoService;
     private readonly Stack<FileSystemNode> _treeMapHistory = new();
-
+    private readonly IClipboardService _clipboardService;
+    
     private CancellationTokenSource? _scanCts;
     private string? _lastScanPath;
 
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService, IWindowManagerService windowManagerService, IDialogService dialogService,
         ILocalizationService localizationService, IThemeService themeService, INotificationService notificationService,
-        IDriveInfoService driveInfoService)
+        IDriveInfoService driveInfoService, IClipboardService clipboardService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -38,6 +39,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _themeService = themeService;
         _notificationService = notificationService;
         _driveInfoService = driveInfoService;
+        _clipboardService = clipboardService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
@@ -60,6 +62,22 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
     private bool _hasScanResult;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ScanProgressText))]
+    private long _scanFilesCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ScanProgressText))]
+    private long _scanFoldersCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ScanProgressText))]
+    private string _scanCurrentPath = string.Empty;
+    
+    public string ScanProgressText => ScanFilesCount == 0 && ScanFoldersCount == 0
+        ? string.Empty
+        : string.Format(_localizationService.GetString("ScanProgressFormat"), ScanFilesCount, ScanFoldersCount);
 
     [ObservableProperty] private ObservableCollection<DriveItemViewModel> _availableDrives = [];
 
@@ -94,7 +112,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     {
         if (result is null) return;
 
-        RootNodes = [new NodeViewModel(result.RootNode, localizationService: _localizationService)];
+        RootNodes = [new NodeViewModel(result.RootNode, localizationService: _localizationService, notificationService: _notificationService, clipboardService: _clipboardService)];
         HasScanResult = true;
 
         _treeMapHistory.Clear();
@@ -176,10 +194,21 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         RootNodes.Clear();
         TypeStatistics.Clear();
         TreeMapRects.Clear();
+        ScanFilesCount = 0;
+        ScanFoldersCount = 0;
+        ScanCurrentPath = string.Empty;
+        
+        var progress = new Progress<ScanProgress>(p =>
+        {
+            ScanFilesCount = p.FilesScanned;
+            ScanFoldersCount = p.FoldersScanned;
+            ScanCurrentPath = p.CurrentPath;
+        });
 
         try
         {
-            var scanResult = await _diskScanService.ScanAsync(path, _scanCts.Token, useElevatedFallbackForAccessDenied);
+            var scanResult = await _diskScanService.ScanAsync(
+                path, _scanCts.Token, useElevatedFallbackForAccessDenied, progress);
             _scanStateService.SetResult(scanResult);
 
             var fileCount = 0;

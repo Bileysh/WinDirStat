@@ -1,31 +1,76 @@
 <Window
     x:Class="WinDirStat_App.SettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Uid="SettingsWindowTitle">
 
-    <ScrollViewer Padding="24">
-        <StackPanel Spacing="20" MaxWidth="440">
-            <NumberBox x:Name="ScanIntervalNumberBox" x:Uid="SettingsScanIntervalNumberBox"
-                       Minimum="15" SmallChange="15" LargeChange="60"
-                       SpinButtonPlacementMode="Inline"
-                       ValueChanged="ScanIntervalNumberBox_ValueChanged" />
+    <Grid Background="Transparent">
+        <ScrollViewer Padding="32">
+            <StackPanel Spacing="24" MaxWidth="800" HorizontalAlignment="Stretch">
+                
+                <TextBlock x:Uid="SettingsHeader" Text="Налаштування" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,0,0,8" />
 
-            <StackPanel Spacing="4">
-                <TextBlock x:Uid="SettingsThresholdSliderLabel" />
-                <Slider Value="{x:Bind ViewModel.LowFreeSpaceThresholdPercent, Mode=TwoWay}"
-                        Minimum="1" Maximum="50" />
+                <StackPanel Spacing="12">
+                    <TextBlock x:Uid="BgScanSettingsTitle" Text="Фонове сканування" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="8">
+                        <StackPanel>
+                            <Grid Padding="16" ColumnDefinitions="*, Auto">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                    <TextBlock x:Uid="ScanIntervalInputHeader" Text="Інтервал сканування (хвилини)" Style="{ThemeResource BodyTextBlockStyle}" />
+                                    <TextBlock x:Uid="ScanIntervalInputDesc" Text="Як часто запускатиметься перевірка (мінімум 15)." Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <NumberBox Grid.Column="1" Value="{x:Bind ViewModel.ScanIntervalMinutes, Mode=TwoWay}" Minimum="15" Maximum="1440" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
+                            </Grid>
+                            
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            
+                            <Grid Padding="16" ColumnDefinitions="*, Auto">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                    <TextBlock x:Uid="SpaceThresholdInputHeader" Text="Поріг вільного місця (%)" Style="{ThemeResource BodyTextBlockStyle}" />
+                                    <TextBlock x:Uid="SpaceThresholdInputDesc" Text="Сповіщати, якщо вільного місця менше цього відсотка." Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <NumberBox Grid.Column="1" Value="{x:Bind ViewModel.LowFreeSpaceThresholdPercent, Mode=TwoWay}" Minimum="1" Maximum="50" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Spacing="12">
+                    <TextBlock x:Uid="DataSettingsTitle" Text="Дані та конфігурація" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="8">
+                        <StackPanel>
+                            <Grid Padding="16" ColumnDefinitions="*, Auto">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                    <TextBlock x:Uid="ExportImportHeader" Text="Експорт та імпорт" Style="{ThemeResource BodyTextBlockStyle}" />
+                                    <TextBlock x:Uid="ExportImportDesc" Text="Збереження налаштувань у файл JSON." Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Button x:Uid="ExportSettingsBtn" Content="Експорт" Command="{x:Bind ViewModel.ExportCommand}" />
+                                    <Button x:Uid="ImportSettingsBtn" Content="Імпорт" Command="{x:Bind ViewModel.ImportCommand}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            
+                            <Grid Padding="16" ColumnDefinitions="*, Auto">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                    <TextBlock x:Uid="TestNotificationHeader" Text="Тестування" Style="{ThemeResource BodyTextBlockStyle}" />
+                                    <TextBlock x:Uid="TestNotificationDesc" Text="Примусовий запуск фонової перевірки дисків." Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" x:Uid="TestNotificationBtn" Content="Запустити тест" Command="{x:Bind ViewModel.TestScanNowCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button x:Uid="SettingsExportButton" Command="{x:Bind ViewModel.ExportCommand}" />
-                <Button x:Uid="SettingsImportButton" Command="{x:Bind ViewModel.ImportCommand}" />
-            </StackPanel>
-
-            <Button x:Uid="SettingsTestScanButton" Command="{x:Bind ViewModel.TestScanNowCommand}"
-                    HorizontalAlignment="Left" />
-
-            <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
-                       Opacity="0.7" TextWrapping="Wrap" />
-        </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Window>

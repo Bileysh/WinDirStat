@@ -1,3 +1,5 @@
+using WinDirStat.Core.BackgroundScan;
+
 namespace WinDirStat.Core.Interfaces;
 
 public interface IBackgroundScanSettingsService
@@ -5,5 +7,5 @@ public interface IBackgroundScanSettingsService
     uint ScanIntervalMinutes { get; set; }
     double LowFreeSpaceThresholdPercent { get; set; }
     string ExportToJson();
-    void ImportFromJson(string json);
+    SettingsValidationError ImportFromJson(string json);
 }
