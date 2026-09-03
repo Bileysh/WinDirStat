@@ -61,7 +61,8 @@ public class DiskScanService : IDiskScanService
     }
 
     public Task<ScanResult> ScanAsync(string rootPath, CancellationToken cancellationToken = default,
-        bool useElevatedFallbackForAccessDenied = false, IProgress<ScanProgress>? progress = null)
+        bool useElevatedFallbackForAccessDenied = false, IProgress<ScanProgress>? progress = null,
+        bool accountForHardLinks = false)
     {
         return Task.Run(() =>
         {
@@ -77,7 +78,7 @@ public class DiskScanService : IDiskScanService
                 var tracker = new ScanProgressTracker();
                 var rootNode = ScanDirectory(rootInfo.Name, rootInfo.FullName, rootInfo.Attributes,
                     rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, tracker, progress,
-                    cancellationToken);
+                    cancellationToken, accountForHardLinks);
 
                 if (useElevatedFallbackForAccessDenied && deniedNodes.Count > 0 && _elevatedScanHelper is not null)
                 {
@@ -139,7 +140,7 @@ public class DiskScanService : IDiskScanService
     private FileSystemNode ScanDirectory(string name, string fullPath, FileAttributes attributes,
         DateTime lastWriteTimeUtc, uint clusterSize, HashSet<FileIdentity> seenHardLinks,
         List<FileSystemNode> deniedNodes, ScanProgressTracker tracker, IProgress<ScanProgress>? progress,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, bool accountForHardLinks)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -167,7 +168,8 @@ public class DiskScanService : IDiskScanService
                 {
                     var childNode = ScanDirectory(entry.Name, entry.FullPath, entry.Attributes,
                         entry.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, tracker, progress,
-                        cancellationToken);
+                        cancellationToken, accountForHardLinks);
+
 
                     node.Children.Add(childNode);
                     node.SizeLogical += childNode.SizeLogical;
@@ -192,11 +194,14 @@ public class DiskScanService : IDiskScanService
                     };
 
 
-                    var identity = _fileIdentityService.GetIdentity(entry.FullPath);
-                    if (identity is { LinkCount: > 1 } id && !seenHardLinks.Add(id))
+                    if (accountForHardLinks)
                     {
-                        fileNode.IsDuplicateHardLink = true;
-                        fileNode.SizePhysical = 0;
+                        var identity = _fileIdentityService.GetIdentity(entry.FullPath);
+                        if (identity is { LinkCount: > 1 } id && !seenHardLinks.Add(id))
+                        {
+                            fileNode.IsDuplicateHardLink = true;
+                            fileNode.SizePhysical = 0;
+                        }
                     }
 
                     node.Children.Add(fileNode);

@@ -21,7 +21,10 @@ public class MainPageViewModelTests
             new FakeThemeService(),
             new FakeNotificationService(),
             new DriveInfoService(),
-            new FakeClipboardService(), new FakeFileExplorerService());
+            new FakeClipboardService(), 
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService());
+            
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
         Assert.Single(vm.RootNodes);
@@ -43,7 +46,9 @@ public class MainPageViewModelTests
             new FakeThemeService(),
             new FakeNotificationService(),
             new DriveInfoService(),
-            new FakeClipboardService(), new FakeFileExplorerService());
+            new FakeClipboardService(), 
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService());
 
         var vmB = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -55,7 +60,9 @@ public class MainPageViewModelTests
             new FakeThemeService(),
             new FakeNotificationService(),
             new DriveInfoService(),
-            new FakeClipboardService(), new FakeFileExplorerService());
+            new FakeClipboardService(), 
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService());
 
         await vmA.OpenFolderCommand.ExecuteAsync(null);
 
