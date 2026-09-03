@@ -337,4 +337,10 @@
     <data name="SettingsTestScanButton.Content" xml:space="preserve">
     <value>Test scan now</value>
   </data>
+    <data name="TrayMenuOpen.Text" xml:space="preserve">
+    <value>Open</value>
+  </data>
+    <data name="TrayMenuExit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
 </root>
