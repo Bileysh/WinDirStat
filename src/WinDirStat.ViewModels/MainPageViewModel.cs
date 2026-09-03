@@ -21,6 +21,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private readonly IDriveInfoService _driveInfoService;
     private readonly Stack<FileSystemNode> _treeMapHistory = new();
     private readonly IClipboardService _clipboardService;
+    private readonly IFileExplorerService _fileExplorerService;
     
     private CancellationTokenSource? _scanCts;
     private string? _lastScanPath;
@@ -28,7 +29,8 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     public MainPageViewModel(IDiskScanService diskScanService, IFolderPickerService folderPickerService,
         IScanStateService scanStateService, IWindowManagerService windowManagerService, IDialogService dialogService,
         ILocalizationService localizationService, IThemeService themeService, INotificationService notificationService,
-        IDriveInfoService driveInfoService, IClipboardService clipboardService)
+        IDriveInfoService driveInfoService, IClipboardService clipboardService,
+        IFileExplorerService fileExplorerService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -40,6 +42,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _notificationService = notificationService;
         _driveInfoService = driveInfoService;
         _clipboardService = clipboardService;
+        _fileExplorerService = fileExplorerService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
@@ -53,50 +56,56 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         }
     }
 
-    [ObservableProperty] private ObservableCollection<NodeViewModel> _rootNodes = [];
+    [ObservableProperty]
+    public partial ObservableCollection<NodeViewModel> RootNodes { get; set; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
     [NotifyPropertyChangedFor(nameof(IsNoDataVisible))]
-    private bool _isScanning;
+    public partial bool IsScanning { get; set; }
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
-    private bool _hasScanResult;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
+    public partial bool HasScanResult { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ScanProgressText))]
-    private long _scanFilesCount;
+    public partial long ScanFilesCount { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ScanProgressText))]
-    private long _scanFoldersCount;
+    public partial long ScanFoldersCount { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ScanProgressText))]
-    private string _scanCurrentPath = string.Empty;
-    
+    public partial string ScanCurrentPath { get; set; } = string.Empty;
+
     public string ScanProgressText => ScanFilesCount == 0 && ScanFoldersCount == 0
         ? string.Empty
         : string.Format(_localizationService.GetString("ScanProgressFormat"), ScanFilesCount, ScanFoldersCount);
 
-    [ObservableProperty] private ObservableCollection<DriveItemViewModel> _availableDrives = [];
+    [ObservableProperty]
+    public partial ObservableCollection<DriveItemViewModel> AvailableDrives { get; set; } = [];
 
     public bool ShowDriveSelector => !IsScanning && !HasScanResult;
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsNoDataVisible))]
-    private ObservableCollection<FileTypeStatisticsViewModel> _typeStatistics = [];
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNoDataVisible))]
+    public partial ObservableCollection<FileTypeStatisticsViewModel> TypeStatistics { get; set; } = [];
 
     public bool IsNoDataVisible => TypeStatistics.Count == 0 && !IsScanning;
 
-    [ObservableProperty] private ObservableCollection<TreeMapRectViewModel> _treeMapRects = [];
+    [ObservableProperty]
+    public partial ObservableCollection<TreeMapRectViewModel> TreeMapRects { get; set; } = [];
 
-    [ObservableProperty] private bool _groupByCategory;
+    [ObservableProperty]
+    public partial bool GroupByCategory { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTreeMapNavigated))]
     [NotifyPropertyChangedFor(nameof(TreeMapRelativePath))]
     [NotifyPropertyChangedFor(nameof(TreeMapAbsoluteRootPath))]
-    private FileSystemNode? _currentTreeMapRoot;
+    public partial FileSystemNode? CurrentTreeMapRoot { get; set; }
 
     public bool IsTreeMapNavigated => _treeMapHistory.Count > 0;
 
@@ -112,7 +121,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     {
         if (result is null) return;
 
-        RootNodes = [new NodeViewModel(result.RootNode, localizationService: _localizationService, notificationService: _notificationService, clipboardService: _clipboardService)];
+        RootNodes = [new NodeViewModel(result.RootNode, localizationService: _localizationService, notificationService: _notificationService, clipboardService: _clipboardService, fileExplorerService: _fileExplorerService)];
         HasScanResult = true;
 
         _treeMapHistory.Clear();
@@ -269,7 +278,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         if (_treeMapHeight <= 0) return;
 
         var rects = SquarifiedTreeMapLayout.Compute(CurrentTreeMapRoot, 0, 0, _treeMapWidth, _treeMapHeight);
-        var viewModels = rects.Select(r => new TreeMapRectViewModel(r, _notificationService, _localizationService));
+        var viewModels = rects.Select(r => new TreeMapRectViewModel(r, _notificationService, _localizationService, _fileExplorerService));
         TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels.ToList());
     }
 

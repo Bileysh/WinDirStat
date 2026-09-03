@@ -2,11 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
 using WinDirStat_App.UserControls;
 using System.Diagnostics;
+using Microsoft.UI.Xaml.Media;
 using WinRT.Interop;
 
 namespace WinDirStat_App.Services;
@@ -87,8 +87,10 @@ public class WindowManagerService : IWindowManagerService
             MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
-        var rootGrid = new Grid();
-        rootGrid.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
+        var rootGrid = new Grid
+        {
+            Style = (Style)Application.Current.Resources["DetachedWindowRootGridStyle"]
+        };
 
         rootGrid.RowDefinitions.Add(new RowDefinition
             { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
@@ -220,11 +222,15 @@ public class WindowManagerService : IWindowManagerService
         if (App.MainWindow is not MainWindow window) return;
 
         window.CurrentPage?.ViewModel.Dispose();
-
+        var previousResult = _rootWindowScope?.ServiceProvider.GetService<IScanStateService>()?.CurrentResult;
+        
         _rootWindowScope?.Dispose();
         var scope = _scopeFactory.CreateScope();
         _rootWindowScope = scope;
-
+        
+        if (previousResult is not null)
+                    scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
+        
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
