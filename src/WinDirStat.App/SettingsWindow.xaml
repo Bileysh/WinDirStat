@@ -33,6 +33,16 @@
                                 </StackPanel>
                                 <NumberBox Grid.Column="1" Value="{x:Bind ViewModel.LowFreeSpaceThresholdPercent, Mode=TwoWay}" Minimum="1" Maximum="50" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
                             </Grid>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid Padding="16" ColumnDefinitions="*, Auto">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                    <TextBlock x:Uid="AccountForHardLinksHeader" Style="{ThemeResource BodyTextBlockStyle}" />
+                                    <TextBlock x:Uid="AccountForHardLinksDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.AccountForHardLinks, Mode=TwoWay}"
+                                              OnContent="" OffContent="" VerticalAlignment="Center" />
+                            </Grid>
                         </StackPanel>
                     </Border>
                 </StackPanel>
