@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using WinDirStat.ViewModels;
+using WinDirStat_App.Services;
 
 namespace WinDirStat_App;
 
@@ -7,11 +8,12 @@ public sealed partial class MainPage : Page
 {
     public MainPageViewModel ViewModel { get; }
 
-    public MainPage(MainPageViewModel viewModel)
+    public MainPage(MainPageViewModel viewModel, ICurrentXamlRootProvider xamlRootProvider)
     {
         ViewModel = viewModel;
         InitializeComponent();
         Unloaded += (_, _) => ViewModel.Dispose();
+        Loaded += (_, _) => xamlRootProvider.XamlRoot = XamlRoot;
     }
 
     private void TreeMapContainer_SizeChanged(object sender, Microsoft.UI.Xaml.SizeChangedEventArgs e)

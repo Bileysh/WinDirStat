@@ -30,8 +30,8 @@ public class BackgroundScanSettingsValidatorTests
     [Fact]
     public void ValidateImport_AcceptsValidValues()
     {
-        var exception = Record.Exception(() => BackgroundScanSettingsValidator.ValidateImport(30, 10.0));
-        Assert.Null(exception);
+        var result = BackgroundScanSettingsValidator.ValidateImport(30, 10.0);
+        Assert.Equal(SettingsValidationError.None, result);
     }
 
     [Theory]
@@ -39,7 +39,8 @@ public class BackgroundScanSettingsValidatorTests
     [InlineData(14u)]
     public void ValidateImport_RejectsIntervalBelowMinimum(uint interval)
     {
-        Assert.Throws<FormatException>(() => BackgroundScanSettingsValidator.ValidateImport(interval, 10.0));
+        var result = BackgroundScanSettingsValidator.ValidateImport(interval, 10.0);
+        Assert.Equal(SettingsValidationError.IntervalTooSmall, result);
     }
 
     [Theory]
@@ -49,18 +50,17 @@ public class BackgroundScanSettingsValidatorTests
     [InlineData(100.0)]
     public void ValidateImport_RejectsThresholdOutOfRange(double threshold)
     {
-        Assert.Throws<FormatException>(() => BackgroundScanSettingsValidator.ValidateImport(30, threshold));
+        var result = BackgroundScanSettingsValidator.ValidateImport(30, threshold);
+        Assert.Equal(SettingsValidationError.ThresholdOutOfRange, result);
     }
 
     [Fact]
     public void ValidateImport_BoundaryValuesAreAccepted()
     {
-        var atMinInterval = Record.Exception(() =>
-            BackgroundScanSettingsValidator.ValidateImport(BackgroundScanSettingsValidator.MinIntervalMinutes, BackgroundScanSettingsValidator.MinThresholdPercent));
-        var atMaxThreshold = Record.Exception(() =>
-            BackgroundScanSettingsValidator.ValidateImport(BackgroundScanSettingsValidator.MinIntervalMinutes, BackgroundScanSettingsValidator.MaxThresholdPercent));
+        var atMinInterval = BackgroundScanSettingsValidator.ValidateImport(BackgroundScanSettingsValidator.MinIntervalMinutes, BackgroundScanSettingsValidator.MinThresholdPercent);
+        var atMaxThreshold = BackgroundScanSettingsValidator.ValidateImport(BackgroundScanSettingsValidator.MinIntervalMinutes, BackgroundScanSettingsValidator.MaxThresholdPercent);
 
-        Assert.Null(atMinInterval);
-        Assert.Null(atMaxThreshold);
+        Assert.Equal(SettingsValidationError.None, atMinInterval);
+        Assert.Equal(SettingsValidationError.None, atMaxThreshold);
     }
 }

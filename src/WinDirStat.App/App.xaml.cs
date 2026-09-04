@@ -46,7 +46,8 @@ public partial class App : Application
         services.AddScoped<IScanStateService, ScanStateService>();
         services.AddSingleton<WindowManagerService>();
         services.AddSingleton<IWindowManagerService>(sp => sp.GetRequiredService<WindowManagerService>());
-        services.AddSingleton<IDialogService, WinUiDialogService>();
+        services.AddScoped<IDialogService, WinUiDialogService>();
+        services.AddScoped<ICurrentXamlRootProvider, CurrentXamlRootProvider>();
         services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
         services.AddSingleton<IThemeService, WinUiThemeService>();
         services.AddSingleton<INotificationService, AppNotificationService>();

@@ -8,18 +8,30 @@ namespace WinDirStat_App.Services;
 
 public class WinUiDialogService : IDialogService
 {
+    private readonly ICurrentXamlRootProvider _xamlRootProvider;
+
+    public WinUiDialogService(ICurrentXamlRootProvider xamlRootProvider)
+    {
+        _xamlRootProvider = xamlRootProvider;
+    }
+
     public async Task ShowMessageAsync(string title, string message, string closeButtonText = "OK")
     {
-        var window = App.MainWindow;
+        var xamlRoot = _xamlRootProvider.XamlRoot;
 
-        if (window?.Content?.XamlRoot == null) return;
+        if (xamlRoot is null)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                "[WinUiDialogService] XamlRoot ще не готовий для цього вікна — діалог пропущено.");
+            return;
+        }
 
         var dialog = new ContentDialog
         {
             Title = title,
             Content = message,
             CloseButtonText = closeButtonText,
-            XamlRoot = window.Content.XamlRoot
+            XamlRoot = xamlRoot
         };
 
         await dialog.ShowAsync();

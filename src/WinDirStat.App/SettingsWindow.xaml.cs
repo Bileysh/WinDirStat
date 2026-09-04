@@ -10,5 +10,6 @@ public sealed partial class SettingsWindow : Microsoft.UI.Xaml.Window
     {
         ViewModel = viewModel;
         InitializeComponent();
+        ViewModel.WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
     }
 }

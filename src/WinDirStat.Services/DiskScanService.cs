@@ -79,6 +79,7 @@ public class DiskScanService : IDiskScanService
                 var rootNode = ScanDirectory(rootInfo.Name, rootInfo.FullName, rootInfo.Attributes,
                     rootInfo.LastWriteTimeUtc, clusterSize, seenHardLinks, deniedNodes, tracker, progress,
                     cancellationToken, accountForHardLinks);
+                rootNode.RootFullPathOverride = rootInfo.FullName;
 
                 if (useElevatedFallbackForAccessDenied && deniedNodes.Count > 0 && _elevatedScanHelper is not null)
                 {
@@ -91,6 +92,7 @@ public class DiskScanService : IDiskScanService
 
                             deniedNode.Children.Clear();
                             deniedNode.Children.AddRange(elevatedNode.Children);
+                            EstablishParentLinks(deniedNode);
                             deniedNode.Status = elevatedNode.Status;
                             deniedNode.ErrorMessage = elevatedNode.ErrorMessage;
                         }
@@ -120,7 +122,7 @@ public class DiskScanService : IDiskScanService
                     Name = Path.GetFileName(rootPath.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } name
                         ? name
                         : rootPath,
-                    FullPath = rootPath,
+                    RootFullPathOverride = rootPath,
                     IsDirectory = true,
                     Status = ScanStatus.Error,
                     ErrorMessage = ex.Message
@@ -147,7 +149,6 @@ public class DiskScanService : IDiskScanService
         var node = new FileSystemNode
         {
             Name = name,
-            FullPath = fullPath,
             IsDirectory = true,
             LastModified = lastWriteTimeUtc
         };
@@ -171,7 +172,7 @@ public class DiskScanService : IDiskScanService
                         cancellationToken, accountForHardLinks);
 
 
-                    node.Children.Add(childNode);
+                    node.AddChild(childNode);
                     node.SizeLogical += childNode.SizeLogical;
                     node.SizePhysical += childNode.SizePhysical;
 
@@ -185,7 +186,6 @@ public class DiskScanService : IDiskScanService
                     var fileNode = new FileSystemNode
                     {
                         Name = entry.Name,
-                        FullPath = entry.FullPath,
                         IsDirectory = false,
                         Extension = Path.GetExtension(entry.Name),
                         SizeLogical = entry.Length,
@@ -204,7 +204,7 @@ public class DiskScanService : IDiskScanService
                         }
                     }
 
-                    node.Children.Add(fileNode);
+                    node.AddChild(fileNode);
                     node.SizeLogical += fileNode.SizeLogical;
                     node.SizePhysical += fileNode.SizePhysical;
 
@@ -226,6 +226,15 @@ public class DiskScanService : IDiskScanService
         }
 
         return node;
+    }
+
+    private static void EstablishParentLinks(FileSystemNode node)
+    {
+        foreach (var child in node.Children)
+        {
+            child.Parent = node;
+            EstablishParentLinks(child);
+        }
     }
 
     private static void RecomputeSizes(FileSystemNode node)

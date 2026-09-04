@@ -32,7 +32,7 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
 
     public string ExportToJson()
     {
-        var dto = new SettingsDto(ScanIntervalMinutes, LowFreeSpaceThresholdPercent);
+        var dto = new SettingsDto(ScanIntervalMinutes, LowFreeSpaceThresholdPercent, AccountForHardLinks);
         return JsonSerializer.Serialize(dto, SettingsJsonContext.Default.SettingsDto);
     }
 
@@ -50,6 +50,7 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
 
             ScanIntervalMinutes = dto.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = dto.LowFreeSpaceThresholdPercent;
+            AccountForHardLinks = dto.AccountForHardLinks;
             return SettingsValidationError.None;
         }
         catch (JsonException)
@@ -58,7 +59,8 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
         }
     }
 
-    private record SettingsDto(uint ScanIntervalMinutes, double LowFreeSpaceThresholdPercent);
+    private record SettingsDto(uint ScanIntervalMinutes, double LowFreeSpaceThresholdPercent,
+        bool AccountForHardLinks = false);
 
     [JsonSerializable(typeof(SettingsDto))]
     private partial class SettingsJsonContext : JsonSerializerContext;
