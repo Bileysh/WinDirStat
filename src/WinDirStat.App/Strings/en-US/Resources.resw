@@ -193,6 +193,12 @@
     <data name="LowSpaceThresholdStatus" xml:space="preserve">
     <value>Low-space warning threshold: {0}%.</value>
   </data>
+    <data name="AccountForHardLinksEnabledStatus" xml:space="preserve">
+    <value>Hard link accounting enabled — scans will be more accurate but slower.</value>
+  </data>
+    <data name="AccountForHardLinksDisabledStatus" xml:space="preserve">
+    <value>Hard link accounting disabled — scans will be faster.</value>
+  </data>
     <data name="SettingsExportedStatus" xml:space="preserve">
     <value>Settings saved to {0}.</value>
   </data>
@@ -297,6 +303,12 @@
   </data>
     <data name="SpaceThresholdInputDesc.Text" xml:space="preserve">
     <value>Notify when free space drops below this percentage.</value>
+  </data>
+    <data name="AccountForHardLinksHeader.Text" xml:space="preserve">
+    <value>Account for hard links</value>
+  </data>
+    <data name="AccountForHardLinksDesc.Text" xml:space="preserve">
+    <value>More accurate disk-usage totals on volumes with many hard links (e.g. C:\Windows\WinSxS), at the cost of a slower scan.</value>
   </data>
     <data name="DataSettingsTitle.Text" xml:space="preserve">
     <value>Data &amp; configuration</value>

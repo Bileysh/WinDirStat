@@ -230,6 +230,12 @@
     <data name="LowSpaceThresholdStatus" xml:space="preserve">
     <value>Поріг попередження: {0}%.</value>
   </data>
+    <data name="AccountForHardLinksEnabledStatus" xml:space="preserve">
+    <value>Врахування hard link'ів увімкнено — сканування точніше, але повільніше.</value>
+  </data>
+    <data name="AccountForHardLinksDisabledStatus" xml:space="preserve">
+    <value>Врахування hard link'ів вимкнено — сканування швидше.</value>
+  </data>
     <data name="SettingsExportedStatus" xml:space="preserve">
     <value>Налаштування збережено у {0}.</value>
   </data>
@@ -334,6 +340,12 @@
   </data>
     <data name="SpaceThresholdInputDesc.Text" xml:space="preserve">
     <value>Сповіщати, якщо вільного місця менше цього відсотка.</value>
+  </data>
+    <data name="AccountForHardLinksHeader.Text" xml:space="preserve">
+    <value>Враховувати hard link'и</value>
+  </data>
+    <data name="AccountForHardLinksDesc.Text" xml:space="preserve">
+    <value>Точніший підрахунок зайнятого місця на томах із багатьма hard link'ами (напр. C:\Windows\WinSxS), ціною повільнішого сканування.</value>
   </data>
     <data name="DataSettingsTitle.Text" xml:space="preserve">
     <value>Дані та конфігурація</value>
