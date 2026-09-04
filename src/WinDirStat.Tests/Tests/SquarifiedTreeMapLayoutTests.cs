@@ -7,12 +7,12 @@ public class SquarifiedTreeMapLayoutTests
 {
     private static FileSystemNode BuildRoot() => new()
     {
-        Name = "root", FullPath = "root", IsDirectory = true,
+        Name = "root", IsDirectory = true,
         Children =
         {
-            new FileSystemNode { Name = "a", FullPath = "a", SizeLogical = 500 },
-            new FileSystemNode { Name = "b", FullPath = "b", SizeLogical = 300 },
-            new FileSystemNode { Name = "c", FullPath = "c", SizeLogical = 200 }
+            new FileSystemNode { Name = "a", SizeLogical = 500 },
+            new FileSystemNode { Name = "b", SizeLogical = 300 },
+            new FileSystemNode { Name = "c", SizeLogical = 200 }
         }
     };
 
@@ -47,7 +47,7 @@ public class SquarifiedTreeMapLayoutTests
     [Fact]
     public void Compute_ReturnsEmptyList_WhenNoChildren()
     {
-        var root = new FileSystemNode { Name = "root", FullPath = "root", IsDirectory = true };
+        var root = new FileSystemNode { Name = "root", IsDirectory = true };
         Assert.Empty(SquarifiedTreeMapLayout.Compute(root, 0, 0, 100, 50));
     }
 }
