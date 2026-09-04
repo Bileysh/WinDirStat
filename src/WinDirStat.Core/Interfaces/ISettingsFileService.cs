@@ -2,7 +2,7 @@ namespace WinDirStat.Core.Interfaces;
 
 public interface ISettingsFileService
 {
-    Task<string?> ExportAsync(string json, string suggestedFileName);
+    Task<string?> ExportAsync(string json, string suggestedFileName, IntPtr ownerHwnd);
 
-    Task<(string Json, string FileName)?> ImportAsync();
+    Task<(string Json, string FileName)?> ImportAsync(IntPtr ownerHwnd);
 }

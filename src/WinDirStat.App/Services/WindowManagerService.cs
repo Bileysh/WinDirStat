@@ -53,7 +53,8 @@ public class WindowManagerService : IWindowManagerService
 
         var scope = _scopeFactory.CreateScope();
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
-        var page = new MainPage(viewModel);
+        var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        var page = new MainPage(viewModel, xamlRootProvider);
 
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
             WindowNative.GetWindowHandle(newWindow);
@@ -193,7 +194,8 @@ public class WindowManagerService : IWindowManagerService
         _rootWindowScope = scope;
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
-        var mainPage = new MainPage(viewModel);
+        var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        var mainPage = new MainPage(viewModel, xamlRootProvider);
         return mainPage;
     }
     
@@ -234,7 +236,8 @@ public class WindowManagerService : IWindowManagerService
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
-        var mainPage = new MainPage(viewModel);
+        var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        var mainPage = new MainPage(viewModel, xamlRootProvider);
         window.SetContent(mainPage);
         
         if (window.Content is FrameworkElement fe)
