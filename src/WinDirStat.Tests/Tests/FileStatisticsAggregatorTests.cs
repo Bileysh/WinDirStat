@@ -10,12 +10,12 @@ public class FileStatisticsAggregatorTests
     {
         var root = new FileSystemNode
         {
-            Name = "root", FullPath = "root", IsDirectory = true,
+            Name = "root", IsDirectory = true,
             Children =
             {
-                new FileSystemNode { Name = "a.mp4", FullPath = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
-                new FileSystemNode { Name = "b.mp4", FullPath = "b.mp4", Extension = ".mp4", SizeLogical = 200 },
-                new FileSystemNode { Name = "c.txt", FullPath = "c.txt", Extension = ".txt", SizeLogical = 50 }
+                new FileSystemNode { Name = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
+                new FileSystemNode { Name = "b.mp4", Extension = ".mp4", SizeLogical = 200 },
+                new FileSystemNode { Name = "c.txt", Extension = ".txt", SizeLogical = 50 }
             }
         };
 
@@ -32,11 +32,11 @@ public class FileStatisticsAggregatorTests
     {
         var root = new FileSystemNode
         {
-            Name = "root", FullPath = "root", IsDirectory = true,
+            Name = "root", IsDirectory = true,
             Children =
             {
-                new FileSystemNode { Name = "a.mp4", FullPath = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
-                new FileSystemNode { Name = "b.mkv", FullPath = "b.mkv", Extension = ".mkv", SizeLogical = 200 }
+                new FileSystemNode { Name = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
+                new FileSystemNode { Name = "b.mkv", Extension = ".mkv", SizeLogical = 200 }
             }
         };
 

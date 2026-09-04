@@ -8,7 +8,7 @@ public class TreeMapRectViewModelTests
     [Fact]
     public void ShowPropertiesCommand_WhenNodeHasNoPath_DoesNotThrow()
     {
-        var node = new FileSystemNode { Name = "unnamed", FullPath = string.Empty };
+        var node = new FileSystemNode { Name = "unnamed", RootFullPathOverride = string.Empty };
         var rect = new TreeMapRect(node, 0, 0, 100, 100);
         var vm = new TreeMapRectViewModel(rect);
 
