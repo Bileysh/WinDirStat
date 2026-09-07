@@ -46,30 +46,41 @@
                 <uap:SplashScreen Image="Assets\SplashScreen.png"/>
             </uap:VisualElements>
             <Extensions>
-                <Extension Category="windows.backgroundTasks" EntryPoint="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.Task">
+                <Extension Category="windows.backgroundTasks"
+                           EntryPoint="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.Task">
                     <BackgroundTasks>
                         <Task Type="timer"/>
                     </BackgroundTasks>
                 </Extension>
 
+                <uap:Extension Category="windows.fileTypeAssociation">
+                    <uap:FileTypeAssociation Name="windirstat-scan">
+                        <uap:SupportedFileTypes>
+                            <uap:FileType>.wdsscan</uap:FileType>
+                        </uap:SupportedFileTypes>
+                    </uap:FileTypeAssociation>
+                </uap:Extension>
+
                 <com:Extension Category="windows.comServer">
                     <com:ComServer>
                         <com:ExeServer Executable="WinDirStat.App.exe" DisplayName="WinDirStat Background Scan"
                                        LaunchAndActivationPermission="O:PSG:BUD:(A;;11;;;IU)(A;;11;;;S-1-15-2-1)S:(ML;;NX;;;LW)">
-                            <com:Class Id="F14A5D3E-9B71-4C82-8E2A-6D9F3C1B7A44" DisplayName="WinDirStat Background Scan Task" />
+                            <com:Class Id="F14A5D3E-9B71-4C82-8E2A-6D9F3C1B7A44"
+                                       DisplayName="WinDirStat Background Scan Task"/>
                         </com:ExeServer>
                     </com:ComServer>
                 </com:Extension>
 
                 <desktop:Extension Category="windows.toastNotificationActivation">
-                    <desktop:ToastNotificationActivation ToastActivatorCLSID="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03" />
+                    <desktop:ToastNotificationActivation ToastActivatorCLSID="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03"/>
                 </desktop:Extension>
 
                 <com:Extension Category="windows.comServer">
                     <com:ComServer>
                         <com:ExeServer Executable="WinDirStat.App.exe" DisplayName="WinDirStat"
                                        Arguments="----AppNotificationActivated:">
-                            <com:Class Id="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03" DisplayName="WinDirStat Toast Activator" />
+                            <com:Class Id="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03"
+                                       DisplayName="WinDirStat Toast Activator"/>
                         </com:ExeServer>
                     </com:ComServer>
                 </com:Extension>

@@ -355,4 +355,13 @@
     <data name="TrayMenuExit.Text" xml:space="preserve">
     <value>Exit</value>
   </data>
+    <data name="MenuFileExportScan.Text" xml:space="preserve">
+    <value>Export scan…</value>
+  </data>
+    <data name="MenuFileImportScan.Text" xml:space="preserve">
+    <value>Import scan…</value>
+  </data>
+    <data name="ExportCompleteTitle.Text" xml:space="preserve">
+    <value>Scan exported</value>
+  </data>
 </root>

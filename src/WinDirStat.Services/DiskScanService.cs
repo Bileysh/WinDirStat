@@ -92,7 +92,7 @@ public class DiskScanService : IDiskScanService
 
                             deniedNode.Children.Clear();
                             deniedNode.Children.AddRange(elevatedNode.Children);
-                            EstablishParentLinks(deniedNode);
+                            deniedNode.EstablishParentLinksRecursively();
                             deniedNode.Status = elevatedNode.Status;
                             deniedNode.ErrorMessage = elevatedNode.ErrorMessage;
                         }
@@ -227,16 +227,7 @@ public class DiskScanService : IDiskScanService
 
         return node;
     }
-
-    private static void EstablishParentLinks(FileSystemNode node)
-    {
-        foreach (var child in node.Children)
-        {
-            child.Parent = node;
-            EstablishParentLinks(child);
-        }
-    }
-
+    
     private static void RecomputeSizes(FileSystemNode node)
     {
         if (node.Children.Count == 0) return;

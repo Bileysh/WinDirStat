@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <Page
     x:Class="WinDirStat_App.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -37,6 +38,16 @@
                                 Command="{x:Bind ViewModel.RescanElevatedCommand}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE7EF;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="MenuFileExportScan" Command="{x:Bind ViewModel.ExportScanResultsCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE74E;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="MenuFileImportScan" Command="{x:Bind ViewModel.ImportScanResultsCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE8E5;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator />
@@ -113,7 +124,7 @@
                 <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
                                      ResizeBehavior="BasedOnAlignment" />
 
-                <Border Grid.Column="2" Margin="8" CornerRadius="8" BorderThickness="1" 
+                <Border Grid.Column="2" Margin="8" CornerRadius="8" BorderThickness="1"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                     <Grid>

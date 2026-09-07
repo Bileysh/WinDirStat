@@ -30,4 +30,13 @@ public class FileSystemNode
         child.Parent = this;
         Children.Add(child);
     }
+
+    public void EstablishParentLinksRecursively()
+    {
+        foreach (var child in Children)
+        {
+            child.Parent = this;
+            child.EstablishParentLinksRecursively();
+        }
+    }
 }

@@ -26,7 +26,6 @@ public class DiskScanServiceHardLinkTests
         };
 
         var service = new DiskScanService(fakeIdentityService);
-        // Додано accountForHardLinks: true
         var result = await service.ScanAsync(tempRoot.FullName, accountForHardLinks: true);
 
         var a = result.RootNode.Children.Single(n => n.Name == "a.txt");
@@ -67,7 +66,6 @@ public class DiskScanServiceHardLinkTests
         };
 
         var service = new DiskScanService(fakeIdentityService);
-        // Додано accountForHardLinks: true
         var result = await service.ScanAsync(tempRoot.FullName, accountForHardLinks: true);
 
         Assert.All(result.RootNode.Children, n => Assert.False(n.IsDuplicateHardLink));
@@ -81,7 +79,6 @@ public class DiskScanServiceHardLinkTests
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
 
         var service = new DiskScanService(new FakeFileIdentityService());
-        // Додано accountForHardLinks: true
         var result = await service.ScanAsync(tempRoot.FullName, accountForHardLinks: true);
 
         var a = Assert.Single(result.RootNode.Children);
