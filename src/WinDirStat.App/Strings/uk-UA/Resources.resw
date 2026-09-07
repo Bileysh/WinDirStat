@@ -398,10 +398,16 @@
     <data name="MenuFileImportScan.Text" xml:space="preserve">
     <value>Імпортувати скан…</value>
   </data>
+<<<<<<< HEAD
     <data name="ExportCompleteTitle" xml:space="preserve">
     <value>Скан експортовано</value>
   </data>
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Не вдалося експортувати</value>
   </data>
+=======
+    <data name="ExportCompleteTitle.Text" xml:space="preserve">
+    <value>Скан експортовано</value>
+  </data>
+>>>>>>> 8b33ea1 (Implement single instance, rich activation, and scan export/import)
 </root>
