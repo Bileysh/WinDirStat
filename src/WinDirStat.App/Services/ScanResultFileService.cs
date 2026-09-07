@@ -1,4 +1,8 @@
+using System;
+using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinDirStat.Core.Entities;
@@ -10,6 +14,13 @@ public sealed class ScanResultFileService : IScanResultFileService
 {
     private const string Extension = ".wdsscan";
 
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        TypeInfoResolver = FileSystemNodeJsonContext.Default,
+        MaxDepth = 256,
+        PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
+    };
+
     public async Task<string?> ExportAsync(FileSystemNode rootNode, string suggestedFileName, IntPtr ownerHwnd)
     {
         var picker = new FileSavePicker();
@@ -20,8 +31,10 @@ public sealed class ScanResultFileService : IScanResultFileService
         var file = await picker.PickSaveFileAsync();
         if (file is null) return null;
 
-        var json = JsonSerializer.Serialize(rootNode, FileSystemNodeJsonContext.Default.FileSystemNode);
-        await FileIO.WriteTextAsync(file, json);
+        using var stream = await file.OpenStreamForWriteAsync();
+        stream.SetLength(0);
+        await JsonSerializer.SerializeAsync(stream, rootNode, JsonOptions);
+
         return file.Name;
     }
 
@@ -34,29 +47,31 @@ public sealed class ScanResultFileService : IScanResultFileService
         var file = await picker.PickSingleFileAsync();
         if (file is null) return null;
 
-        var json = await FileIO.ReadTextAsync(file);
-        var rootNode = Deserialize(json);
-        return rootNode is null ? null : (rootNode, file.Name);
+        using var stream = await file.OpenStreamForReadAsync();
+        var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
+
+        if (rootNode is not null)
+        {
+            rootNode.EstablishParentLinksRecursively();
+            return (rootNode, file.Name);
+        }
+
+        return null;
     }
 
     public FileSystemNode? ImportFromPath(string filePath)
     {
         try
         {
-            var json = File.ReadAllText(filePath);
-            return Deserialize(json);
+            using var stream = File.OpenRead(filePath);
+            var rootNode = JsonSerializer.Deserialize<FileSystemNode>(stream, JsonOptions);
+            rootNode?.EstablishParentLinksRecursively();
+            return rootNode;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[ScanResultFileService] ImportFromPath('{filePath}') failed: {ex}");
+            System.Diagnostics.Debug.WriteLine($"[ScanResultFileService] ImportFromPath failed: {ex}");
             return null;
         }
-    }
-
-    private static FileSystemNode? Deserialize(string json)
-    {
-        var rootNode = JsonSerializer.Deserialize(json, FileSystemNodeJsonContext.Default.FileSystemNode);
-        rootNode?.EstablishParentLinksRecursively();
-        return rootNode;
     }
 }

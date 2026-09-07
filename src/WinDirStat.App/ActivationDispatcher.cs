@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Windows.AppLifecycle;
 using Windows.ApplicationModel.Activation;
 using WinDirStat.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace WinDirStat_App;
 
@@ -26,47 +27,62 @@ public static class ActivationDispatcher
                 HandleStartupTask(args);
                 break;
             default:
-                Debug.WriteLine($"[ActivationDispatcher] Необроблений вид активації: {args.Kind}");
+                Debug.WriteLine($"[ActivationDispatcher] Непідтримуваний тип активації: {args.Kind}");
                 break;
         }
     }
 
     private static void HandleLaunch(AppActivationArguments args)
     {
+        if (args.Data is ICommandLineActivatedEventArgs cmdArgs)
+        {
+            var path = cmdArgs.Operation.Arguments.Trim(' ', '"');
+            if (!string.IsNullOrWhiteSpace(path) && System.IO.Directory.Exists(path))
+            {
+                App.MainDispatcherQueue?.TryEnqueue(() => App.RootViewModel?.ScanPathAsync(path));
+            }
+        }
     }
 
     private static void HandleFile(AppActivationArguments args)
     {
-        if (args.Data is not IFileActivatedEventArgs fileArgs || fileArgs.Files.Count == 0)
-        {
-            Debug.WriteLine("[ActivationDispatcher] File-активація без файлів — проігноровано.");
-            return;
-        }
+        if (args.Data is not IFileActivatedEventArgs fileArgs || fileArgs.Files.Count == 0) return;
 
         var path = fileArgs.Files[0].Path;
 
-        var fileService = App.StaticServices?.GetService(typeof(IScanResultFileService)) as IScanResultFileService;
-        var rootNode = fileService?.ImportFromPath(path);
-
-        if (rootNode is null)
+        Task.Run(() =>
         {
-            Debug.WriteLine($"[ActivationDispatcher] File-активація: не вдалось імпортувати '{path}'.");
-            return;
-        }
+            var fileService = App.StaticServices?.GetService(typeof(IScanResultFileService)) as IScanResultFileService;
+            var rootNode = fileService?.ImportFromPath(path);
 
-        App.MainDispatcherQueue?.TryEnqueue(() => App.RootViewModel?.LoadImportedResult(rootNode));
+            if (rootNode is null)
+            {
+                Debug.WriteLine($"[ActivationDispatcher] File-активація: не вдалось імпортувати '{path}'.");
+                return;
+            }
+
+            App.MainDispatcherQueue?.TryEnqueue(() => App.RootViewModel?.LoadImportedResult(rootNode));
+        });
     }
 
     private static void HandleProtocol(AppActivationArguments args)
     {
         if (args.Data is IProtocolActivatedEventArgs protocolArgs)
         {
-            Debug.WriteLine($"[ActivationDispatcher] Protocol-активація: '{protocolArgs.Uri}' — Reserve, не сьогодні.");
+            var uri = protocolArgs.Uri;
+            if (uri.Host.Equals("scan", StringComparison.OrdinalIgnoreCase))
+            {
+                var path = uri.Query.Replace("?path=", "").Trim();
+                if (!string.IsNullOrEmpty(path) && System.IO.Directory.Exists(path))
+                {
+                    App.MainDispatcherQueue?.TryEnqueue(() => App.RootViewModel?.ScanPathAsync(path));
+                }
+            }
         }
     }
 
     private static void HandleStartupTask(AppActivationArguments args)
     {
-        Debug.WriteLine("[ActivationDispatcher] StartupTask-активація — Reserve, не сьогодні.");
+        Debug.WriteLine("[ActivationDispatcher] StartupTask-активація виконана.");
     }
 }

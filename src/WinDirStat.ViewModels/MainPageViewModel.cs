@@ -206,7 +206,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private bool CanRescan() => !IsScanning && _lastScanPath is not null;
 
-    private async Task ScanPathAsync(string path, bool useElevatedFallbackForAccessDenied = false)
+    public async Task ScanPathAsync(string path, bool useElevatedFallbackForAccessDenied = false)
     {
         CancelScan();
         _scanCts = new CancellationTokenSource();
@@ -399,14 +399,25 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         var result = _scanStateService.CurrentResult;
         if (result is null) return;
 
-        var suggestedName = Path.GetFileName(result.RootPath.TrimEnd(Path.DirectorySeparatorChar));
-        var fileName = await _scanResultFileService.ExportAsync(
-            result.RootNode, string.IsNullOrEmpty(suggestedName) ? "scan" : suggestedName,
-            _windowHandleProvider.Hwnd);
-
-        if (fileName is not null)
+        try
         {
-            _notificationService.ShowNotification(_localizationService.GetString("ExportCompleteTitle"), fileName);
+            var suggestedName = Path.GetFileName(result.RootPath.TrimEnd(Path.DirectorySeparatorChar));
+            var fileName = await _scanResultFileService.ExportAsync(
+                result.RootNode, string.IsNullOrEmpty(suggestedName) ? "scan" : suggestedName,
+                _windowHandleProvider.Hwnd);
+
+            if (fileName is not null)
+            {
+                var title = "Експорт завершено";
+                try { title = _localizationService.GetString("ExportCompleteTitle"); }
+                catch { try { title = _localizationService.GetString("ExportCompleteTitle/Text"); } catch { } }
+
+                _notificationService.ShowNotification(title, fileName);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowMessageAsync("Помилка експорту", ex.Message);
         }
     }
 
@@ -421,7 +432,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public void LoadImportedResult(FileSystemNode rootNode)
     {
-        var (statsByCategory, statsByExtension) = FileStatisticsAggregator.ComputeAll(rootNode);
+        var (statsByExtension, statsByCategory) = FileStatisticsAggregator.ComputeAll(rootNode);
         var result = new ScanResult(rootNode.RootFullPathOverride ?? rootNode.Name, rootNode,
             statsByCategory, statsByExtension, TimeSpan.Zero);
         _scanStateService.SetResult(result);

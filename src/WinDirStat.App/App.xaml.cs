@@ -16,7 +16,7 @@ public partial class App : Application
     private readonly AppActivationArguments? _initialActivationArgs;
     public static Window? MainWindow { get; private set; }
     public static IServiceProvider? StaticServices { get; private set; }
-    public static MainPageViewModel? RootViewModel { get; private set; }
+    public static MainPageViewModel? RootViewModel { get; internal set; }
 
     public static DispatcherQueue? MainDispatcherQueue { get; private set; }
 
