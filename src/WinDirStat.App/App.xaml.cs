@@ -31,10 +31,26 @@ public partial class App
         MainDispatcherQueue = DispatcherQueue.GetForCurrentThread();
         Services = ConfigureServices();
         StaticServices = Services;
+
+        try
+        {
+            ClassicContextMenuRegistrar.EnsureRegistered();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] ClassicContextMenuRegistrar failed: {ex}");
+        }
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        if (_initialActivationArgs?.Kind == ExtendedActivationKind.StartupTask)
+        {
+            ActivationDispatcher.Handle(_initialActivationArgs);
+            Environment.Exit(0);
+            return;
+        }
+
         var windowManager = Services.GetRequiredService<WindowManagerService>();
         var mainPage = windowManager.CreateScopedMainPage();
         RootViewModel = mainPage.ViewModel;
