@@ -1,8 +1,11 @@
+using WinDirStat.Core.Entities;
+
 namespace WinDirStat.Core.Interfaces;
 
 public interface IWindowManagerService
 {
-    void OpenMainWindow();
+    void OpenMainWindow(string? initialScanPath = null);
+    void OpenMainWindowWithImportedResult(FileSystemNode rootNode);
     void OpenStatisticsWindow(IMainPageViewModel viewModel);
     void OpenTreeViewWindow(IMainPageViewModel viewModel);
     void OpenTreeMapWindow(IMainPageViewModel viewModel);

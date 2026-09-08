@@ -3,6 +3,7 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinDirStat.Core.Interfaces;
+using WinDirStat.Core.Entities;
 using WinDirStat.ViewModels;
 using WinDirStat_App.UserControls;
 using System.Diagnostics;
@@ -13,16 +14,14 @@ namespace WinDirStat_App.Services;
 
 public class WindowManagerService : IWindowManagerService
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
     private readonly List<Window> _openWindows = new();
 
-    public WindowManagerService(IServiceProvider serviceProvider, IServiceScopeFactory scopeFactory,
+    public WindowManagerService(IServiceScopeFactory scopeFactory,
         IThemeService themeService, ILocalizationService localizationService)
     {
-        _serviceProvider = serviceProvider;
         _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
@@ -44,7 +43,23 @@ public class WindowManagerService : IWindowManagerService
         }
     }
 
-    public void OpenMainWindow()
+    public void OpenMainWindow(string? initialScanPath = null)
+    {
+        var (viewModel, _) = CreateAndShowNewMainWindow();
+
+        if (!string.IsNullOrWhiteSpace(initialScanPath))
+        {
+            _ = viewModel.ScanPathAsync(initialScanPath);
+        }
+    }
+
+    public void OpenMainWindowWithImportedResult(FileSystemNode rootNode)
+    {
+        var (viewModel, _) = CreateAndShowNewMainWindow();
+        viewModel.LoadImportedResult(rootNode);
+    }
+
+    private (MainPageViewModel ViewModel, Window Window) CreateAndShowNewMainWindow()
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
@@ -68,11 +83,13 @@ public class WindowManagerService : IWindowManagerService
         OffsetWindowPosition(newWindow);
 
         newWindow.Activate();
-        
+
         if (newWindow.Content is FrameworkElement fe)
         {
             fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
         }
+
+        return (viewModel, newWindow);
     }
 
     private Window CreateDetachedWindow(string title, FrameworkElement content, int width, int height,
@@ -85,7 +102,8 @@ public class WindowManagerService : IWindowManagerService
 
         var rootGrid = new Grid
         {
-            Style = (Style)Application.Current.Resources["DetachedWindowRootGridStyle"]
+            Style = (Style)Application.Current.Resources["DetachedWindowRootGridStyle"],
+            Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent)
         };
 
         rootGrid.RowDefinitions.Add(new RowDefinition
