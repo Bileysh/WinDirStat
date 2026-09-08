@@ -371,9 +371,12 @@
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Path not found</value>
   </data>
+<<<<<<< HEAD
 =======
     <data name="ExportCompleteTitle.Text" xml:space="preserve">
     <value>Scan exported</value>
   </data>
 >>>>>>> 8b33ea1 (Implement single instance, rich activation, and scan export/import)
+=======
+>>>>>>> 65aeb81 (Deep OS shell integration and activation routing)
 </root>
