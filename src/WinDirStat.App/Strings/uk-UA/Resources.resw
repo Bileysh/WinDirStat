@@ -398,7 +398,10 @@
     <data name="MenuFileImportScan.Text" xml:space="preserve">
     <value>Імпортувати скан…</value>
   </data>
-    <data name="ExportCompleteTitle.Text" xml:space="preserve">
+    <data name="ExportCompleteTitle" xml:space="preserve">
     <value>Скан експортовано</value>
+  </data>
+    <data name="ExportErrorTitle" xml:space="preserve">
+    <value>Не вдалося експортувати</value>
   </data>
 </root>

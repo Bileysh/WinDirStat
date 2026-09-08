@@ -39,7 +39,7 @@ public partial class App : Application
         RootViewModel = mainPage.ViewModel;
         _mWindow = new MainWindow(mainPage);
         MainWindow = _mWindow;
-        _mWindow.Closed += (_, _) => { MainWindow = null; RootViewModel = null; };
+        _mWindow.Closed += OnMainWindowClosed;
         windowManager.SetRootWindowHandle(_mWindow);
         _mWindow.Activate();
 
@@ -47,6 +47,12 @@ public partial class App : Application
         Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
 
         ActivationDispatcher.Handle(_initialActivationArgs);
+    }
+
+    private static void OnMainWindowClosed(object sender, WindowEventArgs args)
+    {
+        MainWindow = null;
+        RootViewModel = null;
     }
 
     private static IServiceProvider ConfigureServices()

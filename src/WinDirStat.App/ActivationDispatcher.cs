@@ -27,7 +27,7 @@ public static class ActivationDispatcher
                 HandleStartupTask(args);
                 break;
             default:
-                Debug.WriteLine($"[ActivationDispatcher] Непідтримуваний тип активації: {args.Kind}");
+                Debug.WriteLine($"[ActivationDispatcher] Unsupported activation kind: {args.Kind}");
                 break;
         }
     }
@@ -57,7 +57,7 @@ public static class ActivationDispatcher
 
             if (rootNode is null)
             {
-                Debug.WriteLine($"[ActivationDispatcher] File-активація: не вдалось імпортувати '{path}'.");
+                Debug.WriteLine($"[ActivationDispatcher] File activation: failed to import '{path}'.");
                 return;
             }
 
@@ -83,6 +83,6 @@ public static class ActivationDispatcher
 
     private static void HandleStartupTask(AppActivationArguments args)
     {
-        Debug.WriteLine("[ActivationDispatcher] StartupTask-активація виконана.");
+        Debug.WriteLine("[ActivationDispatcher] StartupTask activation handled.");
     }
 }

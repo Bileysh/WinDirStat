@@ -361,7 +361,10 @@
     <data name="MenuFileImportScan.Text" xml:space="preserve">
     <value>Import scan…</value>
   </data>
-    <data name="ExportCompleteTitle.Text" xml:space="preserve">
+    <data name="ExportCompleteTitle" xml:space="preserve">
     <value>Scan exported</value>
+  </data>
+    <data name="ExportErrorTitle" xml:space="preserve">
+    <value>Export failed</value>
   </data>
 </root>

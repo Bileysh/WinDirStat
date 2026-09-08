@@ -64,12 +64,7 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Title = _localizationService.GetString("WindowTitle_New");
 
         _openWindows.Add(newWindow);
-        newWindow.Closed += (_, _) =>
-        {
-            _openWindows.Remove(newWindow);
-            viewModel.Dispose();
-            scope.Dispose();
-        };
+        newWindow.Closed += (_, _) => CleanupNewMainWindow(newWindow, viewModel, scope);
         OffsetWindowPosition(newWindow);
 
         newWindow.Activate();
@@ -113,10 +108,7 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Content = rootGrid;
         newWindow.Title = $"WinDirStat - {title}";
         _openWindows.Add(newWindow);
-        newWindow.Closed += (_, _) =>
-        {
-            _openWindows.Remove(newWindow);
-        };
+        newWindow.Closed += (_, _) => _openWindows.Remove(newWindow);
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
         OffsetWindowPosition(newWindow);
@@ -124,6 +116,19 @@ public class WindowManagerService : IWindowManagerService
         rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
 
         return newWindow;
+    }
+
+    private void CleanupNewMainWindow(Window window, MainPageViewModel viewModel, IServiceScope scope)
+    {
+        _openWindows.Remove(window);
+        viewModel.Dispose();
+        scope.Dispose();
+    }
+
+    private void CleanupSettingsWindow(Window window, IServiceScope scope)
+    {
+        _openWindows.Remove(window);
+        scope.Dispose();
     }
 
     private void OffsetWindowPosition(Window newWindow)
@@ -184,7 +189,7 @@ public class WindowManagerService : IWindowManagerService
         }
 
         _openWindows.Add(window);
-        window.Closed += (_, _) => { _openWindows.Remove(window); scope.Dispose(); };
+        window.Closed += (_, _) => CleanupSettingsWindow(window, scope);
         OffsetWindowPosition(window);
         window.Activate();
     }

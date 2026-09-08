@@ -408,16 +408,14 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
             if (fileName is not null)
             {
-                var title = "Експорт завершено";
-                try { title = _localizationService.GetString("ExportCompleteTitle"); }
-                catch { try { title = _localizationService.GetString("ExportCompleteTitle/Text"); } catch { } }
-
+                var title = _localizationService.GetString("ExportCompleteTitle");
                 _notificationService.ShowNotification(title, fileName);
             }
         }
         catch (Exception ex)
         {
-            await _dialogService.ShowMessageAsync("Помилка експорту", ex.Message);
+            var title = _localizationService.GetString("ExportErrorTitle");
+            await _dialogService.ShowMessageAsync(title, ex.Message);
         }
     }
 
