@@ -17,7 +17,7 @@ public static class ActivationDispatcher
                 HandleLaunch(args, isColdStart);
                 break;
             case ExtendedActivationKind.File:
-                HandleFile(args);
+                HandleFile(args, isColdStart);
                 break;
             case ExtendedActivationKind.Protocol:
                 HandleProtocol(args, isColdStart);
@@ -85,7 +85,7 @@ public static class ActivationDispatcher
         return firstSpace > 0 ? trimmed[..firstSpace] : trimmed;
     }
 
-    private static void HandleFile(AppActivationArguments args)
+    private static void HandleFile(AppActivationArguments args, bool isColdStart)
     {
         if (args.Data is not IFileActivatedEventArgs fileArgs || fileArgs.Files.Count == 0) return;
 
@@ -103,7 +103,13 @@ public static class ActivationDispatcher
             }
 
             App.MainDispatcherQueue?.TryEnqueue(() =>
-            {
+            { 
+                if (isColdStart && App.RootViewModel is not null)
+                {
+                    App.RootViewModel.LoadImportedResult(rootNode);
+                    return;
+                }
+
                 var windowManager =
                     App.StaticServices?.GetService(typeof(IWindowManagerService)) as IWindowManagerService;
                 windowManager?.OpenMainWindowWithImportedResult(rootNode);

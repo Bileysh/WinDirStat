@@ -35,36 +35,65 @@ public partial class App : Application
 
         try
         {
-            ClassicContextMenuRegistrar.EnsureRegistered();
+            var registrationError = ClassicContextMenuRegistrar.EnsureRegistered();
+            if (registrationError is not null)
+            {
+                var notificationService = Services.GetService<INotificationService>();
+                notificationService?.ShowNotification(
+                    "Context menu registration failed",
+                    registrationError.Length > 200 ? registrationError[..200] : registrationError);
+            }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[App] ClassicContextMenuRegistrar failed: {ex}");
+            System.Diagnostics.Debug.WriteLine($"[App] ClassicContextMenuRegistrar threw unexpectedly: {ex}");
         }
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        if (_initialActivationArgs?.Kind == ExtendedActivationKind.StartupTask)
+        try
         {
-            ActivationDispatcher.Handle(_initialActivationArgs);
-            Environment.Exit(0);
-            return;
+            if (_initialActivationArgs?.Kind == ExtendedActivationKind.StartupTask)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "[App] StartupTask activation: registering background scan task, then exiting without a window.");
+
+                try
+                {
+                    ActivationDispatcher.Handle(_initialActivationArgs);
+                }
+                catch (Exception ex)
+                {
+                    var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "windirstat_registry.log");
+                    System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss} FAILED: {ex}\n");
+                }
+
+                System.Diagnostics.Debug.WriteLine("[App] StartupTask activation: exiting (Environment.Exit(0)).");
+                Environment.Exit(0);
+                return;
+            }
+
+            var windowManager = Services.GetRequiredService<WindowManagerService>();
+            var mainPage = windowManager.CreateScopedMainPage();
+            RootViewModel = mainPage.ViewModel;
+            _mWindow = new MainWindow(mainPage);
+            MainWindow = _mWindow;
+            _mWindow.Closed += OnMainWindowClosed;
+            windowManager.SetRootWindowHandle(_mWindow);
+            _mWindow.Activate();
+
+            Services.GetRequiredService<INotificationService>();
+            Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
+
+            ActivationDispatcher.Handle(_initialActivationArgs, isColdStart: true);
         }
-
-        var windowManager = Services.GetRequiredService<WindowManagerService>();
-        var mainPage = windowManager.CreateScopedMainPage();
-        RootViewModel = mainPage.ViewModel;
-        _mWindow = new MainWindow(mainPage);
-        MainWindow = _mWindow;
-        _mWindow.Closed += OnMainWindowClosed;
-        windowManager.SetRootWindowHandle(_mWindow);
-        _mWindow.Activate();
-
-        Services.GetRequiredService<INotificationService>();
-        Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
-
-        ActivationDispatcher.Handle(_initialActivationArgs, isColdStart: true);
+        catch (Exception ex)
+        {
+            var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "windirstat_crash.log");
+            System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss} OnLaunched CRASHED: {ex}\n");
+            throw;
+        }
     }
 
     private static void OnMainWindowClosed(object sender, WindowEventArgs args)

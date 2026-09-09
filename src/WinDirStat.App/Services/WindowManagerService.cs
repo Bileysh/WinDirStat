@@ -69,7 +69,8 @@ public class WindowManagerService : IWindowManagerService
         var scope = _scopeFactory.CreateScope();
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var page = new MainPage(viewModel, xamlRootProvider);
+        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
+        var page = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
 
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
             WindowNative.GetWindowHandle(newWindow);
@@ -224,7 +225,8 @@ public class WindowManagerService : IWindowManagerService
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var mainPage = new MainPage(viewModel, xamlRootProvider);
+        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
+        var mainPage = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
         return mainPage;
     }
     
@@ -267,7 +269,8 @@ public class WindowManagerService : IWindowManagerService
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var mainPage = new MainPage(viewModel, xamlRootProvider);
+        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
+        var mainPage = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
         window.SetContent(mainPage);
         
         if (window.Content is FrameworkElement fe)
