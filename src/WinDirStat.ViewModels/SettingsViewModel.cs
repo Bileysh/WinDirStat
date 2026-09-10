@@ -23,7 +23,12 @@ public partial class SettingsViewModel : ObservableObject
     public partial double LowFreeSpaceThresholdPercent { get; set; }
 
     [ObservableProperty]
+    public partial bool AccountForHardLinks { get; set; }
+
+    [ObservableProperty]
     public partial string? StatusMessage { get; set; }
+    
+    public IntPtr WindowHandle { get; set; }
 
     public SettingsViewModel(
         IBackgroundScanSettingsService settings,
@@ -40,6 +45,7 @@ public partial class SettingsViewModel : ObservableObject
 
         ScanIntervalMinutes = settings.ScanIntervalMinutes;
         LowFreeSpaceThresholdPercent = settings.LowFreeSpaceThresholdPercent;
+        AccountForHardLinks = settings.AccountForHardLinks;
 
         _isInitialized = true;
     }
@@ -61,10 +67,19 @@ public partial class SettingsViewModel : ObservableObject
         StatusMessage = string.Format(_localizationService.GetString("LowSpaceThresholdStatus"), _settings.LowFreeSpaceThresholdPercent.ToString("F0"));
     }
 
+    partial void OnAccountForHardLinksChanged(bool value)
+    {
+        if (!_isInitialized) return;
+        
+        _settings.AccountForHardLinks = value;
+        StatusMessage = _localizationService.GetString(
+            value ? "AccountForHardLinksEnabledStatus" : "AccountForHardLinksDisabledStatus");
+    }
+
     [RelayCommand]
     private async Task ExportAsync()
     {
-        var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "windirstat-settings");
+        var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "windirstat-settings", WindowHandle);
         if (fileName is null) return;
 
         StatusMessage = string.Format(_localizationService.GetString("SettingsExportedStatus"), fileName);
@@ -73,7 +88,7 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ImportAsync()
     {
-        var result = await _fileService.ImportAsync();
+        var result = await _fileService.ImportAsync(WindowHandle);
         if (result is null) return;
 
         var validationResult = _settings.ImportFromJson(result.Value.Json);
@@ -82,6 +97,7 @@ public partial class SettingsViewModel : ObservableObject
         {
             ScanIntervalMinutes = _settings.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = _settings.LowFreeSpaceThresholdPercent;
+            AccountForHardLinks = _settings.AccountForHardLinks;
             StatusMessage = string.Format(_localizationService.GetString("SettingsImportedStatus"), result.Value.FileName);
         }
         else

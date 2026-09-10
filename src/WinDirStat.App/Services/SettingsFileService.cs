@@ -6,12 +6,12 @@ namespace WinDirStat_App.Services;
 
 public sealed class SettingsFileService : ISettingsFileService
 {
-    public async Task<string?> ExportAsync(string json, string suggestedFileName)
+    public async Task<string?> ExportAsync(string json, string suggestedFileName, IntPtr ownerHwnd)
     {
         var picker = new FileSavePicker();
         picker.FileTypeChoices.Add("JSON", [".json"]);
         picker.SuggestedFileName = suggestedFileName;
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, GetWindowHandle());
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 
         var file = await picker.PickSaveFileAsync();
         if (file is null) return null;
@@ -20,11 +20,11 @@ public sealed class SettingsFileService : ISettingsFileService
         return file.Name;
     }
 
-    public async Task<(string Json, string FileName)?> ImportAsync()
+    public async Task<(string Json, string FileName)?> ImportAsync(IntPtr ownerHwnd)
     {
         var picker = new FileOpenPicker();
         picker.FileTypeFilter.Add(".json");
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, GetWindowHandle());
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 
         var file = await picker.PickSingleFileAsync();
         if (file is null) return null;
@@ -32,7 +32,4 @@ public sealed class SettingsFileService : ISettingsFileService
         var json = await FileIO.ReadTextAsync(file);
         return (json, file.Name);
     }
-
-    private static IntPtr GetWindowHandle() =>
-        WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
 }

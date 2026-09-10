@@ -21,6 +21,13 @@
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <StartupObject>WinDirStat_App.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x86'">
+    <LargeAddressAware>true</LargeAddressAware>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <PackageReference Include="LargeAddressAware" Version="1.0.6" />
+  </ItemGroup>
 
     <ItemGroup>
         <Content Include="Assets\AppIcon.ico" />
