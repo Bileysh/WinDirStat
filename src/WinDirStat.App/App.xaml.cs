@@ -58,6 +58,7 @@ public partial class App : Application
         services.AddTransient<SettingsWindow>();
         services.AddSingleton<IBackgroundScanTestRunner, BackgroundScanTestRunner>();
         services.AddSingleton<IClipboardService, ClipboardService>();
+        services.AddSingleton<IFileExplorerService, FileExplorerService>();
         return services.BuildServiceProvider();
     }
 }

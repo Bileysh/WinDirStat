@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.Input;
 using WinDirStat.Core.Classification;
 using WinDirStat.Core.Entities;
@@ -11,6 +10,7 @@ public partial class TreeMapRectViewModel
 {
     private readonly INotificationService? _notificationService;
     private readonly ILocalizationService? _localizationService;
+    private readonly IFileExplorerService? _fileExplorerService;
 
     public FileSystemNode Node { get; }
     public double X { get; }
@@ -26,10 +26,11 @@ public partial class TreeMapRectViewModel
     public bool IsFolder { get; }
 
     public TreeMapRectViewModel(TreeMapRect rect, INotificationService? notificationService = null,
-        ILocalizationService? localizationService = null)
+        ILocalizationService? localizationService = null, IFileExplorerService? fileExplorerService = null)
     {
         _notificationService = notificationService;
         _localizationService = localizationService;
+        _fileExplorerService = fileExplorerService;
         Node = rect.Node;
         X = rect.X;
         Y = rect.Y;
@@ -49,7 +50,7 @@ public partial class TreeMapRectViewModel
         IsSizeVisible = !IsFolder && Width > TreeMapConstants.MinWidthForSize &&
                         Height > TreeMapConstants.MinHeightForSize;
     }
-
+    
     [RelayCommand]
     private void OpenInExplorer()
     {
@@ -57,24 +58,7 @@ public partial class TreeMapRectViewModel
 
         try
         {
-            if (IsFolder)
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = Node.FullPath,
-                    UseShellExecute = true,
-                    Verb = "open"
-                });
-            }
-            else
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "explorer.exe",
-                    Arguments = $"/select,\"{Node.FullPath}\"",
-                    UseShellExecute = true
-                });
-            }
+            _fileExplorerService?.OpenInExplorer(Node.FullPath, IsFolder);
         }
         catch (Exception ex)
         {
@@ -92,18 +76,7 @@ public partial class TreeMapRectViewModel
 
         try
         {
-            var succeeded = ShellInterop.SHObjectProperties(
-                IntPtr.Zero, ShellInterop.SHOP_FILEPATH, Node.FullPath, null);
-
-            if (!succeeded)
-            {
-                var error = Marshal.GetLastWin32Error();
-                Debug.WriteLine(
-                    $"[TreeMapRectViewModel] SHObjectProperties returned false for '{Node.FullPath}' " +
-                    $"(Win32 error {error}).");
-                _notificationService?.ShowNotification(
-                    GetLocalizedOrFallback("ShowPropertiesFailedTitle", "Failed to open properties"), Node.Name);
-            }
+            _fileExplorerService?.ShowProperties(Node.FullPath);
         }
         catch (Exception ex)
         {
@@ -113,15 +86,7 @@ public partial class TreeMapRectViewModel
                 $"'{Node.Name}': {ex.Message}");
         }
     }
+
     private string GetLocalizedOrFallback(string key, string fallback) =>
         _localizationService?.GetString(key) ?? fallback;
-
-    private static class ShellInterop
-    {
-        public const uint SHOP_FILEPATH = 0x2;
-
-        [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool SHObjectProperties(
-            IntPtr hwnd, uint shopObjectType, string pszObjectName, string? pszPropertyPage);
-    }
 }

@@ -30,12 +30,14 @@
                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                        Visibility="{x:Bind GetNoDataVisibility(ViewModel.RootNodes.Count, ViewModel.IsScanning), Mode=OneWay}" />
 
-            <TreeView ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}">
+            <TreeView ItemsSource="{x:Bind ViewModel.RootNodes, Mode=OneWay}" CanDragItems="False"
+                      CanReorderItems="False" AllowDrop="False">
                 <TreeView.ItemTemplate>
                     <DataTemplate x:DataType="vm:NodeViewModel">
-                        <TreeViewItem ItemsSource="{x:Bind Children}">
+                        <TreeViewItem ItemsSource="{x:Bind Children}"
+                                      AutomationProperties.Name="{x:Bind AccessibleName, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal" Spacing="12">
-                               <StackPanel.ContextFlyout>
+                                <StackPanel.ContextFlyout>
                                     <MenuFlyout>
                                         <MenuFlyoutItem x:Uid="MenuShowInExplorer"
                                                         Command="{x:Bind OpenInExplorerCommand}">
@@ -50,9 +52,20 @@
                                                 <FontIcon Glyph="&#xE946;" />
                                             </MenuFlyoutItem.Icon>
                                         </MenuFlyoutItem>
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem x:Uid="MenuCopyName" Command="{x:Bind CopyNameCommand}">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE8C8;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem x:Uid="MenuCopyPath" Command="{x:Bind CopyPathCommand}">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE8C8;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
                                     </MenuFlyout>
                                 </StackPanel.ContextFlyout>
-                                
+
                                 <TextBlock Text="{x:Bind Name}" Width="220" />
                                 <TextBlock Text="{x:Bind StatusGlyph}" FontFamily="Segoe MDL2 Assets"
                                            Width="16" Opacity="0.7"
