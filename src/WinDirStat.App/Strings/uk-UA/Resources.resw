@@ -404,4 +404,7 @@
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Не вдалося експортувати</value>
   </data>
+    <data name="InvalidPathTitle" xml:space="preserve">
+    <value>Шлях не знайдено</value>
+  </data>
 </root>

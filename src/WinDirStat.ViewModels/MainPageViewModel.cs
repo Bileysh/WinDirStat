@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinDirStat.Core.Classification;
@@ -63,7 +64,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         }
     }
 
-    [ObservableProperty] 
+    [ObservableProperty]
     public partial ObservableCollection<NodeViewModel> RootNodes { get; set; } = [];
 
     [ObservableProperty]
@@ -90,7 +91,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     public string ScanProgressText => ScanFilesCount == 0 && ScanFoldersCount == 0
         ? string.Empty
         : string.Format(_localizationService.GetString("ScanProgressFormat"), ScanFilesCount, ScanFoldersCount);
-    
+
     [ObservableProperty]
     public partial ObservableCollection<DriveItemViewModel> AvailableDrives { get; set; } = [];
 
@@ -101,7 +102,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     public partial ObservableCollection<FileTypeStatisticsViewModel> TypeStatistics { get; set; } = [];
 
     public bool IsNoDataVisible => TypeStatistics.Count == 0 && !IsScanning;
-
 
     [ObservableProperty]
     public partial ObservableCollection<TreeMapRectViewModel> TreeMapRects { get; set; } = [];

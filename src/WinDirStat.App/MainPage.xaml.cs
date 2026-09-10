@@ -1,4 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
 using WinDirStat_App.Services;
 
@@ -6,11 +9,15 @@ namespace WinDirStat_App;
 
 public sealed partial class MainPage : Page
 {
+    private readonly IScanResultFileService _scanResultFileService;
+
     public MainPageViewModel ViewModel { get; }
 
-    public MainPage(MainPageViewModel viewModel, ICurrentXamlRootProvider xamlRootProvider)
+    public MainPage(MainPageViewModel viewModel, ICurrentXamlRootProvider xamlRootProvider,
+        IScanResultFileService scanResultFileService)
     {
         ViewModel = viewModel;
+        _scanResultFileService = scanResultFileService;
         InitializeComponent();
         Unloaded += (_, _) => ViewModel.Dispose();
         Loaded += (_, _) => xamlRootProvider.XamlRoot = XamlRoot;
@@ -58,6 +65,37 @@ public sealed partial class MainPage : Page
         if (ViewModel.CancelScanCommand.CanExecute(null))
         {
             ViewModel.CancelScanCommand.Execute(null);
+        }
+    }
+
+    private void Page_DragOver(object sender, Microsoft.UI.Xaml.DragEventArgs e)
+    { 
+        e.AcceptedOperation = e.DataView.Contains(StandardDataFormats.StorageItems)
+            ? DataPackageOperation.Copy
+            : DataPackageOperation.None;
+    }
+
+    private async void Page_Drop(object sender, Microsoft.UI.Xaml.DragEventArgs e)
+    {
+        if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+
+        var deferral = e.GetDeferral();
+        try
+        {
+            var items = await e.DataView.GetStorageItemsAsync();
+            var file = items.OfType<StorageFile>()
+                .FirstOrDefault(f => f.Path.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
+            if (file is null) return;
+            
+            var rootNode = await Task.Run(() => _scanResultFileService.ImportFromPath(file.Path));
+            if (rootNode is not null)
+            {
+                ViewModel.LoadImportedResult(rootNode);
+            }
+        }
+        finally
+        {
+            deferral.Complete();
         }
     }
 }

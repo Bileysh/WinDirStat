@@ -7,7 +7,8 @@
         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
-        IgnorableNamespaces="uap rescap com desktop">
+        xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+        IgnorableNamespaces="uap rescap com desktop uap5">
 
     <Identity
             Name="4B18DC31-5920-4065-AAE7-05908E7C027E"
@@ -60,6 +61,19 @@
                         </uap:SupportedFileTypes>
                     </uap:FileTypeAssociation>
                 </uap:Extension>
+
+                <uap:Extension Category="windows.protocol">
+                    <uap:Protocol Name="windirstat">
+                        <uap:DisplayName>WinDirStat</uap:DisplayName>
+                    </uap:Protocol>
+                </uap:Extension>
+
+                <uap5:Extension Category="windows.startupTask">
+                    <uap5:StartupTask
+                            TaskId="WinDirStat.StartupTask"
+                            Enabled="false"
+                            DisplayName="WinDirStat background scanning"/>
+                </uap5:Extension>
 
                 <com:Extension Category="windows.comServer">
                     <com:ComServer>

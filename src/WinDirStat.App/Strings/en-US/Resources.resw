@@ -367,4 +367,7 @@
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Export failed</value>
   </data>
+    <data name="InvalidPathTitle" xml:space="preserve">
+    <value>Path not found</value>
+  </data>
 </root>

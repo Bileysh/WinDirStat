@@ -1,10 +1,15 @@
+using WinDirStat.Core.Entities;
 using WinDirStat.Core.Interfaces;
 
 namespace WinDirStat.Tests.FakeService;
 
 public class FakeWindowManagerService : IWindowManagerService
 {
-    public void OpenMainWindow()
+    public void OpenMainWindow(string? initialScanPath = null)
+    {
+    }
+
+    public void OpenMainWindowWithImportedResult(FileSystemNode rootNode)
     {
     }
 

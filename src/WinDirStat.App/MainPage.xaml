@@ -10,7 +10,10 @@
     xmlns:converters="using:WinDirStat_App.Converters"
     xmlns:uc="using:WinDirStat_App.UserControls"
     mc:Ignorable="d"
-    Background="Transparent">
+    Background="Transparent"
+    AllowDrop="True"
+    DragOver="Page_DragOver"
+    Drop="Page_Drop">
 
     <Page.KeyboardAccelerators>
         <KeyboardAccelerator Key="O" Modifiers="Control" Invoked="OpenFolderAccelerator_Invoked" />

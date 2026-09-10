@@ -2,27 +2,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using WinDirStat.Core.Interfaces;
+using WinDirStat.Core.Entities;
 using WinDirStat.ViewModels;
 using WinDirStat_App.UserControls;
 using System.Diagnostics;
+using Microsoft.UI.Xaml.Media;
 using WinRT.Interop;
 
 namespace WinDirStat_App.Services;
 
 public class WindowManagerService : IWindowManagerService
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
     private readonly List<Window> _openWindows = new();
 
-    public WindowManagerService(IServiceProvider serviceProvider, IServiceScopeFactory scopeFactory,
+    public WindowManagerService(IServiceScopeFactory scopeFactory,
         IThemeService themeService, ILocalizationService localizationService)
     {
-        _serviceProvider = serviceProvider;
         _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
@@ -44,7 +43,23 @@ public class WindowManagerService : IWindowManagerService
         }
     }
 
-    public void OpenMainWindow()
+    public void OpenMainWindow(string? initialScanPath = null)
+    {
+        var (viewModel, _) = CreateAndShowNewMainWindow();
+
+        if (!string.IsNullOrWhiteSpace(initialScanPath))
+        {
+            _ = viewModel.ScanPathAsync(initialScanPath);
+        }
+    }
+
+    public void OpenMainWindowWithImportedResult(FileSystemNode rootNode)
+    {
+        var (viewModel, _) = CreateAndShowNewMainWindow();
+        viewModel.LoadImportedResult(rootNode);
+    }
+
+    private (MainPageViewModel ViewModel, Window Window) CreateAndShowNewMainWindow()
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
@@ -54,7 +69,8 @@ public class WindowManagerService : IWindowManagerService
         var scope = _scopeFactory.CreateScope();
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var page = new MainPage(viewModel, xamlRootProvider);
+        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
+        var page = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
 
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
             WindowNative.GetWindowHandle(newWindow);
@@ -68,11 +84,13 @@ public class WindowManagerService : IWindowManagerService
         OffsetWindowPosition(newWindow);
 
         newWindow.Activate();
-        
+
         if (newWindow.Content is FrameworkElement fe)
         {
             fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
         }
+
+        return (viewModel, newWindow);
     }
 
     private Window CreateDetachedWindow(string title, FrameworkElement content, int width, int height,
@@ -83,8 +101,11 @@ public class WindowManagerService : IWindowManagerService
             MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
-        var rootGrid = new Grid();
-        rootGrid.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
+        var rootGrid = new Grid
+        {
+            Style = (Style)Application.Current.Resources["DetachedWindowRootGridStyle"],
+            Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent)
+        };
 
         rootGrid.RowDefinitions.Add(new RowDefinition
             { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
@@ -204,7 +225,8 @@ public class WindowManagerService : IWindowManagerService
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var mainPage = new MainPage(viewModel, xamlRootProvider);
+        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
+        var mainPage = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
         return mainPage;
     }
     
@@ -233,17 +255,22 @@ public class WindowManagerService : IWindowManagerService
         if (App.MainWindow is not MainWindow window) return;
 
         window.CurrentPage?.ViewModel.Dispose();
-
+        var previousResult = _rootWindowScope?.ServiceProvider.GetService<IScanStateService>()?.CurrentResult;
+        
         _rootWindowScope?.Dispose();
         var scope = _scopeFactory.CreateScope();
         _rootWindowScope = scope;
-
+        
+        if (previousResult is not null)
+                    scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
+        
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         App.RootViewModel = viewModel;
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var mainPage = new MainPage(viewModel, xamlRootProvider);
+        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
+        var mainPage = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
         window.SetContent(mainPage);
         
         if (window.Content is FrameworkElement fe)
