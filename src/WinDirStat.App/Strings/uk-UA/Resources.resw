@@ -392,4 +392,16 @@
     <data name="TrayMenuExit.Text" xml:space="preserve">
     <value>Вихід</value>
   </data>
+    <data name="MenuFileExportScan.Text" xml:space="preserve">
+    <value>Експортувати скан…</value>
+  </data>
+    <data name="MenuFileImportScan.Text" xml:space="preserve">
+    <value>Імпортувати скан…</value>
+  </data>
+    <data name="ExportCompleteTitle" xml:space="preserve">
+    <value>Скан експортовано</value>
+  </data>
+    <data name="ExportErrorTitle" xml:space="preserve">
+    <value>Не вдалося експортувати</value>
+  </data>
 </root>

@@ -2,11 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
 using WinDirStat_App.UserControls;
 using System.Diagnostics;
-using Microsoft.UI.Xaml.Media;
 using WinRT.Interop;
 
 namespace WinDirStat_App.Services;
@@ -64,12 +64,7 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Title = _localizationService.GetString("WindowTitle_New");
 
         _openWindows.Add(newWindow);
-        newWindow.Closed += (_, _) =>
-        {
-            _openWindows.Remove(newWindow);
-            viewModel.Dispose();
-            scope.Dispose();
-        };
+        newWindow.Closed += (_, _) => CleanupNewMainWindow(newWindow, viewModel, scope);
         OffsetWindowPosition(newWindow);
 
         newWindow.Activate();
@@ -88,10 +83,8 @@ public class WindowManagerService : IWindowManagerService
             MicaController.IsSupported())
             newWindow.SystemBackdrop = new MicaBackdrop();
 
-        var rootGrid = new Grid
-        {
-            Style = (Style)Application.Current.Resources["DetachedWindowRootGridStyle"]
-        };
+        var rootGrid = new Grid();
+        rootGrid.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
 
         rootGrid.RowDefinitions.Add(new RowDefinition
             { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
@@ -115,10 +108,7 @@ public class WindowManagerService : IWindowManagerService
         newWindow.Content = rootGrid;
         newWindow.Title = $"WinDirStat - {title}";
         _openWindows.Add(newWindow);
-        newWindow.Closed += (_, _) =>
-        {
-            _openWindows.Remove(newWindow);
-        };
+        newWindow.Closed += (_, _) => _openWindows.Remove(newWindow);
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
         OffsetWindowPosition(newWindow);
@@ -126,6 +116,19 @@ public class WindowManagerService : IWindowManagerService
         rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
 
         return newWindow;
+    }
+
+    private void CleanupNewMainWindow(Window window, MainPageViewModel viewModel, IServiceScope scope)
+    {
+        _openWindows.Remove(window);
+        viewModel.Dispose();
+        scope.Dispose();
+    }
+
+    private void CleanupSettingsWindow(Window window, IServiceScope scope)
+    {
+        _openWindows.Remove(window);
+        scope.Dispose();
     }
 
     private void OffsetWindowPosition(Window newWindow)
@@ -170,17 +173,23 @@ public class WindowManagerService : IWindowManagerService
 
     public void OpenSettingsWindow()
     {
-        var window = _serviceProvider.GetRequiredService<SettingsWindow>();
+        var scope = _scopeFactory.CreateScope();
+        var window = scope.ServiceProvider.GetRequiredService<SettingsWindow>();
+        var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        
         window.Title = _localizationService.GetString("WindowTitle_Settings");
 
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
             window.SystemBackdrop = new MicaBackdrop();
 
         if (window.Content is FrameworkElement fe)
+        {
             fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+            fe.Loaded += (_, _) => xamlRootProvider.XamlRoot = fe.XamlRoot;
+        }
 
         _openWindows.Add(window);
-        window.Closed += (_, _) => _openWindows.Remove(window);
+        window.Closed += (_, _) => CleanupSettingsWindow(window, scope);
         OffsetWindowPosition(window);
         window.Activate();
     }
@@ -224,16 +233,13 @@ public class WindowManagerService : IWindowManagerService
         if (App.MainWindow is not MainWindow window) return;
 
         window.CurrentPage?.ViewModel.Dispose();
-        var previousResult = _rootWindowScope?.ServiceProvider.GetService<IScanStateService>()?.CurrentResult;
-        
+
         _rootWindowScope?.Dispose();
         var scope = _scopeFactory.CreateScope();
         _rootWindowScope = scope;
-        
-        if (previousResult is not null)
-                    scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
-        
+
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
+        App.RootViewModel = viewModel;
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();

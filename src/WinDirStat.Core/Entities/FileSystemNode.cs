@@ -1,4 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json.Serialization;
 
 namespace WinDirStat.Core.Entities;
 
@@ -19,8 +22,9 @@ public class FileSystemNode
     public string Extension { get; init; } = string.Empty;
     public long SizeLogical { get; set; }
     public long SizePhysical { get; set; }
-    public DateTime LastModified { get; init; }
-    public List<FileSystemNode> Children { get; } = [];
+    public DateTime LastModified { get; set; }
+    public List<FileSystemNode> Children { get; set; } = new();
+    
     public ScanStatus Status { get; set; } = ScanStatus.Ok;
     public string? ErrorMessage { get; set; }
     public bool IsDuplicateHardLink { get; set; }
@@ -29,5 +33,14 @@ public class FileSystemNode
     {
         child.Parent = this;
         Children.Add(child);
+    }
+
+    public void EstablishParentLinksRecursively()
+    {
+        foreach (var child in Children)
+        {
+            child.Parent = this;
+            child.EstablishParentLinksRecursively();
+        }
     }
 }

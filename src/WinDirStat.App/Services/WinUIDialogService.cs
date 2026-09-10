@@ -22,7 +22,7 @@ public class WinUiDialogService : IDialogService
         if (xamlRoot is null)
         {
             System.Diagnostics.Debug.WriteLine(
-                "[WinUiDialogService] XamlRoot ще не готовий для цього вікна — діалог пропущено.");
+                "[WinUiDialogService] XamlRoot not ready for this window yet — dialog skipped.");
             return;
         }
 

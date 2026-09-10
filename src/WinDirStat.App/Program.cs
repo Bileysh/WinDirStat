@@ -1,104 +1,110 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.AppLifecycle;
 using WinDirStat_App.Services;
-using WinDirStat.Core.Entities;
-using WinDirStat.Services;
-using WinDirStat.WinRT;
 
 namespace WinDirStat_App;
 
-public static class Program
+public static partial class Program
 {
-    private const string RegisterForBgTaskServerArg = "-RegisterForBGTaskServer";
+    private const string ElevatedScanArg = "--elevated-scan";
+    private const string SingleInstanceKey = "WinDirStat.MainInstance";
     private static readonly ManualResetEvent ExitEvent = new(false);
-    private static uint _registrationToken;
+    private static readonly ManualResetEvent RedirectEvent = new(false);
 
     [STAThread]
-    private static void Main(string[] args)
+    static void Main(string[] args)
     {
-        if (args.Length >= 3 &&
-            args[0].Equals(ElevatedScanHelperClient.ElevatedScanArg, StringComparison.OrdinalIgnoreCase))
+        WinRT.ComWrappersSupport.InitializeComWrappers();
+
+        if (args.Length >= 3 && args[0] == ElevatedScanArg)
         {
-            Environment.ExitCode = RunAsElevatedScanHelper(inputFile: args[1], outputFile: args[2]);
+            var exitCode = ElevatedScanServer.Run(args[1], args[2]);
+            Environment.Exit(exitCode);
             return;
         }
 
-        if (args.Any(a => a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase)
-                          || a.Equals(RegisterForBgTaskServerArg, StringComparison.OrdinalIgnoreCase)))
+        var activatedArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
+
+        if (RedirectToExistingInstanceIfAny(activatedArgs))
         {
-            RunAsBackgroundTaskServer();
             return;
         }
 
-        RunAsInteractiveApp();
+        RunAsInteractiveApp(activatedArgs);
     }
 
-    private static int RunAsElevatedScanHelper(string inputFile, string outputFile)
+    private static bool RedirectToExistingInstanceIfAny(AppActivationArguments activatedArgs)
     {
-        try
+        var mainInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
+
+        if (mainInstance.IsCurrent)
         {
-            PrivilegeHelper.EnableBackupPrivilege();
+            mainInstance.Activated += OnActivatedFromAnotherInstance;
+            return false;
+        }
 
-            var paths = File.ReadAllLines(inputFile).Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
-            var results = new Dictionary<string, FileSystemNode>();
-            var scanService = new DiskScanService(new FileIdentityService());
-
-            foreach (var path in paths)
+        Task.Run(async () =>
+        {
+            try
             {
-                try
-                {
-                    var result = scanService.ScanAsync(path).GetAwaiter().GetResult();
-                    results[path] = result.RootNode;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[ElevatedScanHelper] Scan of '{path}' failed: {ex}");
-                }
+                await mainInstance.RedirectActivationToAsync(activatedArgs);
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Program] Redirect failed: {ex}");
+            }
+            finally
+            {
+                RedirectEvent.Set();
+            }
+        });
+        RedirectEvent.WaitOne();
 
-            var json = System.Text.Json.JsonSerializer.Serialize(
-                results, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode);
-            File.WriteAllText(outputFile, json);
-
-            return 0;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ElevatedScanHelper] Batch scan failed: {ex}");
-            return 1;
-        }
+        return true;
     }
 
-    private static void RunAsBackgroundTaskServer()
+    private static void OnActivatedFromAnotherInstance(object? sender, AppActivationArguments args)
     {
-        var taskGuid = typeof(BackgroundScanTask).GUID;
+        App.MainDispatcherQueue?.TryEnqueue(() =>
+        {
+            if (App.MainWindow is not { } window) return;
 
-        NotificationRegistration.TryRegister("BGTask");
+            window.Activate();
+            BringToForeground(window);
 
-        BackgroundScanTask.Completed += OnBackgroundScanTaskCompleted;
-
-        ComServer.CoRegisterClassObject(
-            ref taskGuid,
-            new ComServer.BackgroundTaskFactory(),
-            ComServer.CLSCTX_LOCAL_SERVER,
-            ComServer.REGCLS_MULTIPLEUSE,
-            out _registrationToken);
-
-        ExitEvent.WaitOne();
-
-        BackgroundScanTask.Completed -= OnBackgroundScanTaskCompleted;
-        ComServer.CoRevokeClassObject(_registrationToken);
+            ActivationDispatcher.Handle(args);
+        });
     }
 
-    private static void OnBackgroundScanTaskCompleted(object? sender, EventArgs e) => ExitEvent.Set();
+    private static void BringToForeground(Window window)
+    {
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+        var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+        var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
 
-    private static void RunAsInteractiveApp()
+        if (appWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter &&
+            presenter.State == Microsoft.UI.Windowing.OverlappedPresenterState.Minimized)
+        {
+            presenter.Restore();
+        }
+        NativeMethods.SetForegroundWindow(hwnd);
+    }
+
+    private static partial class NativeMethods
+    {
+        [System.Runtime.InteropServices.LibraryImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        public static partial bool SetForegroundWindow(IntPtr hWnd);
+    }
+
+    private static void RunAsInteractiveApp(AppActivationArguments initialActivationArgs)
     {
         Application.Start(_ =>
         {
             var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
             SynchronizationContext.SetSynchronizationContext(context);
-            new App();
+            new App(initialActivationArgs);
         });
     }
 }
