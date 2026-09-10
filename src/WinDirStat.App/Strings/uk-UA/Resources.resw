@@ -374,4 +374,10 @@
     <data name="SettingsTestScanButton.Content" xml:space="preserve">
     <value>Тестовий скан зараз</value>
   </data>
+    <data name="TrayMenuOpen.Text" xml:space="preserve">
+    <value>Відкрити</value>
+  </data>
+    <data name="TrayMenuExit.Text" xml:space="preserve">
+    <value>Вихід</value>
+  </data>
 </root>
