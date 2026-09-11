@@ -15,7 +15,7 @@ public class FakeScanResultFileService: IScanResultFileService
         throw new NotImplementedException();
     }
 
-    public FileSystemNode? ImportFromPath(string filePath)
+    public async Task<FileSystemNode?> ImportFromPathAsync(string filePath)
     {
         throw new NotImplementedException();
     }
