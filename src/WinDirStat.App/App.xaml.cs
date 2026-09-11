@@ -70,6 +70,7 @@ public partial class App
     {
         MainWindow = null;
         RootViewModel = null;
+        Current.Exit();
     }
 
     private static IServiceProvider ConfigureServices()
