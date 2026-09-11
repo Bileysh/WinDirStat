@@ -8,7 +8,9 @@
         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
         xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
-        IgnorableNamespaces="uap rescap com desktop uap5">
+        xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+        xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+        IgnorableNamespaces="uap rescap com desktop uap5 desktop4 desktop5">
 
     <Identity
             Name="4B18DC31-5920-4065-AAE7-05908E7C027E"
@@ -98,6 +100,18 @@
                         </com:ExeServer>
                     </com:ComServer>
                 </com:Extension>
+                
+                <desktop4:Extension Category="windows.fileExplorerContextMenus">
+                    <desktop4:FileExplorerContextMenus>
+                        <desktop5:ItemType Type="Directory">
+                            <desktop5:Verb Id="ScanWithWinDirStatFolder" Clsid="6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21" />
+                        </desktop5:ItemType>
+                        <desktop5:ItemType Type="Drive">
+                            <desktop5:Verb Id="ScanWithWinDirStatDrive" Clsid="6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21" />
+                        </desktop5:ItemType>
+                    </desktop4:FileExplorerContextMenus>
+                </desktop4:Extension>
+                
             </Extensions>
         </Application>
     </Applications>
