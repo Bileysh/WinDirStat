@@ -11,7 +11,8 @@ public static class ActivationDispatcher
         None,
         Path,
         File,
-        InvalidPath
+        InvalidPath,
+        StartupTask
     }
 
     public readonly record struct ExtractedActivation(ActivationAction Action, string? Path);
@@ -58,8 +59,7 @@ public static class ActivationDispatcher
                 break;
 
             case ExtendedActivationKind.StartupTask:
-                HandleStartupTask();
-                break;
+                return new ExtractedActivation(ActivationAction.StartupTask, null);
         }
 
         return new ExtractedActivation(ActivationAction.None, null);
@@ -82,32 +82,37 @@ public static class ActivationDispatcher
             case ActivationAction.File:
                 ImportScanFile(extracted.Path, isColdStart);
                 break;
+
+            case ActivationAction.StartupTask:
+                HandleStartupTask();
+                break;
         }
     }
 
-    private static void ImportScanFile(string? path, bool isColdStart)
+    private static async void ImportScanFile(string? path, bool isColdStart)
     {
-        Task.Run(() =>
-        {
-            var fileService = App.StaticServices?.GetService(typeof(IScanResultFileService)) as IScanResultFileService;
-            var rootNode = fileService?.ImportFromPath(path);
+        if (string.IsNullOrEmpty(path)) return;
 
-            if (rootNode is null)
+        var fileService = App.StaticServices?.GetService(typeof(IScanResultFileService)) as IScanResultFileService;
+        if (fileService is null) return;
+
+        var rootNode = await fileService.ImportFromPathAsync(path);
+
+        if (rootNode is null)
+        {
+            return;
+        }
+
+        App.MainDispatcherQueue?.TryEnqueue(() =>
+        {
+            if (isColdStart && App.RootViewModel is not null)
             {
+                App.RootViewModel.LoadImportedResult(rootNode);
                 return;
             }
 
-            App.MainDispatcherQueue?.TryEnqueue(() =>
-            {
-                if (isColdStart && App.RootViewModel is not null)
-                {
-                    App.RootViewModel.LoadImportedResult(rootNode);
-                    return;
-                }
-
-                var windowManager = App.StaticServices?.GetService(typeof(IWindowManagerService)) as IWindowManagerService;
-                windowManager?.OpenMainWindowWithImportedResult(rootNode);
-            });
+            var windowManager = App.StaticServices?.GetService(typeof(IWindowManagerService)) as IWindowManagerService;
+            windowManager?.OpenMainWindowWithImportedResult(rootNode);
         });
     }
 

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
@@ -26,8 +27,15 @@ public static partial class Program
             Environment.Exit(exitCode);
             return;
         }
+        if (args.Any(a => a.Equals("--explorer-command-server", StringComparison.OrdinalIgnoreCase)))
+        {
+            RunAsExplorerCommandServer();
+            return;
+        }
 
-        if (args.Any(a => a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase) || a.Equals(RegisterForBgTaskServerArg, StringComparison.OrdinalIgnoreCase)))
+        if (args.Any(a =>
+                a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase) || a.Equals(RegisterForBgTaskServerArg,
+                    StringComparison.OrdinalIgnoreCase)))
         {
             RunAsBackgroundTaskServer();
             return;
@@ -141,9 +149,9 @@ public static partial class Program
 
     private static partial class NativeMethods
     {
-        [System.Runtime.InteropServices.LibraryImport("user32.dll")]
-        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static partial void SetForegroundWindow(IntPtr hWnd);
+        [LibraryImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool SetForegroundWindow(IntPtr hWnd);
     }
 
     private static void RunAsInteractiveApp(AppActivationArguments initialActivationArgs)
@@ -154,5 +162,21 @@ public static partial class Program
             SynchronizationContext.SetSynchronizationContext(context);
             new App(initialActivationArgs);
         });
+    }
+
+    private static void RunAsExplorerCommandServer()
+    {
+        var clsid = new Guid(ExplorerCommandServer.ExplorerCommandClsid);
+
+        ComServer.CoRegisterClassObject(
+            ref clsid,
+            new ExplorerCommandServer.ExplorerCommandFactory(),
+            ComServer.CLSCTX_LOCAL_SERVER,
+            ComServer.REGCLS_MULTIPLEUSE,
+            out var explorerCommandToken);
+
+        ExitEvent.WaitOne();
+
+        ComServer.CoRevokeClassObject(explorerCommandToken);
     }
 }

@@ -69,8 +69,7 @@ public class WindowManagerService : IWindowManagerService
         var scope = _scopeFactory.CreateScope();
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
-        var page = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
+        var page = new MainPage(viewModel, xamlRootProvider);
 
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
             WindowNative.GetWindowHandle(newWindow);
@@ -93,8 +92,7 @@ public class WindowManagerService : IWindowManagerService
         return (viewModel, newWindow);
     }
 
-    private Window CreateDetachedWindow(string title, FrameworkElement content, int width, int height,
-        MainPageViewModel viewModel)
+    private Window CreateDetachedWindow(string title, FrameworkElement content, int width, int height)
     {
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
@@ -170,7 +168,7 @@ public class WindowManagerService : IWindowManagerService
         var vm = (MainPageViewModel)viewModel;
         var control = new StatisticsControl { ViewModel = vm };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_Statistics"), control,
-                WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight, vm)
+                WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight)
             .Activate();
     }
 
@@ -179,7 +177,7 @@ public class WindowManagerService : IWindowManagerService
         var vm = (MainPageViewModel)viewModel;
         var control = new TreeViewControl { ViewModel = vm };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeView"), control,
-                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight, vm)
+                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight)
             .Activate();
     }
 
@@ -188,7 +186,7 @@ public class WindowManagerService : IWindowManagerService
         var vm = (MainPageViewModel)viewModel;
         var control = new TreeMapControl { ViewModel = vm };
         CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeMap"), control,
-                WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight, vm)
+                WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight)
             .Activate();
     }
 
@@ -225,8 +223,7 @@ public class WindowManagerService : IWindowManagerService
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
-        var mainPage = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
+        var mainPage = new MainPage(viewModel, xamlRootProvider);
         return mainPage;
     }
     
@@ -269,8 +266,7 @@ public class WindowManagerService : IWindowManagerService
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
 
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        var scanResultFileService = scope.ServiceProvider.GetRequiredService<IScanResultFileService>();
-        var mainPage = new MainPage(viewModel, xamlRootProvider, scanResultFileService);
+        var mainPage = new MainPage(viewModel, xamlRootProvider);
         window.SetContent(mainPage);
         
         if (window.Content is FrameworkElement fe)
