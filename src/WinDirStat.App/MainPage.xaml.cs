@@ -1,23 +1,19 @@
 using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
+using WinDirStat_App.Services;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
-using WinDirStat_App.Services;
 
 namespace WinDirStat_App;
 
 public sealed partial class MainPage : Page
 {
-    private readonly IScanResultFileService _scanResultFileService;
-
     public MainPageViewModel ViewModel { get; }
 
-    public MainPage(MainPageViewModel viewModel, ICurrentXamlRootProvider xamlRootProvider,
-        IScanResultFileService scanResultFileService)
+    public MainPage(MainPageViewModel viewModel, ICurrentXamlRootProvider xamlRootProvider)
     {
         ViewModel = viewModel;
-        _scanResultFileService = scanResultFileService;
         InitializeComponent();
         Unloaded += (_, _) => ViewModel.Dispose();
         Loaded += (_, _) => xamlRootProvider.XamlRoot = XamlRoot;
@@ -83,15 +79,8 @@ public sealed partial class MainPage : Page
         try
         {
             var items = await e.DataView.GetStorageItemsAsync();
-            var file = items.OfType<StorageFile>()
-                .FirstOrDefault(f => f.Path.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
-            if (file is null) return;
-            
-            var rootNode = await Task.Run(() => _scanResultFileService.ImportFromPath(file.Path));
-            if (rootNode is not null)
-            {
-                ViewModel.LoadImportedResult(rootNode);
-            }
+            var paths = items.OfType<StorageFile>().Select(f => f.Path).ToList();
+            await ViewModel.HandleDroppedFilesAsync(paths);
         }
         finally
         {
