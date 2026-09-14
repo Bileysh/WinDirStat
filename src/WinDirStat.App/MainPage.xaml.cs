@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
+using Serilog;
 using WinDirStat_App.Services;
 using WinDirStat.Core.Interfaces;
 using WinDirStat.ViewModels;
@@ -73,14 +74,24 @@ public sealed partial class MainPage : Page
 
     private async void Page_Drop(object sender, Microsoft.UI.Xaml.DragEventArgs e)
     {
-        if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+        if (!e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            Log.Debug("Page_Drop: dropped data does not contain storage items, ignoring");
+            return;
+        }
 
         var deferral = e.GetDeferral();
         try
         {
             var items = await e.DataView.GetStorageItemsAsync();
             var paths = items.OfType<StorageFile>().Select(f => f.Path).ToList();
+            Log.Information("Page_Drop: received {Count} file(s): [{Paths}]", paths.Count, string.Join(" | ", paths));
+
             await ViewModel.HandleDroppedFilesAsync(paths);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Page_Drop: handling dropped files failed");
         }
         finally
         {

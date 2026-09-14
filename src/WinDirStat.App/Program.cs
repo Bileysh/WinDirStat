@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+using Serilog;
 using WinDirStat_App.Services;
 using WinDirStat.WinRT;
 
@@ -12,24 +13,28 @@ public static partial class Program
     private const string ElevatedScanArg = "--elevated-scan";
     private const string RegisterForBgTaskServerArg = "-RegisterForBGTaskServer";
     private const string SingleInstanceKey = "WinDirStat.MainInstance";
-    private static readonly ManualResetEvent ExitEvent = new(false);
+    internal static readonly ManualResetEvent ExitEvent = new(false);
     private static readonly ManualResetEvent RedirectEvent = new(false);
     private static uint _registrationToken;
 
     [STAThread]
     static void Main(string[] args)
     {
-        WinRT.ComWrappersSupport.InitializeComWrappers();
-
         if (args.Length >= 3 && args[0] == ElevatedScanArg)
         {
+            AppLogger.Initialize("ElevatedScan");
             var exitCode = ElevatedScanServer.Run(args[1], args[2]);
+            Log.Information("ElevatedScanServer.Run returned exit code {ExitCode}", exitCode);
+            AppLogger.Shutdown();
             Environment.Exit(exitCode);
             return;
         }
+
         if (args.Any(a => a.Equals("--explorer-command-server", StringComparison.OrdinalIgnoreCase)))
         {
+            AppLogger.Initialize("ExplorerCommandServer");
             RunAsExplorerCommandServer();
+            AppLogger.Shutdown();
             return;
         }
 
@@ -37,14 +42,20 @@ public static partial class Program
                 a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase) || a.Equals(RegisterForBgTaskServerArg,
                     StringComparison.OrdinalIgnoreCase)))
         {
+            AppLogger.Initialize("BackgroundTaskServer");
             RunAsBackgroundTaskServer();
+            AppLogger.Shutdown();
             return;
         }
 
+        AppLogger.Initialize("Interactive");
         var activatedArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
+        Log.Information("Initial activation kind: {Kind}", activatedArgs.Kind);
 
         if (RedirectToExistingInstanceIfAny(activatedArgs))
         {
+            Log.Information("Redirected to existing instance, exiting this process");
+            AppLogger.Shutdown();
             return;
         }
 
@@ -76,7 +87,10 @@ public static partial class Program
 
     private static bool RedirectToExistingInstanceIfAny(AppActivationArguments activatedArgs)
     {
+        Log.Information("RedirectToExistingInstanceIfAny: activation kind={Kind}", activatedArgs.Kind);
+
         var mainInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
+        Log.Information("FindOrRegisterForKey: IsCurrent={IsCurrent}", mainInstance.IsCurrent);
 
         if (mainInstance.IsCurrent)
         {
@@ -92,9 +106,9 @@ public static partial class Program
                 await mainInstance.RedirectActivationToAsync(activatedArgs);
                 redirectSucceeded = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // ignored
+                Log.Warning(ex, "RedirectActivationToAsync failed (stale registration?)");
             }
             finally
             {
@@ -105,12 +119,15 @@ public static partial class Program
 
         if (redirectSucceeded)
         {
+            Log.Information("Redirect succeeded");
             return true;
         }
 
+        Log.Warning("Redirect failed — retrying FindOrRegisterForKey (self-heal path)");
         var retryInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
         if (retryInstance.IsCurrent)
         {
+            Log.Information("Self-heal succeeded: this process is now the registered instance");
             retryInstance.Activated += OnActivatedFromAnotherInstance;
         }
 
@@ -119,16 +136,34 @@ public static partial class Program
 
     private static void OnActivatedFromAnotherInstance(object? sender, AppActivationArguments args)
     {
-        var extracted = ActivationDispatcher.Extract(args);
+        ActivationDispatcher.ExtractedActivation extracted;
+        try
+        {
+            extracted = ActivationDispatcher.Extract(args);
+            Log.Information("OnActivatedFromAnotherInstance: extracted {Action} / '{Path}'",
+                extracted.Action, extracted.Path);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "OnActivatedFromAnotherInstance: Extract failed (source process likely already exited)");
+            return;
+        }
 
         App.MainDispatcherQueue?.TryEnqueue(() =>
         {
-            if (App.MainWindow is not null)
+            try
             {
-                BringToForeground(App.MainWindow);
-            }
+                if (App.MainWindow is not null)
+                {
+                    BringToForeground(App.MainWindow);
+                }
 
-            ActivationDispatcher.HandleExtracted(extracted, isColdStart: false);
+                ActivationDispatcher.HandleExtracted(extracted, isColdStart: false);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "OnActivatedFromAnotherInstance: post-extraction handling failed");
+            }
         });
     }
 
@@ -166,16 +201,21 @@ public static partial class Program
 
     private static void RunAsExplorerCommandServer()
     {
+        Log.Information("RunAsExplorerCommandServer: registering CLSID {Clsid}",
+            ExplorerCommandServer.ExplorerCommandClsid);
+
         var clsid = new Guid(ExplorerCommandServer.ExplorerCommandClsid);
 
-        ComServer.CoRegisterClassObject(
+        var hr = ComServer.CoRegisterClassObject(
             ref clsid,
             new ExplorerCommandServer.ExplorerCommandFactory(),
             ComServer.CLSCTX_LOCAL_SERVER,
             ComServer.REGCLS_MULTIPLEUSE,
             out var explorerCommandToken);
+        Log.Information("CoRegisterClassObject returned hr=0x{Hr:X8}, token={Token}", hr, explorerCommandToken);
 
-        ExitEvent.WaitOne();
+        var activatedInTime = ExitEvent.WaitOne(TimeSpan.FromSeconds(30));
+        Log.Information("ExplorerCommandServer exiting (activated-before-timeout={Activated})", activatedInTime);
 
         ComServer.CoRevokeClassObject(explorerCommandToken);
     }
