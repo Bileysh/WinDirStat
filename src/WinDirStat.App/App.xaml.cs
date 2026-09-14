@@ -32,13 +32,19 @@ public partial class App
         Services = ConfigureServices();
         StaticServices = Services;
 
+        UnhandledException += (_, e) =>
+        {
+            Serilog.Log.Fatal(e.Exception, "WinUI Application.UnhandledException (Handled will be set to true)");
+            e.Handled = true;
+        };
+
         try
         {
             ClassicContextMenuRegistrar.EnsureRegistered();
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[App] ClassicContextMenuRegistrar failed: {ex}");
+            Serilog.Log.Warning(ex, "ClassicContextMenuRegistrar failed (known non-functional for MSIX, non-fatal)");
         }
     }
 

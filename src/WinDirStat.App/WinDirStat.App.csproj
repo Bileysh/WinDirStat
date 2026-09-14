@@ -47,32 +47,34 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
 
-  <!--
-    Microsoft.Windows.SDK.BuildTools.WinApp adds first-class support for
-    `dotnet run` on packaged WinUI apps: it hooks the .NET CLI Run target to
-    register a debug identity via the winapp CLI and launch the app with
-    package identity (AUMID).
-    Set <EnableWinAppRunSupport>false</EnableWinAppRunSupport> in a
-    <PropertyGroup> above to opt out.
-  -->
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219" />
-    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.WinApp" Version="0.5.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WinDirStat.Core\WinDirStat.Core.csproj" />
-    <ProjectReference Include="..\WinDirStat.Services\WinDirStat.Services.csproj" />
-    <ProjectReference Include="..\WinDirStat.ViewModels\WinDirStat.ViewModels.csproj" />
-    <ProjectReference Include="..\WinDirStat.WinRT\WinDirStat.WinRT.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Remove="UserControls\App.xaml" />
-  </ItemGroup>
+    <!--
+      Microsoft.Windows.SDK.BuildTools.WinApp adds first-class support for
+      `dotnet run` on packaged WinUI apps: it hooks the .NET CLI Run target to
+      register a debug identity via the winapp CLI and launch the app with
+      package identity (AUMID).
+      Set <EnableWinAppRunSupport>false</EnableWinAppRunSupport> in a
+      <PropertyGroup> above to opt out.
+    -->
+    <ItemGroup>
+        <PackageReference Include="Serilog" Version="4.2.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219"/>
+        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.1.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10"/>
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526"/>
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools.WinApp" Version="0.5.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\WinDirStat.Core\WinDirStat.Core.csproj"/>
+        <ProjectReference Include="..\WinDirStat.Services\WinDirStat.Services.csproj"/>
+        <ProjectReference Include="..\WinDirStat.ViewModels\WinDirStat.ViewModels.csproj"/>
+        <ProjectReference Include="..\WinDirStat.WinRT\WinDirStat.WinRT.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Remove="UserControls\App.xaml"/>
+    </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
