@@ -206,7 +206,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private bool CanRescan() => !IsScanning && _lastScanPath is not null;
 
-    public async Task ScanPathAsync(string path, bool useElevatedFallbackForAccessDenied = false)
+    public async Task ScanPathAsync(string? path, bool useElevatedFallbackForAccessDenied = false)
     {
         CancelScan();
         _scanCts = new CancellationTokenSource();
