@@ -1,16 +1,23 @@
 using Serilog;
+using Serilog.Events;
 
 namespace WinDirStat_App.Services;
 
 public static class AppLogger
 {
     private static readonly string LogDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "WinDirStat_logs");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinDirStat", "Logs");
 
     public static void Initialize(string processRole)
     {
+#if DEBUG
+        var minLevel = LogEventLevel.Debug;
+#else
+        var minLevel = LogEventLevel.Warning;
+#endif
+
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
+            .MinimumLevel.Is(minLevel)
             .Enrich.WithProperty("ProcessRole", processRole)
             .WriteTo.File(
                 Path.Combine(LogDirectory, "log-.txt"),

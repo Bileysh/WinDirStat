@@ -13,6 +13,7 @@ public static partial class ExplorerCommandServer
     private const string IID_IUnknown = "00000000-0000-0000-C000-000000000046";
 
     public const string ExplorerCommandClsid = "6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21";
+    private const string AppProtocolScheme = "windirstat";
     
     private static readonly StrategyBasedComWrappers ComWrappers = new();
 
@@ -168,16 +169,14 @@ public static partial class ExplorerCommandServer
                 Log.Information("Invoke: resolved path = '{Path}'", path);
                 if (path is null) return S_OK;
 
-                var exePath = Environment.ProcessPath;
-                if (string.IsNullOrEmpty(exePath))
-                {
-                    Log.Warning("Invoke: Environment.ProcessPath is empty, cannot relaunch");
-                    return S_OK;
-                }
+                var protocolUri = $"{AppProtocolScheme}://scan?path={Uri.EscapeDataString(path)}";
+                Log.Information("Invoke: launching URI '{Uri}'", protocolUri);
                 
-                var startInfo = new System.Diagnostics.ProcessStartInfo(exePath);
-                startInfo.ArgumentList.Add(path);
-                Log.Information("Invoke: launching '{ExePath}' with argument '{Path}'", exePath, path);
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = protocolUri,
+                    UseShellExecute = true
+                };
 
                 var process = System.Diagnostics.Process.Start(startInfo);
                 Log.Information("Invoke: launched process, pid={Pid}", process?.Id);
@@ -216,30 +215,44 @@ public static partial class ExplorerCommandServer
     [GeneratedComClass]
     internal sealed partial class ExplorerCommandFactory : ComServer.IClassFactory
     {
-        public uint CreateInstance(IntPtr objectAsUnknown, in Guid interfaceId, out IntPtr objectPointer)
+        public uint CreateInstance(IntPtr pUnkOuter, in Guid riid, out IntPtr ppvObject)
         {
-            Log.Information("ExplorerCommandFactory.CreateInstance called (interfaceId={InterfaceId})", interfaceId);
+            Log.Debug("ExplorerCommandFactory.CreateInstance called (riid={Riid})", riid);
+            ppvObject = IntPtr.Zero;
 
-            if (objectAsUnknown != IntPtr.Zero)
+            if (pUnkOuter != IntPtr.Zero)
             {
-                objectPointer = IntPtr.Zero;
                 Log.Warning("CreateInstance: aggregation requested, rejecting (CLASS_E_NOAGGREGATION)");
-
                 return CLASS_E_NOAGGREGATION;
             }
 
             try
             {
-                objectPointer = ComWrappers.GetOrCreateComInterfaceForObject(
-                    new ScanWithWinDirStatCommand(), CreateComInterfaceFlags.None);
-                Log.Information("CreateInstance: ScanWithWinDirStatCommand created successfully, ptr=0x{Ptr:X}",
-                    objectPointer.ToInt64());
+                var instance = new ScanWithWinDirStatCommand();
+                var iUnknownPtr = ComWrappers.GetOrCreateComInterfaceForObject(instance, CreateComInterfaceFlags.None);
+
+                if (riid == new Guid(IID_IUnknown))
+                {
+                    ppvObject = iUnknownPtr;
+                    return S_OK;
+                }
+
+                var riidLocal = riid;
+                var hr = Marshal.QueryInterface(iUnknownPtr, ref riidLocal, out ppvObject);
+                Marshal.Release(iUnknownPtr);
+
+                if (hr != S_OK)
+                {
+                    Log.Warning("CreateInstance: Interface {Riid} not supported (E_NOINTERFACE)", riid);
+                    return E_NOINTERFACE;
+                }
+
+                Log.Information("CreateInstance: Successfully created object for interface {Riid}", riid);
                 return S_OK;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "CreateInstance: failed to create native COM wrapper");
-                objectPointer = IntPtr.Zero;
                 return E_NOINTERFACE;
             }
         }

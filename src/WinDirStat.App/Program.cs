@@ -20,6 +20,14 @@ public static partial class Program
     [STAThread]
     static void Main(string[] args)
     {
+        try
+        {
+            WinRT.ComWrappersSupport.InitializeComWrappers();
+        }
+        catch (InvalidOperationException)
+        {
+        }
+
         if (args.Length >= 3 && args[0] == ElevatedScanArg)
         {
             AppLogger.Initialize("ElevatedScan");
@@ -115,7 +123,12 @@ public static partial class Program
                 RedirectEvent.Set();
             }
         });
-        RedirectEvent.WaitOne();
+        var redirectCompleted = RedirectEvent.WaitOne(8000);
+        if (!redirectCompleted)
+        {
+            Log.Warning("RedirectActivationToAsync did not complete within 8s; proceeding without it " +
+                        "(if it lands late, both instances may handle the same activation)");
+        }
 
         if (redirectSucceeded)
         {
@@ -149,22 +162,23 @@ public static partial class Program
             return;
         }
 
-        App.MainDispatcherQueue?.TryEnqueue(() =>
-        {
-            try
-            {
-                if (App.MainWindow is not null)
-                {
-                    BringToForeground(App.MainWindow);
-                }
+        App.MainDispatcherQueue?.TryEnqueue(() => DispatchActivation(extracted));
+    }
 
-                ActivationDispatcher.HandleExtracted(extracted, isColdStart: false);
-            }
-            catch (Exception ex)
+    private static void DispatchActivation(ActivationDispatcher.ExtractedActivation extracted)
+    {
+        try
+        {
+            if (App.MainWindow is not null)
             {
-                Log.Error(ex, "OnActivatedFromAnotherInstance: post-extraction handling failed");
+                BringToForeground(App.MainWindow);
             }
-        });
+            ActivationDispatcher.HandleExtracted(extracted, isColdStart: false);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "DispatchActivation failed");
+        }
     }
 
     private static void BringToForeground(Window window)
@@ -191,12 +205,14 @@ public static partial class Program
 
     private static void RunAsInteractiveApp(AppActivationArguments initialActivationArgs)
     {
-        Application.Start(_ =>
-        {
-            var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
-            SynchronizationContext.SetSynchronizationContext(context);
-            new App(initialActivationArgs);
-        });
+        Application.Start(p => StartAppInitialization(p, initialActivationArgs));
+    }
+
+    private static void StartAppInitialization(ApplicationInitializationCallbackParams p, AppActivationArguments args)
+    {
+        var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+        SynchronizationContext.SetSynchronizationContext(context);
+        new App(args);
     }
 
     private static void RunAsExplorerCommandServer()
