@@ -31,10 +31,32 @@ public partial class App
         MainDispatcherQueue = DispatcherQueue.GetForCurrentThread();
         Services = ConfigureServices();
         StaticServices = Services;
+
+        UnhandledException += (_, e) =>
+        {
+            Serilog.Log.Fatal(e.Exception, "WinUI Application.UnhandledException (Handled will be set to true)");
+            e.Handled = true;
+        };
+
+        try
+        {
+            ClassicContextMenuRegistrar.EnsureRegistered();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Warning(ex, "ClassicContextMenuRegistrar failed (known non-functional for MSIX, non-fatal)");
+        }
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        if (_initialActivationArgs?.Kind == ExtendedActivationKind.StartupTask)
+        {
+            ActivationDispatcher.Handle(_initialActivationArgs);
+            Environment.Exit(0);
+            return;
+        }
+
         var windowManager = Services.GetRequiredService<WindowManagerService>();
         var mainPage = windowManager.CreateScopedMainPage();
         RootViewModel = mainPage.ViewModel;
@@ -54,6 +76,7 @@ public partial class App
     {
         MainWindow = null;
         RootViewModel = null;
+        Current.Exit();
     }
 
     private static IServiceProvider ConfigureServices()

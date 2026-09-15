@@ -436,6 +436,18 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _scanStateService.SetResult(result);
     }
 
+    public async Task HandleDroppedFilesAsync(IReadOnlyList<string> filePaths)
+    {
+        var wdsscanPath = filePaths.FirstOrDefault(p => p.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
+        if (wdsscanPath is null) return;
+
+        var rootNode = await _scanResultFileService.ImportFromPathAsync(wdsscanPath);
+        if (rootNode is not null)
+        {
+            LoadImportedResult(rootNode);
+        }
+    }
+
     public string TreeMapAbsoluteRootPath => _scanStateService.CurrentResult?.RootPath ?? string.Empty;
 
     public string TreeMapRelativePath

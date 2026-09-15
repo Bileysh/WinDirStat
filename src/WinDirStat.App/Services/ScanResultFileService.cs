@@ -59,18 +59,18 @@ public sealed class ScanResultFileService : IScanResultFileService
         return null;
     }
 
-    public FileSystemNode? ImportFromPath(string filePath)
+    public async Task<FileSystemNode?> ImportFromPathAsync(string filePath)
     {
         try
         {
-            using var stream = File.OpenRead(filePath);
-            var rootNode = JsonSerializer.Deserialize<FileSystemNode>(stream, JsonOptions);
+            await using var stream = File.OpenRead(filePath);
+            var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
             rootNode?.EstablishParentLinksRecursively();
             return rootNode;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[ScanResultFileService] ImportFromPath failed: {ex}");
+            System.Diagnostics.Debug.WriteLine($"[ScanResultFileService] ImportFromPathAsync failed: {ex}");
             return null;
         }
     }
