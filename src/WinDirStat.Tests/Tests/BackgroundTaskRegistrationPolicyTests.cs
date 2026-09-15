@@ -4,7 +4,7 @@ namespace WinDirStat.Tests.Tests;
 
 public class BackgroundTaskRegistrationPolicyTests
 {
-    private const string TaskName = "WinDirStat.BackgroundScan";
+    private const string TaskName = "Volumetric.BackgroundScan";
 
     [Fact]
     public void IsAlreadyRegistered_ReturnsFalse_WhenNoTasksExist()

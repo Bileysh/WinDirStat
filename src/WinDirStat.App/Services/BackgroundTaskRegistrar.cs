@@ -7,7 +7,7 @@ namespace WinDirStat_App.Services;
 
 public sealed class BackgroundTaskRegistrar(IBackgroundScanSettingsService settings) : IBackgroundScanTaskRegistrar
 {
-    private const string TaskName = "WinDirStat.BackgroundScan";
+    private const string TaskName = "Volumetric.BackgroundScan";
 
     public void EnsureRegistered()
     {
