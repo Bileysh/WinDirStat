@@ -8,6 +8,11 @@ namespace WinDirStat_App;
 
 public static partial class ActivationDispatcher
 {
+    private const string ProtocolSchemeHost = "scan";
+    private const string ProtocolPathMarker = "path=";
+    private const string InvalidPathResourceKey = "InvalidPathTitle";
+    private const string DefaultInvalidPathTitle = "Invalid Path";
+
     public enum ActivationAction
     {
         None,
@@ -83,14 +88,21 @@ public static partial class ActivationDispatcher
 
             case ExtendedActivationKind.Protocol:
                 if (args.Data is IProtocolActivatedEventArgs protocolArgs &&
-                    protocolArgs.Uri.Host.Equals("scan", StringComparison.OrdinalIgnoreCase))
+                    protocolArgs.Uri.Host.Equals(ProtocolSchemeHost, StringComparison.OrdinalIgnoreCase))
                 {
-                    var path = protocolArgs.Uri.Query.Replace("?path=", "").Trim();
-                    Log.Information("Extract[Protocol]: uri='{Uri}', path='{Path}'", protocolArgs.Uri, path);
-                    if (!string.IsNullOrEmpty(path))
+                    var uriStr = protocolArgs.Uri.ToString();
+                    Log.Information("Extract[Protocol]: uri='{Uri}'", uriStr);
+                    
+                    var pathIdx = uriStr.IndexOf(ProtocolPathMarker, StringComparison.OrdinalIgnoreCase);
+                    if (pathIdx >= 0)
                     {
-                        return new ExtractedActivation(
-                            Directory.Exists(path) ? ActivationAction.Path : ActivationAction.InvalidPath, path);
+                        var path = Uri.UnescapeDataString(uriStr.Substring(pathIdx + ProtocolPathMarker.Length)).Trim();
+                        Log.Information("Extract[Protocol]: decoded path='{Path}'", path);
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            return new ExtractedActivation(
+                                Directory.Exists(path) ? ActivationAction.Path : ActivationAction.InvalidPath, path);
+                        }
                     }
                 }
 
@@ -106,8 +118,11 @@ public static partial class ActivationDispatcher
 
     public static void HandleExtracted(ExtractedActivation extracted, bool isColdStart)
     {
+#if DEBUG
         Log.Information("HandleExtracted: {Action} / '{Path}' (isColdStart={IsColdStart})",
             extracted.Action, extracted.Path, isColdStart);
+#endif
+
         switch (extracted.Action)
         {
             case ActivationAction.Path:
@@ -115,12 +130,7 @@ public static partial class ActivationDispatcher
                 break;
 
             case ActivationAction.InvalidPath:
-                Log.Warning("HandleExtracted: path '{Path}' does not exist, showing notification instead of scanning",
-                    extracted.Path);
-                var notificationService =
-                    App.StaticServices?.GetService(typeof(INotificationService)) as INotificationService;
-                var localization = App.StaticServices?.GetService(typeof(ILocalizationService)) as ILocalizationService;
-                notificationService?.ShowNotification(localization?.GetString("InvalidPathTitle"), extracted.Path);
+                ShowInvalidPathNotification(extracted.Path);
                 break;
 
             case ActivationAction.File:
@@ -131,6 +141,15 @@ public static partial class ActivationDispatcher
                 HandleStartupTask();
                 break;
         }
+    }
+
+    private static void ShowInvalidPathNotification(string? path)
+    {
+        Log.Warning("HandleExtracted: path '{Path}' does not exist, showing notification instead of scanning", path);
+        var notificationService = App.StaticServices?.GetService(typeof(INotificationService)) as INotificationService;
+        var localization = App.StaticServices?.GetService(typeof(ILocalizationService)) as ILocalizationService;
+        var title = localization?.GetString(InvalidPathResourceKey) ?? DefaultInvalidPathTitle;
+        notificationService?.ShowNotification(title, path ?? string.Empty);
     }
 
     private static async void ImportScanFile(string? path, bool isColdStart)
@@ -149,17 +168,19 @@ public static partial class ActivationDispatcher
         }
 
         Log.Information("ImportScanFile: successfully imported '{Path}'", path);
-        App.MainDispatcherQueue?.TryEnqueue(() =>
-        {
-            if (isColdStart && App.RootViewModel is not null)
-            {
-                App.RootViewModel.LoadImportedResult(rootNode);
-                return;
-            }
+        App.MainDispatcherQueue?.TryEnqueue(() => DispatchImportedResult(rootNode, isColdStart));
+    }
 
-            var windowManager = App.StaticServices?.GetService(typeof(IWindowManagerService)) as IWindowManagerService;
-            windowManager?.OpenMainWindowWithImportedResult(rootNode);
-        });
+    private static void DispatchImportedResult(WinDirStat.Core.Entities.FileSystemNode rootNode, bool isColdStart)
+    {
+        if (isColdStart && App.RootViewModel is not null)
+        {
+            App.RootViewModel.LoadImportedResult(rootNode);
+            return;
+        }
+
+        var windowManager = App.StaticServices?.GetService(typeof(IWindowManagerService)) as IWindowManagerService;
+        windowManager?.OpenMainWindowWithImportedResult(rootNode);
     }
 
     private static void OpenScan(string? path, bool isColdStart)
