@@ -107,7 +107,7 @@
     <value>Help</value>
   </data>
     <data name="MenuHelpAbout.Text" xml:space="preserve">
-    <value>About WinDirStat</value>
+    <value>About Volumetric</value>
   </data>
     <data name="TreeViewHeader.Text" xml:space="preserve">
     <value>Directory Tree</value>
@@ -161,7 +161,7 @@
     <value>About</value>
   </data>
     <data name="AboutMessage" xml:space="preserve">
-    <value>WinDirStat is a free program for analyzing disk space usage on your computer. It allows you to visualize the structure of files and folders, identify which files take up the most space, and manage your disk space effectively.</value>
+    <value>Volumetric is a free program for analyzing disk space usage on your computer. It allows you to visualize the structure of files and folders, identify which files take up the most space, and manage your disk space effectively.</value>
   </data>
     <data name="FilesText" xml:space="preserve">
     <value>files</value>
@@ -236,7 +236,7 @@
     <value>{0}: only {1} left ({2}% free)</value>
   </data>
     <data name="WindowTitle_New" xml:space="preserve">
-    <value>WinDirStat - New window</value>
+    <value>Volumetric - New window</value>
   </data>
     <data name="WindowTitle_Statistics" xml:space="preserve">
     <value>Statistics (Detached)</value>

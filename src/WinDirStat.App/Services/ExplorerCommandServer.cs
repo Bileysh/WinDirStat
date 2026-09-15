@@ -13,7 +13,7 @@ public static partial class ExplorerCommandServer
     private const string IID_IUnknown = "00000000-0000-0000-C000-000000000046";
 
     public const string ExplorerCommandClsid = "6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21";
-    private const string AppProtocolScheme = "windirstat";
+    private const string AppProtocolScheme = "volumetric";
     
     private static readonly StrategyBasedComWrappers ComWrappers = new();
 
@@ -95,12 +95,12 @@ public static partial class ExplorerCommandServer
     private const int SIGDN_FILESYSPATH = unchecked((int)0x80058000);
 
     [GeneratedComClass]
-    public sealed partial class ScanWithWinDirStatCommand : IExplorerCommand
+    public sealed partial class ScanWithVolumetricCommand : IExplorerCommand
     {
         public uint GetTitle(IntPtr items, out IntPtr name)
         {
             Log.Information("GetTitle called");
-            name = Marshal.StringToCoTaskMemUni("Scan with WinDirStat");
+            name = Marshal.StringToCoTaskMemUni("Scan with Volumetric");
             return S_OK;
         }
 
@@ -228,7 +228,7 @@ public static partial class ExplorerCommandServer
 
             try
             {
-                var instance = new ScanWithWinDirStatCommand();
+                var instance = new ScanWithVolumetricCommand();
                 var iUnknownPtr = ComWrappers.GetOrCreateComInterfaceForObject(instance, CreateComInterfaceFlags.None);
 
                 if (riid == new Guid(IID_IUnknown))

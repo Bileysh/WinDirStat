@@ -24,7 +24,7 @@ public sealed class ScanResultFileService : IScanResultFileService
     public async Task<string?> ExportAsync(FileSystemNode rootNode, string suggestedFileName, IntPtr ownerHwnd)
     {
         var picker = new FileSavePicker();
-        picker.FileTypeChoices.Add("WinDirStat scan", [Extension]);
+        picker.FileTypeChoices.Add("Volumetric scan", [Extension]);
         picker.SuggestedFileName = suggestedFileName;
         WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 

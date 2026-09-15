@@ -6,7 +6,7 @@ namespace WinDirStat_App.Services;
 public static class AppLogger
 {
     private static readonly string LogDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinDirStat", "Logs");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Volumetric", "Logs");
 
     public static void Initialize(string processRole)
     {

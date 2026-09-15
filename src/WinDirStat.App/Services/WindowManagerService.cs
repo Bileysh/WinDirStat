@@ -125,7 +125,7 @@ public class WindowManagerService : IWindowManagerService
         rootGrid.Children.Add(content);
 
         newWindow.Content = rootGrid;
-        newWindow.Title = $"WinDirStat - {title}";
+        newWindow.Title = $"Volumetric - {title}";
         _openWindows.Add(newWindow);
         newWindow.Closed += (_, _) => _openWindows.Remove(newWindow);
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));

@@ -135,7 +135,7 @@
     <value>Довідка</value>
   </data>
     <data name="MenuHelpAbout.Text" xml:space="preserve">
-    <value>Про WinDirStat</value>
+    <value>Про Volumetric</value>
   </data>
     <data name="TreeViewHeader.Text" xml:space="preserve">
     <value>Дерево файлів</value>
@@ -198,7 +198,7 @@
     <value>Про програму</value>
   </data>
     <data name="AboutMessage" xml:space="preserve">
-    <value>WinDirStat - це безкоштовна програма для аналізу використання дискового простору на вашому комп'ютері. Вона дозволяє візуалізувати структуру файлів та папок, визначати, які файли займають найбільше місця, та ефективно керувати вашим дисковим простором.</value>
+    <value>Volumetric - це безкоштовна програма для аналізу використання дискового простору на вашому комп'ютері. Вона дозволяє візуалізувати структуру файлів та папок, визначати, які файли займають найбільше місця, та ефективно керувати вашим дисковим простором.</value>
   </data>
     <data name="FilesText" xml:space="preserve">
     <value>файлів</value>
@@ -273,7 +273,7 @@
     <value>{0}: залишилось лише {1} ({2}% вільно)</value>
   </data>
     <data name="WindowTitle_New" xml:space="preserve">
-    <value>WinDirStat - Нове вікно</value>
+    <value>Volumetric - Нове вікно</value>
   </data>
     <data name="WindowTitle_Statistics" xml:space="preserve">
     <value>Статистика (окреме вікно)</value>

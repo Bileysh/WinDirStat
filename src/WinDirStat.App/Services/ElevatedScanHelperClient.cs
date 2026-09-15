@@ -57,8 +57,8 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
 
         if (paths.Count == 0) return true;
 
-        var inputFile = Path.Combine(Path.GetTempPath(), $"windirstat-elevated-scan-in-{Guid.NewGuid():N}.txt");
-        var outputFile = Path.Combine(Path.GetTempPath(), $"windirstat-elevated-scan-{Guid.NewGuid():N}.json");
+        var inputFile = Path.Combine(Path.GetTempPath(), $"volumetric-elevated-scan-in-{Guid.NewGuid():N}.txt");
+        var outputFile = Path.Combine(Path.GetTempPath(), $"volumetric-elevated-scan-{Guid.NewGuid():N}.json");
         File.WriteAllLines(inputFile, paths);
         var arguments = $"{ElevatedScanArg} \"{inputFile}\" \"{outputFile}\"";
 
