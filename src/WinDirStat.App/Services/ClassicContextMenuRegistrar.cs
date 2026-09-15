@@ -5,7 +5,7 @@ namespace WinDirStat_App.Services;
 
 public static class ClassicContextMenuRegistrar
 {
-    private const string MenuText = "Scan with WinDirStat";
+    private const string MenuText = "Scan with Volumetric";
     
     public static string? EnsureRegistered()
     {
@@ -19,8 +19,8 @@ public static class ClassicContextMenuRegistrar
             return reason;
         }
 
-        var directoryError = TryRegisterFor(@"Directory\shell\WinDirStat", exePath, "\"%1\"");
-        var backgroundError = TryRegisterFor(@"Directory\Background\shell\WinDirStat", exePath, "\"%V\"");
+        var directoryError = TryRegisterFor(@"Directory\shell\Volumetric", exePath, "\"%1\"");
+        var backgroundError = TryRegisterFor(@"Directory\Background\shell\Volumetric", exePath, "\"%V\"");
 
         var error = directoryError ?? backgroundError;
         Log(error is null

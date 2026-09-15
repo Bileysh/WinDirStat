@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:tb="using:H.NotifyIcon"
-    Title="WinDirStat.App"
+    Title="Volumetric"
     mc:Ignorable="d">
 
     <Window.SystemBackdrop>
@@ -20,12 +20,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="WinDirStat.App" />
+        <TitleBar x:Name="AppTitleBar" Title="Volumetric" />
 
         <Frame x:Name="RootFrame" Grid.Row="1" />
 
         <tb:TaskbarIcon x:Name="TrayIcon"
-                        ToolTipText="WinDirStat"
+                        ToolTipText="Volumetric"
                         DoubleClickCommand="{x:Bind RestoreWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
