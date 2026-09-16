@@ -3,11 +3,11 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinDirStat.Core.Classification;
-using WinDirStat.Core.Entities;
-using WinDirStat.Core.Interfaces;
+using Volumetric.Core.Classification;
+using Volumetric.Core.Entities;
+using Volumetric.Core.Interfaces;
 
-namespace WinDirStat.ViewModels;
+namespace Volumetric.ViewModels;
 
 public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPageViewModel
 {
@@ -90,7 +90,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public string ScanProgressText => ScanFilesCount == 0 && ScanFoldersCount == 0
         ? string.Empty
-        : string.Format(_localizationService.GetString("ScanProgressFormat"), ScanFilesCount, ScanFoldersCount);
+        : string.Format(_localizationService.GetString(ResourceKeys.ScanProgressFormat), ScanFilesCount, ScanFoldersCount);
 
     [ObservableProperty]
     public partial ObservableCollection<DriveItemViewModel> AvailableDrives { get; set; } = [];
@@ -240,11 +240,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             var folderCount = 0;
             CountNodes(scanResult.RootNode, ref fileCount, ref folderCount);
 
-            var title = _localizationService.GetString("ScanCompleteTitle");
-            var msg = string.Format(_localizationService.GetString("ScanCompleteMessageFormat"),
+            var title = _localizationService.GetString(ResourceKeys.ScanCompleteTitle);
+            var msg = string.Format(_localizationService.GetString(ResourceKeys.ScanCompleteMessageFormat),
                 scanResult.ScanDuration.TotalSeconds, fileCount, folderCount);
 
-            _notificationService.ShowNotification(title, msg);
+            _notificationService.ShowNotification(title, msg, _lastScanPath);
         }
         catch (OperationCanceledException)
         {
@@ -388,8 +388,8 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private async Task ShowAboutAsync()
     {
-        var title = _localizationService.GetString("AboutTitle");
-        var message = _localizationService.GetString("AboutMessage");
+        var title = _localizationService.GetString(ResourceKeys.AboutTitle);
+        var message = _localizationService.GetString(ResourceKeys.AboutMessage);
         await _dialogService.ShowMessageAsync(title, message);
     }
 
@@ -408,13 +408,13 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
             if (fileName is not null)
             {
-                var title = _localizationService.GetString("ExportCompleteTitle");
+                var title = _localizationService.GetString(ResourceKeys.ExportCompleteTitle);
                 _notificationService.ShowNotification(title, fileName);
             }
         }
         catch (Exception ex)
         {
-            var title = _localizationService.GetString("ExportErrorTitle");
+            var title = _localizationService.GetString(ResourceKeys.ExportErrorTitle);
             await _dialogService.ShowMessageAsync(title, ex.Message);
         }
     }
@@ -438,10 +438,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public async Task HandleDroppedFilesAsync(IReadOnlyList<string> filePaths)
     {
-        var wdsscanPath = filePaths.FirstOrDefault(p => p.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
-        if (wdsscanPath is null) return;
+        var volscanPath = filePaths.FirstOrDefault(p => p.EndsWith(".volscan", StringComparison.OrdinalIgnoreCase));
+        if (volscanPath is null) return;
 
-        var rootNode = await _scanResultFileService.ImportFromPathAsync(wdsscanPath);
+        var rootNode = await _scanResultFileService.ImportFromPathAsync(volscanPath);
         if (rootNode is not null)
         {
             LoadImportedResult(rootNode);

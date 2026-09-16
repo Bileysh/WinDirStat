@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinDirStat.Core.Classification;
-using WinDirStat.Core.Entities;
-using WinDirStat.Core.Interfaces;
+using Volumetric.Core.Classification;
+using Volumetric.Core.Entities;
+using Volumetric.Core.Interfaces;
 
-namespace WinDirStat.ViewModels;
+namespace Volumetric.ViewModels;
 
 public partial class NodeViewModel : ObservableObject
 {
@@ -47,7 +47,7 @@ public partial class NodeViewModel : ObservableObject
             .ToList();
 
     public string ChildSummaryFormatted => IsDirectory
-        ? $"{ChildFileCount} {_localizationService?.GetString("FilesText")}, {ChildDirectoryCount} {_localizationService?.GetString("FoldersText")}"
+        ? $"{ChildFileCount} {_localizationService?.GetString(ResourceKeys.FilesText)}, {ChildDirectoryCount} {_localizationService?.GetString(ResourceKeys.FoldersText)}"
         : string.Empty;
 
     public string SizeLogicalFormatted => _node.Status switch
@@ -98,13 +98,13 @@ public partial class NodeViewModel : ObservableObject
     public bool HasStatusIcon => IsDuplicateHardLink || _node.Status != ScanStatus.Ok;
 
     public string StatusTooltip => IsDuplicateHardLink
-        ? _localizationService?.GetString("HardLinkTooltipText") ?? string.Empty
+        ? _localizationService?.GetString(ResourceKeys.HardLinkTooltipText) ?? string.Empty
         : _node.Status switch
         {
             ScanStatus.AccessDenied => _node.ErrorMessage ??
-                                       _localizationService?.GetString("AccessDeniedText") ?? string.Empty,
-            ScanStatus.Error => _node.ErrorMessage ?? _localizationService?.GetString("ScanErrorText") ?? string.Empty,
-            ScanStatus.ReparsePoint => _localizationService?.GetString("ReparsePointText") ?? string.Empty,
+                                       _localizationService?.GetString(ResourceKeys.AccessDeniedText) ?? string.Empty,
+            ScanStatus.Error => _node.ErrorMessage ?? _localizationService?.GetString(ResourceKeys.ScanErrorText) ?? string.Empty,
+            ScanStatus.ReparsePoint => _localizationService?.GetString(ResourceKeys.ReparsePointText) ?? string.Empty,
             _ => string.Empty
         };
 

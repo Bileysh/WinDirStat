@@ -1,11 +1,11 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WinDirStat.Core.BackgroundScan;
-using WinDirStat.Core.Interfaces;
+using Volumetric.Core.BackgroundScan;
+using Volumetric.Core.Interfaces;
 using System.Threading.Tasks;
 
-namespace WinDirStat.ViewModels;
+namespace Volumetric.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
@@ -57,7 +57,7 @@ public partial class SettingsViewModel : ObservableObject
 
         _settings.ScanIntervalMinutes = value;
         _registrar.ReRegister();
-        StatusMessage = string.Format(_localizationService.GetString("ScanIntervalStatus"), _settings.ScanIntervalMinutes);
+        StatusMessage = string.Format(_localizationService.GetString(ResourceKeys.ScanIntervalStatus), _settings.ScanIntervalMinutes);
     }
 
     partial void OnLowFreeSpaceThresholdPercentChanged(double value)
@@ -65,7 +65,7 @@ public partial class SettingsViewModel : ObservableObject
         if (!_isInitialized) return;
 
         _settings.LowFreeSpaceThresholdPercent = value;
-        StatusMessage = string.Format(_localizationService.GetString("LowSpaceThresholdStatus"), _settings.LowFreeSpaceThresholdPercent.ToString("F0"));
+        StatusMessage = string.Format(_localizationService.GetString(ResourceKeys.LowSpaceThresholdStatus), _settings.LowFreeSpaceThresholdPercent.ToString("F0"));
     }
 
     partial void OnAccountForHardLinksChanged(bool value)
@@ -80,10 +80,10 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ExportAsync()
     {
-        var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "windirstat-settings", WindowHandle);
+        var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "volumetric-settings", WindowHandle);
         if (fileName is null) return;
 
-        StatusMessage = string.Format(_localizationService.GetString("SettingsExportedStatus"), fileName);
+        StatusMessage = string.Format(_localizationService.GetString(ResourceKeys.SettingsExportedStatus), fileName);
     }
 
     [RelayCommand]
@@ -99,11 +99,11 @@ public partial class SettingsViewModel : ObservableObject
             ScanIntervalMinutes = _settings.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = _settings.LowFreeSpaceThresholdPercent;
             AccountForHardLinks = _settings.AccountForHardLinks;
-            StatusMessage = string.Format(_localizationService.GetString("SettingsImportedStatus"), result.Value.FileName);
+            StatusMessage = string.Format(_localizationService.GetString(ResourceKeys.SettingsImportedStatus), result.Value.FileName);
         }
         else
         {
-            StatusMessage = _localizationService.GetString($"SettingsError_{validationResult}");
+            StatusMessage = _localizationService.GetString($"{ResourceKeys.SettingsErrorPrefix}{validationResult}");
         }
     }
 
@@ -111,6 +111,6 @@ public partial class SettingsViewModel : ObservableObject
     private void TestScanNow()
     {
         _testRunner.RunNow();
-        StatusMessage = _localizationService.GetString("TestScanCompletedStatus");
+        StatusMessage = _localizationService.GetString(ResourceKeys.TestScanCompletedStatus);
     }
 }
