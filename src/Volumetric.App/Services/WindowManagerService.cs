@@ -2,15 +2,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using WinDirStat.Core.Interfaces;
-using WinDirStat.Core.Entities;
-using WinDirStat.ViewModels;
-using WinDirStat_App.UserControls;
+using Volumetric.Core.Interfaces;
+using Volumetric.Core.Entities;
+using Volumetric.ViewModels;
+using Volumetric_App.UserControls;
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Media;
 using WinRT.Interop;
 
-namespace WinDirStat_App.Services;
+namespace Volumetric_App.Services;
 
 public class WindowManagerService : IWindowManagerService
 {
@@ -76,11 +76,12 @@ public class WindowManagerService : IWindowManagerService
 
         newWindow.Content = page;
 
-        newWindow.Title = _localizationService.GetString("WindowTitle_New");
+        newWindow.Title = _localizationService.GetString(ResourceKeys.WindowTitle_New);
 
         _openWindows.Add(newWindow);
         newWindow.Closed += (_, _) => CleanupNewMainWindow(newWindow, viewModel, scope);
         OffsetWindowPosition(newWindow);
+        WireXamlRootActivation(newWindow, page, xamlRootProvider);
 
         newWindow.Activate();
 
@@ -133,8 +134,25 @@ public class WindowManagerService : IWindowManagerService
         OffsetWindowPosition(newWindow);
         
         rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+        
+        var xamlRootProvider = _rootWindowScope?.ServiceProvider.GetService<ICurrentXamlRootProvider>();
+        if (xamlRootProvider is not null)
+        {
+            rootGrid.Loaded += (_, _) => xamlRootProvider.XamlRoot = rootGrid.XamlRoot;
+            WireXamlRootActivation(newWindow, rootGrid, xamlRootProvider);
+        }
 
         return newWindow;
+    }
+    
+    private static void WireXamlRootActivation(Window window, FrameworkElement root,
+        ICurrentXamlRootProvider xamlRootProvider)
+    {
+        window.Activated += (_, e) =>
+        {
+            if (e.WindowActivationState == WindowActivationState.Deactivated) return;
+            if (root.XamlRoot is not null) xamlRootProvider.XamlRoot = root.XamlRoot;
+        };
     }
 
     private void CleanupNewMainWindow(Window window, MainPageViewModel viewModel, IServiceScope scope)
@@ -167,7 +185,7 @@ public class WindowManagerService : IWindowManagerService
     {
         var vm = (MainPageViewModel)viewModel;
         var control = new StatisticsControl { ViewModel = vm };
-        CreateDetachedWindow(_localizationService.GetString("WindowTitle_Statistics"), control,
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_Statistics), control,
                 WindowManagerConstants.StatisticsWindowWidth, WindowManagerConstants.StatisticsWindowHeight)
             .Activate();
     }
@@ -176,7 +194,7 @@ public class WindowManagerService : IWindowManagerService
     {
         var vm = (MainPageViewModel)viewModel;
         var control = new TreeViewControl { ViewModel = vm };
-        CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeView"), control,
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_TreeView), control,
                 WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight)
             .Activate();
     }
@@ -185,7 +203,7 @@ public class WindowManagerService : IWindowManagerService
     {
         var vm = (MainPageViewModel)viewModel;
         var control = new TreeMapControl { ViewModel = vm };
-        CreateDetachedWindow(_localizationService.GetString("WindowTitle_TreeMap"), control,
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_TreeMap), control,
                 WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight)
             .Activate();
     }
@@ -196,7 +214,7 @@ public class WindowManagerService : IWindowManagerService
         var window = scope.ServiceProvider.GetRequiredService<SettingsWindow>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
         
-        window.Title = _localizationService.GetString("WindowTitle_Settings");
+        window.Title = _localizationService.GetString(ResourceKeys.WindowTitle_Settings);
 
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
             window.SystemBackdrop = new MicaBackdrop();
@@ -205,6 +223,7 @@ public class WindowManagerService : IWindowManagerService
         {
             fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
             fe.Loaded += (_, _) => xamlRootProvider.XamlRoot = fe.XamlRoot;
+            WireXamlRootActivation(window, fe, xamlRootProvider);
         }
 
         _openWindows.Add(window);
