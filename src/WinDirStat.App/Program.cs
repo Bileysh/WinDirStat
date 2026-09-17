@@ -26,9 +26,8 @@ public static partial class Program
             Environment.Exit(exitCode);
             return;
         }
-        
-        if (args.Any(a => a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase)
-                           || a.Equals(RegisterForBgTaskServerArg, StringComparison.OrdinalIgnoreCase)))
+
+        if (args.Any(a => a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase) || a.Equals(RegisterForBgTaskServerArg, StringComparison.OrdinalIgnoreCase)))
         {
             RunAsBackgroundTaskServer();
             return;
@@ -76,7 +75,7 @@ public static partial class Program
             mainInstance.Activated += OnActivatedFromAnotherInstance;
             return false;
         }
-        
+
         var redirectSucceeded = false;
         Task.Run(async () =>
         {
@@ -85,10 +84,9 @@ public static partial class Program
                 await mainInstance.RedirectActivationToAsync(activatedArgs);
                 redirectSucceeded = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"[Program] Redirect to existing instance failed, treating registration as stale: {ex}");
+                // ignored
             }
             finally
             {
@@ -100,22 +98,29 @@ public static partial class Program
         if (redirectSucceeded)
         {
             return true;
-        } 
-        
+        }
+
         var retryInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
         if (retryInstance.IsCurrent)
         {
             retryInstance.Activated += OnActivatedFromAnotherInstance;
         }
-        
+
         return false;
     }
 
     private static void OnActivatedFromAnotherInstance(object? sender, AppActivationArguments args)
     {
+        var extracted = ActivationDispatcher.Extract(args);
+
         App.MainDispatcherQueue?.TryEnqueue(() =>
         {
-            ActivationDispatcher.Handle(args);
+            if (App.MainWindow is not null)
+            {
+                BringToForeground(App.MainWindow);
+            }
+
+            ActivationDispatcher.HandleExtracted(extracted, isColdStart: false);
         });
     }
 
@@ -138,7 +143,7 @@ public static partial class Program
     {
         [System.Runtime.InteropServices.LibraryImport("user32.dll")]
         [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static partial bool SetForegroundWindow(IntPtr hWnd);
+        public static partial void SetForegroundWindow(IntPtr hWnd);
     }
 
     private static void RunAsInteractiveApp(AppActivationArguments initialActivationArgs)
