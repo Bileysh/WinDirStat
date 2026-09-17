@@ -22,7 +22,7 @@ public class DiskScanServiceProgressTests
 
         var result = await service.ScanAsync(tempRoot.FullName);
 
-        Assert.Equal(1, result.RootNode.Children.Count);
+        Assert.Single(result.RootNode.Children);
     }
 
     [Fact]

@@ -24,7 +24,7 @@ public class FileSystemNode
     public long SizePhysical { get; set; }
     public DateTime LastModified { get; set; }
     public List<FileSystemNode> Children { get; set; } = new();
-    
+
     public ScanStatus Status { get; set; } = ScanStatus.Ok;
     public string? ErrorMessage { get; set; }
     public bool IsDuplicateHardLink { get; set; }

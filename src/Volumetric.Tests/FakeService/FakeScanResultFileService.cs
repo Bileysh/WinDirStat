@@ -3,7 +3,7 @@ using Volumetric.Core.Interfaces;
 
 namespace Volumetric.Tests.FakeService;
 
-public class FakeScanResultFileService: IScanResultFileService
+public class FakeScanResultFileService : IScanResultFileService
 {
     public Task<string?> ExportAsync(FileSystemNode rootNode, string suggestedFileName, IntPtr ownerHwnd)
     {

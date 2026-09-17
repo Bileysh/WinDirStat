@@ -14,7 +14,7 @@ public static partial class ActivationArgumentParser
     }
 
     public readonly record struct ParsedLaunch(ParsedKind Kind, string? Path);
-    
+
     public static ParsedLaunch ParseLaunchArguments(string? rawArgs, Func<string, bool> pathExists)
     {
         ArgumentNullException.ThrowIfNull(pathExists);
@@ -28,7 +28,7 @@ public static partial class ActivationArgumentParser
 
         return new ParsedLaunch(pathExists(path) ? ParsedKind.Path : ParsedKind.InvalidPath, path);
     }
-    
+
     public static string? ExtractPathFromProtocolUri(string? uriString, string pathMarker = DefaultProtocolPathMarker)
     {
         if (string.IsNullOrEmpty(uriString)) return null;

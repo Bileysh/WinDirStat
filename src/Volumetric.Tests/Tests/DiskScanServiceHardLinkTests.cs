@@ -54,7 +54,7 @@ public class DiskScanServiceHardLinkTests
         var tempRoot = Directory.CreateTempSubdirectory();
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "b.txt"), new byte[100]);
-        
+
         var suspiciousIdentity = new FileIdentity(1, 1000, LinkCount: 1);
         var fakeIdentityService = new FakeFileIdentityService
         {
