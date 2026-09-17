@@ -12,7 +12,7 @@ public static partial class Program
 {
     private const string ElevatedScanArg = "--elevated-scan";
     private const string RegisterForBgTaskServerArg = "-RegisterForBGTaskServer";
-    private const string SingleInstanceKey = "WinDirStat.MainInstance";
+    private const string SingleInstanceKey = "Volumetric.MainInstance";
     internal static readonly ManualResetEvent ExitEvent = new(false);
     private static readonly ManualResetEvent RedirectEvent = new(false);
     private static uint _registrationToken;
@@ -126,6 +126,10 @@ public static partial class Program
         var redirectCompleted = RedirectEvent.WaitOne(8000);
         if (!redirectCompleted)
         {
+            // The existing instance's dispatcher might just be busy (e.g. mid-scan) rather
+            // than dead. We give up waiting and proceed as a new instance below, but if the
+            // redirect lands after all this and the other instance *also* handles it, the
+            // same click could open two windows - worth watching for in manual QA.
             Log.Warning("RedirectActivationToAsync did not complete within 8s; proceeding without it " +
                         "(if it lands late, both instances may handle the same activation)");
         }
