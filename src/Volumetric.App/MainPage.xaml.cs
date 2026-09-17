@@ -66,7 +66,7 @@ public sealed partial class MainPage : Page
     }
 
     private void Page_DragOver(object sender, Microsoft.UI.Xaml.DragEventArgs e)
-    { 
+    {
         e.AcceptedOperation = e.DataView.Contains(StandardDataFormats.StorageItems)
             ? DataPackageOperation.Copy
             : DataPackageOperation.None;

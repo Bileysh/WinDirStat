@@ -10,7 +10,8 @@ public class FileStatisticsAggregatorTests
     {
         var root = new FileSystemNode
         {
-            Name = "root", IsDirectory = true,
+            Name = "root",
+            IsDirectory = true,
             Children =
             {
                 new FileSystemNode { Name = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
@@ -32,7 +33,8 @@ public class FileStatisticsAggregatorTests
     {
         var root = new FileSystemNode
         {
-            Name = "root", IsDirectory = true,
+            Name = "root",
+            IsDirectory = true,
             Children =
             {
                 new FileSystemNode { Name = "a.mp4", Extension = ".mp4", SizeLogical = 100 },

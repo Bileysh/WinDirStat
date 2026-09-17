@@ -10,8 +10,7 @@ public sealed partial class MainWindow : Window
     public ICommand RestoreWindowCommand { get; }
     public ICommand ExitCommand { get; }
 
-    public MainWindow(MainPage mainPage)
-    {
+    public MainWindow(MainPage mainPage) {
         RestoreWindowCommand = new RelayCommand(RestoreWindow);
         ExitCommand = new RelayCommand(ExitApp);
 

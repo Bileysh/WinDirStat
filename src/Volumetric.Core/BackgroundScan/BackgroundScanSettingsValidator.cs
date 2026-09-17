@@ -18,12 +18,12 @@ public static class BackgroundScanSettingsValidator
 
     public static double ClampThreshold(double value) =>
         Math.Clamp(value, MinThresholdPercent, MaxThresholdPercent);
-    
+
     public static SettingsValidationError ValidateImport(uint scanIntervalMinutes, double lowFreeSpaceThresholdPercent)
     {
         if (scanIntervalMinutes < MinIntervalMinutes) return SettingsValidationError.IntervalTooSmall;
         if (lowFreeSpaceThresholdPercent is < MinThresholdPercent or > MaxThresholdPercent) return SettingsValidationError.ThresholdOutOfRange;
-        
+
         return SettingsValidationError.None;
     }
 }
