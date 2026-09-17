@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.Input;
 using Volumetric.Core.Classification;
 using Volumetric.Core.Entities;
@@ -11,6 +10,7 @@ public partial class TreeMapRectViewModel
     private readonly INotificationService? _notificationService;
     private readonly ILocalizationService? _localizationService;
     private readonly IFileExplorerService? _fileExplorerService;
+    private readonly IAppLogger? _appLogger;
 
     public FileSystemNode Node { get; }
     public double X { get; }
@@ -26,11 +26,13 @@ public partial class TreeMapRectViewModel
     public bool IsFolder { get; }
 
     public TreeMapRectViewModel(TreeMapRect rect, INotificationService? notificationService = null,
-        ILocalizationService? localizationService = null, IFileExplorerService? fileExplorerService = null)
+        ILocalizationService? localizationService = null, IFileExplorerService? fileExplorerService = null,
+        IAppLogger? appLogger = null)
     {
         _notificationService = notificationService;
         _localizationService = localizationService;
         _fileExplorerService = fileExplorerService;
+        _appLogger = appLogger;
         Node = rect.Node;
         X = rect.X;
         Y = rect.Y;
@@ -50,7 +52,7 @@ public partial class TreeMapRectViewModel
         IsSizeVisible = !IsFolder && Width > TreeMapConstants.MinWidthForSize &&
                         Height > TreeMapConstants.MinHeightForSize;
     }
-    
+
     [RelayCommand]
     private void OpenInExplorer()
     {
@@ -62,9 +64,9 @@ public partial class TreeMapRectViewModel
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[TreeMapRectViewModel] OpenInExplorer failed for '{Node.FullPath}': {ex}");
+            _appLogger?.Warning(ex, "[TreeMapRectViewModel] OpenInExplorer failed for '{FullPath}'", Node.FullPath);
             _notificationService?.ShowNotification(
-                GetLocalizedOrFallback("OpenInExplorerFailedTitle", "Failed to open Explorer"),
+                GetLocalizedOrFallback(ResourceKeys.OpenInExplorerFailedTitle, "Failed to open Explorer"),
                 $"'{Node.Name}': {ex.Message}");
         }
     }
@@ -80,9 +82,9 @@ public partial class TreeMapRectViewModel
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[TreeMapRectViewModel] ShowProperties failed for '{Node.FullPath}': {ex}");
+            _appLogger?.Warning(ex, "[TreeMapRectViewModel] ShowProperties failed for '{FullPath}'", Node.FullPath);
             _notificationService?.ShowNotification(
-                GetLocalizedOrFallback("ShowPropertiesFailedTitle", "Failed to open properties"),
+                GetLocalizedOrFallback(ResourceKeys.ShowPropertiesFailedTitle, "Failed to open properties"),
                 $"'{Node.Name}': {ex.Message}");
         }
     }

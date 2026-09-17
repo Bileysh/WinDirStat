@@ -14,12 +14,19 @@ public sealed class ScanResultFileService : IScanResultFileService
 {
     private const string Extension = ".volscan";
 
+    private readonly IAppLogger _logger;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         TypeInfoResolver = FileSystemNodeJsonContext.Default,
         MaxDepth = 256,
         PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
     };
+
+    public ScanResultFileService(IAppLogger logger)
+    {
+        _logger = logger;
+    }
 
     public async Task<string?> ExportAsync(FileSystemNode rootNode, string suggestedFileName, IntPtr ownerHwnd)
     {
@@ -70,7 +77,7 @@ public sealed class ScanResultFileService : IScanResultFileService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[ScanResultFileService] ImportFromPathAsync failed: {ex}");
+            _logger.Error(ex, "[ScanResultFileService] ImportFromPathAsync failed for '{FilePath}'", filePath);
             return null;
         }
     }

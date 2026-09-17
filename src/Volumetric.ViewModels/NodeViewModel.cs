@@ -15,11 +15,13 @@ public partial class NodeViewModel : ObservableObject
     private readonly INotificationService? _notificationService;
     private readonly IClipboardService? _clipboardService;
     private readonly IFileExplorerService? _fileExplorerService;
+    private readonly IAppLogger? _appLogger;
     private List<NodeViewModel>? _children;
 
     public NodeViewModel(FileSystemNode node, long parentSizeLogical = 0,
         ILocalizationService? localizationService = null, INotificationService? notificationService = null,
-        IClipboardService? clipboardService = null, IFileExplorerService? fileExplorerService = null)
+        IClipboardService? clipboardService = null, IFileExplorerService? fileExplorerService = null,
+        IAppLogger? appLogger = null)
     {
         _node = node;
         _parentSizeLogical = parentSizeLogical;
@@ -27,6 +29,7 @@ public partial class NodeViewModel : ObservableObject
         _notificationService = notificationService;
         _clipboardService = clipboardService;
         _fileExplorerService = fileExplorerService;
+        _appLogger = appLogger;
     }
 
     public string Name => _node.Name;
@@ -43,7 +46,7 @@ public partial class NodeViewModel : ObservableObject
     public IReadOnlyList<NodeViewModel> Children =>
         _children ??= _node.Children
             .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService,
-                _clipboardService, _fileExplorerService))
+                _clipboardService, _fileExplorerService, _appLogger))
             .ToList();
 
     public string ChildSummaryFormatted => IsDirectory
@@ -119,9 +122,9 @@ public partial class NodeViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[NodeViewModel] OpenInExplorer failed for '{_node.FullPath}': {ex}");
+            _appLogger?.Warning(ex, "[NodeViewModel] OpenInExplorer failed for '{FullPath}'", _node.FullPath);
             _notificationService?.ShowNotification(
-                GetLocalizedOrFallback("OpenInExplorerFailedTitle", "Failed to open Explorer"),
+                GetLocalizedOrFallback(ResourceKeys.OpenInExplorerFailedTitle, "Failed to open Explorer"),
                 $"'{Name}': {ex.Message}");
         }
     }
@@ -137,9 +140,9 @@ public partial class NodeViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[NodeViewModel] ShowProperties failed for '{_node.FullPath}': {ex}");
+            _appLogger?.Warning(ex, "[NodeViewModel] ShowProperties failed for '{FullPath}'", _node.FullPath);
             _notificationService?.ShowNotification(
-                GetLocalizedOrFallback("ShowPropertiesFailedTitle", "Failed to open properties"),
+                GetLocalizedOrFallback(ResourceKeys.ShowPropertiesFailedTitle, "Failed to open properties"),
                 $"'{Name}': {ex.Message}");
         }
     }
