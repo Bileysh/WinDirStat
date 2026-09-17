@@ -107,7 +107,9 @@ public class WindowManagerService : IWindowManagerService
         };
 
         rootGrid.RowDefinitions.Add(new RowDefinition
-            { Height = new GridLength(WindowManagerConstants.TitleBarRowHeight) });
+        {
+            Height = new GridLength(WindowManagerConstants.TitleBarRowHeight)
+        });
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var titleText = new TextBlock
@@ -132,9 +134,9 @@ public class WindowManagerService : IWindowManagerService
         newWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
         OffsetWindowPosition(newWindow);
-        
+
         rootGrid.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
-        
+
         var xamlRootProvider = _rootWindowScope?.ServiceProvider.GetService<ICurrentXamlRootProvider>();
         if (xamlRootProvider is not null)
         {
@@ -144,7 +146,7 @@ public class WindowManagerService : IWindowManagerService
 
         return newWindow;
     }
-    
+
     private static void WireXamlRootActivation(Window window, FrameworkElement root,
         ICurrentXamlRootProvider xamlRootProvider)
     {
@@ -213,10 +215,11 @@ public class WindowManagerService : IWindowManagerService
         var scope = _scopeFactory.CreateScope();
         var window = scope.ServiceProvider.GetRequiredService<SettingsWindow>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
-        
+
         window.Title = _localizationService.GetString(ResourceKeys.WindowTitle_Settings);
 
-        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) && MicaController.IsSupported())
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
+            MicaController.IsSupported())
             window.SystemBackdrop = new MicaBackdrop();
 
         if (window.Content is FrameworkElement fe)
@@ -233,7 +236,7 @@ public class WindowManagerService : IWindowManagerService
     }
 
     private IServiceScope? _rootWindowScope;
-    
+
     public MainPage CreateScopedMainPage()
     {
         _rootWindowScope?.Dispose();
@@ -245,14 +248,14 @@ public class WindowManagerService : IWindowManagerService
         var mainPage = new MainPage(viewModel, xamlRootProvider);
         return mainPage;
     }
-    
+
     public void SetRootWindowHandle(Window window)
     {
         if (_rootWindowScope is null) return;
 
         var handleProvider = _rootWindowScope.ServiceProvider.GetRequiredService<IWindowHandleProvider>();
         handleProvider.Hwnd = WindowNative.GetWindowHandle(window);
-        
+
         if (window.Content is FrameworkElement fe)
         {
             fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;
@@ -272,14 +275,14 @@ public class WindowManagerService : IWindowManagerService
 
         window.CurrentPage?.ViewModel.Dispose();
         var previousResult = _rootWindowScope?.ServiceProvider.GetService<IScanStateService>()?.CurrentResult;
-        
+
         _rootWindowScope?.Dispose();
         var scope = _scopeFactory.CreateScope();
         _rootWindowScope = scope;
-        
+
         if (previousResult is not null)
-                    scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
-        
+            scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
+
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         App.RootViewModel = viewModel;
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
@@ -287,7 +290,7 @@ public class WindowManagerService : IWindowManagerService
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
         var mainPage = new MainPage(viewModel, xamlRootProvider);
         window.SetContent(mainPage);
-        
+
         if (window.Content is FrameworkElement fe)
         {
             fe.RequestedTheme = _themeService.IsDarkTheme ? ElementTheme.Dark : ElementTheme.Light;

@@ -1,5 +1,5 @@
 ﻿using Volumetric.Core.Entities;
- 
+
 namespace Volumetric.Core.Classification;
 
 public static class FileCategoryClassifier

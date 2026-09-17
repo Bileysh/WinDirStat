@@ -12,7 +12,7 @@ public class FileIdentityService : IFileIdentityService
     private const uint FILE_SHARE_WRITE = 0x00000002;
     private const uint FILE_SHARE_DELETE = 0x00000004;
     private const uint OPEN_EXISTING = 3;
-    
+
     private const uint FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
