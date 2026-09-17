@@ -23,6 +23,7 @@ public static class AppLogger
                 Path.Combine(LogDirectory, "log-.txt"),
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 7,
+                shared: true,
                 outputTemplate:
                 "{Timestamp:HH:mm:ss.fff} [{Level:u3}] [{ProcessRole}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();

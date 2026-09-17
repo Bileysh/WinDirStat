@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Serilog;
 using Volumetric.Core.Entities;
 using Volumetric.Services;
 
@@ -15,10 +16,10 @@ public static class ElevatedScanServer
         {
             var paths = File.ReadAllLines(inputFile);
             var results = new Dictionary<string, FileSystemNode>();
-            
+
             var identityService = new FileIdentityService();
             var scanService = new DiskScanService(identityService);
-            
+
             foreach (var path in paths)
             {
                 if (Directory.Exists(path) || File.Exists(path))
@@ -27,15 +28,15 @@ public static class ElevatedScanServer
                     results[path] = result.RootNode;
                 }
             }
-            
+
             var json = JsonSerializer.Serialize(results, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode);
             File.WriteAllText(outputFile, json);
-            
+
             return 0;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[ElevatedScanServer] Fatal error: {ex}");
+            Log.Error(ex, "[ElevatedScanServer] Fatal error");
             return -1;
         }
     }

@@ -12,6 +12,13 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
 {
     public const string ElevatedScanArg = "--elevated-scan";
 
+    private readonly IAppLogger _logger;
+
+    public ElevatedScanHelperClient(IAppLogger logger)
+    {
+        _logger = logger;
+    }
+
     private const string ApplicationActivationManagerClsid = "45BA127D-10A8-46EA-8AB7-56EA9078943C";
     private static readonly Guid IidApplicationActivationManager = new("2E941141-7F97-4756-BA1D-9DECDE894A3D");
 
@@ -95,8 +102,8 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
             return false;
         }
         catch (Exception ex)
-        { 
-            Debug.WriteLine($"[ElevatedScanHelper] Batch scan failed: {ex}");
+        {
+            _logger.Error(ex, "[ElevatedScanHelper] Batch scan failed");
             return false;
         }
         finally

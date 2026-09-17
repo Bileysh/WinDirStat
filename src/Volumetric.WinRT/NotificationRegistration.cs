@@ -1,4 +1,5 @@
 using Microsoft.Windows.AppNotifications;
+using Serilog;
 
 namespace Volumetric.WinRT;
 
@@ -13,7 +14,7 @@ public static class NotificationRegistration
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[{callerTag}] AppNotificationManager.Register() failed: {ex}");
+            Log.Warning(ex, "[{CallerTag}] AppNotificationManager.Register() failed", callerTag);
             return false;
         }
     }
