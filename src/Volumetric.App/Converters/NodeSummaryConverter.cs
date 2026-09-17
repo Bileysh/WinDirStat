@@ -2,10 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using System;
-using WinDirStat.Core.Interfaces;
-using WinDirStat.ViewModels;
+using Volumetric.Core.Interfaces;
+using Volumetric.ViewModels;
 
-namespace WinDirStat_App.Converters;
+namespace Volumetric_App.Converters;
 
 public class NodeSummaryConverter : IValueConverter
 {
@@ -14,8 +14,8 @@ public class NodeSummaryConverter : IValueConverter
         if (value is NodeViewModel node && node.IsDirectory)
         {
             var localizationService = ((App)Application.Current).Services.GetRequiredService<ILocalizationService>();
-            var filesText = localizationService.GetString("FilesText");
-            var foldersText = localizationService.GetString("FoldersText");
+            var filesText = localizationService.GetString(ResourceKeys.FilesText);
+            var foldersText = localizationService.GetString(ResourceKeys.FoldersText);
 
             return $"{node.ChildFileCount} {filesText}, {node.ChildDirectoryCount} {foldersText}";
         }
