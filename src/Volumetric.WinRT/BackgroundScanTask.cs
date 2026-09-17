@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Threading;
 using Windows.ApplicationModel.Background;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
@@ -7,7 +8,7 @@ using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.Windows.Globalization;
 using Windows.Storage;
 
-namespace WinDirStat.WinRT;
+namespace Volumetric.WinRT;
 
 [ComVisible(true)]
 [ClassInterface(ClassInterfaceType.None)]
@@ -17,6 +18,10 @@ public sealed class BackgroundScanTask : IBackgroundTask
 {
     private const string ThresholdKey = "BackgroundScan.LowFreeSpaceThresholdPercent";
     private const double DefaultLowFreeSpacePercentThreshold = 10.0;
+    private const string DriveStatusSummaryLineKey = "DriveStatusSummaryLine";
+    private const string DriveStatusNotificationTitleKey = "DriveStatusNotificationTitle";
+    private const string LowSpaceNotificationTitleKey = "LowSpaceNotificationTitle";
+    private const string LowSpaceNotificationBodyKey = "LowSpaceNotificationBody";
 
     private static readonly ResourceManager ResourceManager = new();
 
@@ -42,6 +47,7 @@ public sealed class BackgroundScanTask : IBackgroundTask
     public static event EventHandler? Completed;
 
     private BackgroundTaskDeferral? _deferral;
+    private int _deferralCompleted;
 
     public void Run(IBackgroundTaskInstance taskInstance)
     {
@@ -54,7 +60,7 @@ public sealed class BackgroundScanTask : IBackgroundTask
         }
         finally
         {
-            _deferral.Complete();
+            CompleteDeferralOnce();
             Completed?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -65,14 +71,14 @@ public sealed class BackgroundScanTask : IBackgroundTask
         PersistResults(results);
         ShowNotifications(results);
     }
-    
+
     private static IReadOnlyList<DriveScanResult> ScanReadyDrives()
     {
         var results = new List<DriveScanResult>();
 
         foreach (var drive in DriveInfo.GetDrives())
         {
-             if (!drive.IsReady) continue;
+            if (!drive.IsReady) continue;
 
             try
             {
@@ -97,20 +103,22 @@ public sealed class BackgroundScanTask : IBackgroundTask
         if (results.Count == 0) return;
 
         var summaryLines = results.Select(r =>
-            string.Format(GetString("DriveStatusSummaryLine"), r.DriveName, FormatBytes(r.FreeBytes), FormatBytes(r.TotalBytes)));
+            string.Format(GetString(DriveStatusSummaryLineKey), r.DriveName, FormatBytes(r.FreeBytes), FormatBytes(r.TotalBytes)));
 
         var summary = new AppNotificationBuilder()
-            .AddText(GetString("DriveStatusNotificationTitle"))
+            .AddText(GetString(DriveStatusNotificationTitleKey))
             .AddText(string.Join("\n", summaryLines))
+            .AddArgument("path", results[0].DriveName)
             .BuildNotification();
         AppNotificationManager.Default.Show(summary);
 
         foreach (var drive in results.Where(r => 100.0 - r.UsedPercent < LowFreeSpacePercentThreshold))
         {
             var warning = new AppNotificationBuilder()
-                .AddText(GetString("LowSpaceNotificationTitle"))
-                .AddText(string.Format(GetString("LowSpaceNotificationBody"), drive.DriveName,
+                .AddText(GetString(LowSpaceNotificationTitleKey))
+                .AddText(string.Format(GetString(LowSpaceNotificationBodyKey), drive.DriveName,
                     FormatBytes(drive.FreeBytes), (100.0 - drive.UsedPercent).ToString("F0")))
+                .AddArgument("path", drive.DriveName)
                 .BuildNotification();
             AppNotificationManager.Default.Show(warning);
         }
@@ -124,7 +132,15 @@ public sealed class BackgroundScanTask : IBackgroundTask
 
     private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
     {
-        _deferral?.Complete();
+        CompleteDeferralOnce();
         Completed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void CompleteDeferralOnce()
+    {
+        if (Interlocked.Exchange(ref _deferralCompleted, 1) == 0)
+        {
+            _deferral?.Complete();
+        }
     }
 }

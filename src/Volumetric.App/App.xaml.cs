@@ -2,12 +2,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
-using WinDirStat_App.Services;
-using WinDirStat.Core.Interfaces;
-using WinDirStat.Services;
-using WinDirStat.ViewModels;
+using Volumetric_App.Services;
+using Volumetric.Core.Interfaces;
+using Volumetric.Services;
+using Volumetric.ViewModels;
 
-namespace WinDirStat_App;
+namespace Volumetric_App;
 
 public partial class App
 {
@@ -70,6 +70,14 @@ public partial class App
         Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
 
         ActivationDispatcher.Handle(_initialActivationArgs, isColdStart: true);
+
+        if (Program.PendingNotificationPath is { } pendingPath)
+        {
+            Program.PendingNotificationPath = null;
+            ActivationDispatcher.HandleExtracted(
+                new ActivationDispatcher.ExtractedActivation(ActivationDispatcher.ActivationAction.Path, pendingPath),
+                isColdStart: true);
+        }
     }
 
     private static void OnMainWindowClosed(object sender, WindowEventArgs args)

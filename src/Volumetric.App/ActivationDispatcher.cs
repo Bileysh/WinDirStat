@@ -1,16 +1,15 @@
-using System.Runtime.InteropServices;
 using Microsoft.Windows.AppLifecycle;
 using Windows.ApplicationModel.Activation;
 using Serilog;
-using WinDirStat.Core.Interfaces;
+using Volumetric.Core.Interfaces;
+using ActivationArgumentParser = Volumetric.Services.ActivationArgumentParser;
 
-namespace WinDirStat_App;
+namespace Volumetric_App;
 
-public static partial class ActivationDispatcher
+public static class ActivationDispatcher
 {
     private const string ProtocolSchemeHost = "scan";
-    private const string ProtocolPathMarker = "path=";
-    private const string InvalidPathResourceKey = "InvalidPathTitle";
+    private const string ProtocolPathMarker = ActivationArgumentParser.DefaultProtocolPathMarker;
     private const string DefaultInvalidPathTitle = "Invalid Path";
 
     public enum ActivationAction
@@ -36,45 +35,42 @@ public static partial class ActivationDispatcher
                     var rawArgs = cmdArgs.Operation.Arguments;
                     Log.Debug("Extract[Launch]: raw Operation.Arguments = '{RawArgs}'", rawArgs);
 
-                    if (string.IsNullOrWhiteSpace(rawArgs)) break;
+                    var parsed = ActivationArgumentParser.ParseLaunchArguments(rawArgs, Directory.Exists);
+                    Log.Information("Extract[Launch]: candidate path='{Path}', kind={Kind}", parsed.Path,
+                        parsed.Kind);
 
-                    var tokens = SplitCommandLine(rawArgs);
-                    Log.Debug("Extract[Launch]: tokenized to [{Tokens}]", string.Join(" | ", tokens));
-
-                    var path = tokens.Length > 0 ? tokens[^1] : null;
-                    if (string.IsNullOrWhiteSpace(path)) break;
-
-                    var exists = Directory.Exists(path);
-                    Log.Information("Extract[Launch]: candidate path='{Path}', exists={Exists}", path, exists);
-
-                    return new ExtractedActivation(exists ? ActivationAction.Path : ActivationAction.InvalidPath,
-                        path);
+                    if (parsed.Kind != ActivationArgumentParser.ParsedKind.None)
+                    {
+                        return new ExtractedActivation(
+                            parsed.Kind == ActivationArgumentParser.ParsedKind.Path
+                                ? ActivationAction.Path
+                                : ActivationAction.InvalidPath, parsed.Path);
+                    }
                 }
-
-                if (args.Data is ILaunchActivatedEventArgs launchArgs)
+                else if (args.Data is ILaunchActivatedEventArgs launchArgs)
                 {
                     var rawLaunchArgs = launchArgs.Arguments;
                     Log.Debug("Extract[Launch]: ILaunchActivatedEventArgs.Arguments = '{RawArgs}'", rawLaunchArgs);
 
-                    if (!string.IsNullOrWhiteSpace(rawLaunchArgs))
-                    {
-                        var launchTokens = SplitCommandLine(rawLaunchArgs);
-                        var launchPath = launchTokens.Length > 0 ? launchTokens[^1] : null;
+                    var parsed = ActivationArgumentParser.ParseLaunchArguments(rawLaunchArgs, Directory.Exists);
+                    Log.Information(
+                        "Extract[Launch/ILaunchActivatedEventArgs]: candidate path='{Path}', kind={Kind}",
+                        parsed.Path, parsed.Kind);
 
-                        if (!string.IsNullOrWhiteSpace(launchPath))
-                        {
-                            var launchExists = Directory.Exists(launchPath);
-                            Log.Information(
-                                "Extract[Launch/ILaunchActivatedEventArgs]: candidate path='{Path}', exists={Exists}",
-                                launchPath, launchExists);
-                            return new ExtractedActivation(
-                                launchExists ? ActivationAction.Path : ActivationAction.InvalidPath, launchPath);
-                        }
+                    if (parsed.Kind != ActivationArgumentParser.ParsedKind.None)
+                    {
+                        return new ExtractedActivation(
+                            parsed.Kind == ActivationArgumentParser.ParsedKind.Path
+                                ? ActivationAction.Path
+                                : ActivationAction.InvalidPath, parsed.Path);
                     }
                 }
+                else
+                {
+                    Log.Debug("Extract[Launch]: args.Data was not ICommandLineActivatedEventArgs ({Type})",
+                        args.Data?.GetType().Name);
+                }
 
-                Log.Debug("Extract[Launch]: args.Data was not ICommandLineActivatedEventArgs ({Type})",
-                    args.Data?.GetType().Name);
                 break;
 
             case ExtendedActivationKind.File:
@@ -92,17 +88,14 @@ public static partial class ActivationDispatcher
                 {
                     var uriStr = protocolArgs.Uri.ToString();
                     Log.Information("Extract[Protocol]: uri='{Uri}'", uriStr);
-                    
-                    var pathIdx = uriStr.IndexOf(ProtocolPathMarker, StringComparison.OrdinalIgnoreCase);
-                    if (pathIdx >= 0)
+
+                    var path = ActivationArgumentParser.ExtractPathFromProtocolUri(uriStr, ProtocolPathMarker);
+                    Log.Information("Extract[Protocol]: decoded path='{Path}'", path);
+
+                    if (path is not null)
                     {
-                        var path = Uri.UnescapeDataString(uriStr.Substring(pathIdx + ProtocolPathMarker.Length)).Trim();
-                        Log.Information("Extract[Protocol]: decoded path='{Path}'", path);
-                        if (!string.IsNullOrEmpty(path))
-                        {
-                            return new ExtractedActivation(
-                                Directory.Exists(path) ? ActivationAction.Path : ActivationAction.InvalidPath, path);
-                        }
+                        return new ExtractedActivation(
+                            Directory.Exists(path) ? ActivationAction.Path : ActivationAction.InvalidPath, path);
                     }
                 }
 
@@ -148,7 +141,7 @@ public static partial class ActivationDispatcher
         Log.Warning("HandleExtracted: path '{Path}' does not exist, showing notification instead of scanning", path);
         var notificationService = App.StaticServices?.GetService(typeof(INotificationService)) as INotificationService;
         var localization = App.StaticServices?.GetService(typeof(ILocalizationService)) as ILocalizationService;
-        var title = localization?.GetString(InvalidPathResourceKey) ?? DefaultInvalidPathTitle;
+        var title = localization?.GetString(ResourceKeys.InvalidPathTitle) ?? DefaultInvalidPathTitle;
         notificationService?.ShowNotification(title, path ?? string.Empty);
     }
 
@@ -171,7 +164,7 @@ public static partial class ActivationDispatcher
         App.MainDispatcherQueue?.TryEnqueue(() => DispatchImportedResult(rootNode, isColdStart));
     }
 
-    private static void DispatchImportedResult(WinDirStat.Core.Entities.FileSystemNode rootNode, bool isColdStart)
+    private static void DispatchImportedResult(Volumetric.Core.Entities.FileSystemNode rootNode, bool isColdStart)
     {
         if (isColdStart && App.RootViewModel is not null)
         {
@@ -196,41 +189,6 @@ public static partial class ActivationDispatcher
         var windowManager = App.StaticServices?.GetService(typeof(IWindowManagerService)) as IWindowManagerService;
         windowManager?.OpenMainWindow(path);
     }
-
-    private static string[] SplitCommandLine(string commandLine)
-    {
-        if (string.IsNullOrWhiteSpace(commandLine)) return [];
-
-        var argv = CommandLineToArgvW(commandLine, out var argc);
-        if (argv == IntPtr.Zero)
-        {
-            Log.Warning("SplitCommandLine: CommandLineToArgvW failed for '{CommandLine}' (Win32Error={Error})",
-                commandLine, Marshal.GetLastWin32Error());
-            return [];
-        }
-
-        try
-        {
-            var result = new string[argc];
-            for (var i = 0; i < argc; i++)
-            {
-                var strPtr = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
-                result[i] = Marshal.PtrToStringUni(strPtr) ?? string.Empty;
-            }
-
-            return result;
-        }
-        finally
-        {
-            LocalFree(argv);
-        }
-    }
-
-    [LibraryImport("shell32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-    private static partial IntPtr CommandLineToArgvW(string cmdLine, out int numArgs);
-
-    [LibraryImport("kernel32.dll")]
-    private static partial IntPtr LocalFree(IntPtr hMem);
 
     private static void HandleStartupTask()
     {

@@ -2,11 +2,12 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+using Microsoft.Windows.AppNotifications;
 using Serilog;
-using WinDirStat_App.Services;
-using WinDirStat.WinRT;
+using Volumetric_App.Services;
+using Volumetric.WinRT;
 
-namespace WinDirStat_App;
+namespace Volumetric_App;
 
 public static partial class Program
 {
@@ -16,6 +17,9 @@ public static partial class Program
     internal static readonly ManualResetEvent ExitEvent = new(false);
     private static readonly ManualResetEvent RedirectEvent = new(false);
     private static uint _registrationToken;
+    
+    internal static bool NotificationsRegistered;
+    internal static string? PendingNotificationPath;
 
     [STAThread]
     static void Main(string[] args)
@@ -57,6 +61,10 @@ public static partial class Program
         }
 
         AppLogger.Initialize("Interactive");
+
+        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
+        NotificationsRegistered = NotificationRegistration.TryRegister("Interactive");
+
         var activatedArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
         Log.Information("Initial activation kind: {Kind}", activatedArgs.Kind);
 
@@ -125,13 +133,9 @@ public static partial class Program
         });
         var redirectCompleted = RedirectEvent.WaitOne(8000);
         if (!redirectCompleted)
-        {
-            // The existing instance's dispatcher might just be busy (e.g. mid-scan) rather
-            // than dead. We give up waiting and proceed as a new instance below, but if the
-            // redirect lands after all this and the other instance *also* handles it, the
-            // same click could open two windows - worth watching for in manual QA.
+        { 
             Log.Warning("RedirectActivationToAsync did not complete within 8s; proceeding without it " +
-                        "(if it lands late, both instances may handle the same activation)");
+                      "(if it lands late, both instances may handle the same activation)");
         }
 
         if (redirectSucceeded)
@@ -167,6 +171,27 @@ public static partial class Program
         }
 
         App.MainDispatcherQueue?.TryEnqueue(() => DispatchActivation(extracted));
+    }
+
+    private static void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
+    {
+        if (!args.Arguments.TryGetValue("path", out var path) || string.IsNullOrEmpty(path))
+        {
+            Log.Information("OnNotificationInvoked: no 'path' argument, nothing to route");
+            return;
+        }
+
+        Log.Information("OnNotificationInvoked: path='{Path}'", path);
+        var extracted = new ActivationDispatcher.ExtractedActivation(ActivationDispatcher.ActivationAction.Path, path);
+
+        if (App.MainDispatcherQueue is not null)
+        {
+            App.MainDispatcherQueue.TryEnqueue(() => DispatchActivation(extracted));
+            return;
+        } 
+        
+        Log.Information("OnNotificationInvoked: no window yet (this is a cold start), stashing for OnLaunched");
+        PendingNotificationPath = path;
     }
 
     private static void DispatchActivation(ActivationDispatcher.ExtractedActivation extracted)
