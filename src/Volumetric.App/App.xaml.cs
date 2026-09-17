@@ -37,15 +37,6 @@ public partial class App
             Serilog.Log.Fatal(e.Exception, "WinUI Application.UnhandledException (Handled will be set to true)");
             e.Handled = true;
         };
-
-        try
-        {
-            ClassicContextMenuRegistrar.EnsureRegistered();
-        }
-        catch (Exception ex)
-        {
-            Serilog.Log.Warning(ex, "ClassicContextMenuRegistrar failed (known non-functional for MSIX, non-fatal)");
-        }
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -93,6 +84,7 @@ public partial class App
         services.AddScoped<MainPageViewModel>();
         services.AddTransient<MainPage>();
         services.AddSingleton<IDiskScanService, DiskScanService>();
+        services.AddSingleton<IAppLogger, SerilogAppLogger>();
         services.AddSingleton<IElevatedScanHelper, ElevatedScanHelperClient>();
         services.AddScoped<IFolderPickerService, FolderPickerService>();
         services.AddScoped<IWindowHandleProvider, WindowHandleProvider>();

@@ -192,18 +192,7 @@ public static class ActivationDispatcher
 
     private static void HandleStartupTask()
     {
-        Log.Information("HandleStartupTask: ensuring background scan task is registered");
-        var registrar =
-            App.StaticServices?.GetService(typeof(IBackgroundScanTaskRegistrar)) as IBackgroundScanTaskRegistrar;
-
-        if (registrar is null)
-        {
-            Log.Warning("HandleStartupTask: IBackgroundScanTaskRegistrar not available");
-            return;
-        }
-
-        registrar.EnsureRegistered();
-        Log.Information("HandleStartupTask: EnsureRegistered completed");
+        Log.Information("Extract[StartupTask]: activation received, no action needed (task already registered)");
     }
 
     public static void Handle(AppActivationArguments? args, bool isColdStart = false)
