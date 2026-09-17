@@ -60,6 +60,7 @@
                     <uap:FileTypeAssociation Name="volumetric-scan">
                         <uap:SupportedFileTypes>
                             <uap:FileType>.volscan</uap:FileType>
+                            <uap:FileType>.wdsscan</uap:FileType>
                         </uap:SupportedFileTypes>
                     </uap:FileTypeAssociation>
                 </uap:Extension>
@@ -75,6 +76,12 @@
                             TaskId="Volumetric.StartupTask"
                             Enabled="false"
                             DisplayName="Volumetric background scanning"/>
+                </uap5:Extension>
+
+                <uap5:Extension Category="windows.appExecutionAlias">
+                    <uap5:AppExecutionAlias>
+                        <uap5:ExecutionAlias Alias="volumetric.exe" />
+                    </uap5:AppExecutionAlias>
                 </uap5:Extension>
 
                 <com:Extension Category="windows.comServer">
@@ -100,7 +107,7 @@
                         </com:ExeServer>
                     </com:ComServer>
                 </com:Extension>
-                
+
                 <com:Extension Category="windows.comServer">
                     <com:ComServer>
                         <com:ExeServer Executable="Volumetric.App.exe" DisplayName="Volumetric Explorer Command"
@@ -110,7 +117,7 @@
                         </com:ExeServer>
                     </com:ComServer>
                 </com:Extension>
-                
+
                 <desktop4:Extension Category="windows.fileExplorerContextMenus">
                     <desktop4:FileExplorerContextMenus>
                         <desktop5:ItemType Type="Directory">
@@ -121,7 +128,7 @@
                         </desktop5:ItemType>
                     </desktop4:FileExplorerContextMenus>
                 </desktop4:Extension>
-                
+
             </Extensions>
         </Application>
     </Applications>

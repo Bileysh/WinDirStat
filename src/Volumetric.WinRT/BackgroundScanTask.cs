@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Threading;
 using Windows.ApplicationModel.Background;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
@@ -46,6 +47,7 @@ public sealed class BackgroundScanTask : IBackgroundTask
     public static event EventHandler? Completed;
 
     private BackgroundTaskDeferral? _deferral;
+    private int _deferralCompleted;
 
     public void Run(IBackgroundTaskInstance taskInstance)
     {
@@ -58,7 +60,7 @@ public sealed class BackgroundScanTask : IBackgroundTask
         }
         finally
         {
-            _deferral.Complete();
+            CompleteDeferralOnce();
             Completed?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -69,14 +71,14 @@ public sealed class BackgroundScanTask : IBackgroundTask
         PersistResults(results);
         ShowNotifications(results);
     }
-    
+
     private static IReadOnlyList<DriveScanResult> ScanReadyDrives()
     {
         var results = new List<DriveScanResult>();
 
         foreach (var drive in DriveInfo.GetDrives())
         {
-             if (!drive.IsReady) continue;
+            if (!drive.IsReady) continue;
 
             try
             {
@@ -130,7 +132,15 @@ public sealed class BackgroundScanTask : IBackgroundTask
 
     private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
     {
-        _deferral?.Complete();
+        CompleteDeferralOnce();
         Completed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void CompleteDeferralOnce()
+    {
+        if (Interlocked.Exchange(ref _deferralCompleted, 1) == 0)
+        {
+            _deferral?.Complete();
+        }
     }
 }

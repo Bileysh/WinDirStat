@@ -26,6 +26,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private readonly IBackgroundScanSettingsService _backgroundScanSettingsService;
     private readonly IScanResultFileService _scanResultFileService;
     private readonly IWindowHandleProvider _windowHandleProvider;
+    private readonly IAppLogger _appLogger;
 
     private CancellationTokenSource? _scanCts;
     private string? _lastScanPath;
@@ -35,7 +36,8 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         ILocalizationService localizationService, IThemeService themeService, INotificationService notificationService,
         IDriveInfoService driveInfoService, IClipboardService clipboardService,
         IFileExplorerService fileExplorerService, IBackgroundScanSettingsService backgroundScanSettingsService,
-        IScanResultFileService scanResultFileService, IWindowHandleProvider windowHandleProvider)
+        IScanResultFileService scanResultFileService, IWindowHandleProvider windowHandleProvider,
+        IAppLogger appLogger)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -51,6 +53,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _backgroundScanSettingsService = backgroundScanSettingsService;
         _scanResultFileService = scanResultFileService;
         _windowHandleProvider = windowHandleProvider;
+        _appLogger = appLogger;
 
         _scanStateService.StateChanged += OnStateChanged;
 
@@ -135,7 +138,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         [
             new NodeViewModel(result.RootNode, localizationService: _localizationService,
                 notificationService: _notificationService, clipboardService: _clipboardService,
-                fileExplorerService: _fileExplorerService)
+                fileExplorerService: _fileExplorerService, appLogger: _appLogger)
         ];
         HasScanResult = true;
 
@@ -244,7 +247,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             var msg = string.Format(_localizationService.GetString(ResourceKeys.ScanCompleteMessageFormat),
                 scanResult.ScanDuration.TotalSeconds, fileCount, folderCount);
 
-            _notificationService.ShowNotification(title, msg, _lastScanPath);
+            _notificationService.ShowNotification(title, msg, path);
         }
         catch (OperationCanceledException)
         {
@@ -295,7 +298,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
         var rects = SquarifiedTreeMapLayout.Compute(CurrentTreeMapRoot, 0, 0, _treeMapWidth, _treeMapHeight);
         var viewModels = rects.Select(r =>
-            new TreeMapRectViewModel(r, _notificationService, _localizationService, _fileExplorerService));
+            new TreeMapRectViewModel(r, _notificationService, _localizationService, _fileExplorerService, _appLogger));
         TreeMapRects = new ObservableCollection<TreeMapRectViewModel>(viewModels.ToList());
     }
 
@@ -434,14 +437,21 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         var result = new ScanResult(rootNode.RootFullPathOverride ?? rootNode.Name, rootNode,
             statsByCategory, statsByExtension, TimeSpan.Zero);
         _scanStateService.SetResult(result);
+
+        _lastScanPath = null;
+        RescanCommand.NotifyCanExecuteChanged();
+        RescanElevatedCommand.NotifyCanExecuteChanged();
     }
 
     public async Task HandleDroppedFilesAsync(IReadOnlyList<string> filePaths)
     {
-        var volscanPath = filePaths.FirstOrDefault(p => p.EndsWith(".volscan", StringComparison.OrdinalIgnoreCase));
-        if (volscanPath is null) return;
+        var scanPath = filePaths.FirstOrDefault(p =>
+            p.EndsWith(".volscan", StringComparison.OrdinalIgnoreCase) ||
+            p.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
 
-        var rootNode = await _scanResultFileService.ImportFromPathAsync(volscanPath);
+        if (scanPath is null) return;
+
+        var rootNode = await _scanResultFileService.ImportFromPathAsync(scanPath);
         if (rootNode is not null)
         {
             LoadImportedResult(rootNode);
