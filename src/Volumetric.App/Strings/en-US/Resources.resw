@@ -82,8 +82,14 @@
     <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Open in separate window</value>
   </data>
+  <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Open tree view in separate window</value>
+  </data>
     <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Open in separate window</value>
+  </data>
+  <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Open statistics in separate window</value>
   </data>
     <data name="OpenTreeMapWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Open in separate window</value>
@@ -143,6 +149,9 @@
     <value>Cancel Scan</value>
   </data>
     <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Go up one level</value>
+  </data>
+  <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Go up one level</value>
   </data>
     <data name="MenuWindowOpenNew.Text" xml:space="preserve">
