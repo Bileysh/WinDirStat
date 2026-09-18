@@ -170,8 +170,14 @@
     <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Відкрити в окремому вікні</value>
   </data>
+  <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Відкрити дерево файлів в окремому вікні</value>
+  </data>
     <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Відкрити в окремому вікні</value>
+  </data>
+  <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Відкрити статистику в окремому вікні</value>
   </data>
     <data name="OpenTreeMapWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Відкрити в окремому вікні</value>
@@ -183,6 +189,9 @@
     <value>Скасувати сканування</value>
   </data>
     <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Повернутися на рівень вище</value>
+  </data>
+  <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Повернутися на рівень вище</value>
   </data>
     <data name="ScanCompleteTitle" xml:space="preserve">
