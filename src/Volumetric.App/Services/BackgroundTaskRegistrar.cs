@@ -13,15 +13,23 @@ public sealed class BackgroundTaskRegistrar(IBackgroundScanSettingsService setti
 
     public void EnsureRegistered()
     {
-        MigrateLegacyRegistrations();
+        var existingNames = BackgroundTaskRegistration.AllTasks.Values.Select(t => t.Name).ToList();
 
-        var existingNames = BackgroundTaskRegistration.AllTasks.Values.Select(t => t.Name);
-        if (BackgroundTaskRegistrationPolicy.IsAlreadyRegistered(existingNames, TaskName))
+        if (!BackgroundTaskRegistrationPolicy.IsAlreadyRegistered(existingNames, TaskName))
         {
-            return;
+            try
+            {
+                Register();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "EnsureRegistered: failed to register '{TaskName}'; leaving any " +
+                              "legacy registration in place.", TaskName);
+                return;
+            }
         }
 
-        Register();
+        MigrateLegacyRegistrations();
     }
 
     private static void MigrateLegacyRegistrations()
