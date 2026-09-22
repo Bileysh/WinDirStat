@@ -9,10 +9,12 @@ namespace Volumetric_App.Services;
 public class WinUiDialogService : IDialogService
 {
     private readonly ICurrentXamlRootProvider _xamlRootProvider;
+    private readonly IAppLogger _logger;
 
-    public WinUiDialogService(ICurrentXamlRootProvider xamlRootProvider)
+    public WinUiDialogService(ICurrentXamlRootProvider xamlRootProvider, IAppLogger logger)
     {
         _xamlRootProvider = xamlRootProvider;
+        _logger = logger;
     }
 
     public async Task ShowMessageAsync(string title, string message, string closeButtonText = "OK")
@@ -21,8 +23,7 @@ public class WinUiDialogService : IDialogService
 
         if (xamlRoot is null)
         {
-            System.Diagnostics.Debug.WriteLine(
-                "[WinUiDialogService] XamlRoot not ready for this window yet — dialog skipped.");
+            _logger.Warning("[WinUiDialogService] XamlRoot not ready for this window yet — dialog skipped.");
             return;
         }
 

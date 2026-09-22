@@ -14,6 +14,8 @@ public static class ResourceKeys
     public const string FilesText = "FilesText";
     public const string FoldersText = "FoldersText";
     public const string NoExtensionLabel = "NoExtensionLabel";
+    public const string OpenInExplorerFailedTitle = "OpenInExplorerFailedTitle";
+    public const string ShowPropertiesFailedTitle = "ShowPropertiesFailedTitle";
 
     public const string Category_Archives = "Category_Archives";
     public const string Category_Audio = "Category_Audio";
