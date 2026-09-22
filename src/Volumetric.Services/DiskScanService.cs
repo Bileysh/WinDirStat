@@ -227,7 +227,7 @@ public class DiskScanService : IDiskScanService
 
         return node;
     }
-    
+
     private static void RecomputeSizes(FileSystemNode node)
     {
         if (node.Children.Count == 0) return;

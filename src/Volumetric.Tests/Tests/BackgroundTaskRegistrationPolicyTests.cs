@@ -37,4 +37,41 @@ public class BackgroundTaskRegistrationPolicyTests
 
         Assert.False(BackgroundTaskRegistrationPolicy.IsAlreadyRegistered(existing, TaskName));
     }
+
+    [Fact]
+    public void FindLegacyRegistrations_ReturnsEmpty_WhenNoLegacyNamesPresent()
+    {
+        var existing = new[] { TaskName, "SomeOtherApp.Task" };
+        var legacyNames = new[] { "WinDirStat.BackgroundScan" };
+
+        Assert.Empty(BackgroundTaskRegistrationPolicy.FindLegacyRegistrations(existing, legacyNames));
+    }
+
+    [Fact]
+    public void FindLegacyRegistrations_ReturnsMatch_WhenLegacyNamePresent()
+    {
+        var existing = new[] { TaskName, "WinDirStat.BackgroundScan" };
+        var legacyNames = new[] { "WinDirStat.BackgroundScan" };
+
+        Assert.Equal(["WinDirStat.BackgroundScan"],
+            BackgroundTaskRegistrationPolicy.FindLegacyRegistrations(existing, legacyNames));
+    }
+
+    [Fact]
+    public void FindLegacyRegistrations_ReturnsAllMatches_WhenMultipleLegacyNamesRegistered()
+    {
+        var existing = new[] { "WinDirStat.BackgroundScan", "OldName.BackgroundScan", TaskName };
+        var legacyNames = new[] { "WinDirStat.BackgroundScan", "OldName.BackgroundScan" };
+
+        Assert.Equal(2, BackgroundTaskRegistrationPolicy.FindLegacyRegistrations(existing, legacyNames).Count());
+    }
+
+    [Fact]
+    public void FindLegacyRegistrations_IsCaseSensitive()
+    {
+        var existing = new[] { "WINDIRSTAT.BACKGROUNDSCAN" };
+        var legacyNames = new[] { "WinDirStat.BackgroundScan" };
+
+        Assert.Empty(BackgroundTaskRegistrationPolicy.FindLegacyRegistrations(existing, legacyNames));
+    }
 }

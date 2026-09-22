@@ -33,8 +33,10 @@ public static class FileStatisticsAggregator
             .GroupBy(selector)
             .Select(g => new FileTypeStatisticsEntry
             {
-                Label = g.Key.Label, Category = g.Key.Category,
-                TotalSize = g.Sum(f => f.SizeLogical), FileCount = g.Count(),
+                Label = g.Key.Label,
+                Category = g.Key.Category,
+                TotalSize = g.Sum(f => f.SizeLogical),
+                FileCount = g.Count(),
                 PercentOfTotal = totalSize > 0 ? g.Sum(f => f.SizeLogical) / totalSize * 100 : 0
             })
             .OrderByDescending(s => s.TotalSize)
@@ -50,7 +52,7 @@ public static class FileStatisticsAggregator
         }
 
         foreach (var child in node.Children)
-        foreach (var file in EnumerateFiles(child))
-            yield return file;
+            foreach (var file in EnumerateFiles(child))
+                yield return file;
     }
 }

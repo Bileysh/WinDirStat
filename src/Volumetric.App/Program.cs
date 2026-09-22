@@ -12,12 +12,11 @@ namespace Volumetric_App;
 public static partial class Program
 {
     private const string ElevatedScanArg = "--elevated-scan";
-    private const string RegisterForBgTaskServerArg = "-RegisterForBGTaskServer";
     private const string SingleInstanceKey = "Volumetric.MainInstance";
     internal static readonly ManualResetEvent ExitEvent = new(false);
     private static readonly ManualResetEvent RedirectEvent = new(false);
     private static uint _registrationToken;
-    
+
     internal static bool NotificationsRegistered;
     internal static string? PendingNotificationPath;
 
@@ -50,9 +49,7 @@ public static partial class Program
             return;
         }
 
-        if (args.Any(a =>
-                a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase) || a.Equals(RegisterForBgTaskServerArg,
-                    StringComparison.OrdinalIgnoreCase)))
+        if (args.Any(a => a.Equals("-Embedding", StringComparison.OrdinalIgnoreCase)))
         {
             AppLogger.Initialize("BackgroundTaskServer");
             RunAsBackgroundTaskServer();
@@ -133,7 +130,7 @@ public static partial class Program
         });
         var redirectCompleted = RedirectEvent.WaitOne(8000);
         if (!redirectCompleted)
-        { 
+        {
             Log.Warning("RedirectActivationToAsync did not complete within 8s; proceeding without it " +
                       "(if it lands late, both instances may handle the same activation)");
         }
@@ -188,8 +185,8 @@ public static partial class Program
         {
             App.MainDispatcherQueue.TryEnqueue(() => DispatchActivation(extracted));
             return;
-        } 
-        
+        }
+
         Log.Information("OnNotificationInvoked: no window yet (this is a cold start), stashing for OnLaunched");
         PendingNotificationPath = path;
     }

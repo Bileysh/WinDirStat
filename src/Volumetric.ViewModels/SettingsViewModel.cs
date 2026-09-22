@@ -14,7 +14,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISettingsFileService _fileService;
     private readonly IBackgroundScanTestRunner _testRunner;
     private readonly ILocalizationService _localizationService;
-    
+
     private readonly bool _isInitialized;
 
     [ObservableProperty]
@@ -28,7 +28,7 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string? StatusMessage { get; set; }
-    
+
     public IntPtr WindowHandle { get; set; }
 
     public SettingsViewModel(
@@ -71,7 +71,7 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnAccountForHardLinksChanged(bool value)
     {
         if (!_isInitialized) return;
-        
+
         _settings.AccountForHardLinks = value;
         StatusMessage = _localizationService.GetString(
             value ? "AccountForHardLinksEnabledStatus" : "AccountForHardLinksDisabledStatus");

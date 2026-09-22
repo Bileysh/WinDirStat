@@ -17,7 +17,7 @@ public class FolderPickerService : IFolderPickerService
     }
 
     public Task<string?> PickFolderAsync()
-    { 
+    {
         var hwnd = _windowHandleProvider.Hwnd;
 
         if (ElevationHelper.IsElevated())

@@ -1,4 +1,5 @@
 using System.Linq;
+using Serilog;
 using Windows.ApplicationModel.Background;
 using Volumetric.Core.BackgroundScan;
 using Volumetric.Core.Interfaces;
@@ -8,16 +9,43 @@ namespace Volumetric_App.Services;
 public sealed class BackgroundTaskRegistrar(IBackgroundScanSettingsService settings) : IBackgroundScanTaskRegistrar
 {
     private const string TaskName = "Volumetric.BackgroundScan";
+    private static readonly string[] LegacyTaskNames = ["WinDirStat.BackgroundScan"];
 
     public void EnsureRegistered()
     {
-        var existingNames = BackgroundTaskRegistration.AllTasks.Values.Select(t => t.Name);
-        if (BackgroundTaskRegistrationPolicy.IsAlreadyRegistered(existingNames, TaskName))
+        var existingNames = BackgroundTaskRegistration.AllTasks.Values.Select(t => t.Name).ToList();
+
+        if (!BackgroundTaskRegistrationPolicy.IsAlreadyRegistered(existingNames, TaskName))
         {
-            return;
+            try
+            {
+                Register();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "EnsureRegistered: failed to register '{TaskName}'; leaving any " +
+                              "legacy registration in place.", TaskName);
+                return;
+            }
         }
 
-        Register();
+        MigrateLegacyRegistrations();
+    }
+
+    private static void MigrateLegacyRegistrations()
+    {
+        var existingNames = BackgroundTaskRegistration.AllTasks.Values.Select(t => t.Name).ToList();
+        var legacyNames = BackgroundTaskRegistrationPolicy.FindLegacyRegistrations(existingNames, LegacyTaskNames);
+
+        foreach (var legacyName in legacyNames)
+        {
+            var legacy = BackgroundTaskRegistration.AllTasks.Values.FirstOrDefault(t => t.Name == legacyName);
+            if (legacy is null)
+                continue;
+
+            Log.Information("Migrating orphaned legacy background task registration '{LegacyTaskName}'", legacyName);
+            legacy.Unregister(cancelTask: false);
+        }
     }
 
     public void ReRegister()

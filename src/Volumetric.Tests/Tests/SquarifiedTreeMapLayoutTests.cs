@@ -7,7 +7,8 @@ public class SquarifiedTreeMapLayoutTests
 {
     private static FileSystemNode BuildRoot() => new()
     {
-        Name = "root", IsDirectory = true,
+        Name = "root",
+        IsDirectory = true,
         Children =
         {
             new FileSystemNode { Name = "a", SizeLogical = 500 },

@@ -14,7 +14,7 @@ public static partial class ExplorerCommandServer
 
     public const string ExplorerCommandClsid = "6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21";
     private const string AppProtocolScheme = "volumetric";
-    
+
     private static readonly StrategyBasedComWrappers ComWrappers = new();
 
     [GeneratedComInterface, Guid("a08ce4d0-fa25-44ab-b57c-c7b1c323e0b9"),
@@ -171,7 +171,7 @@ public static partial class ExplorerCommandServer
 
                 var protocolUri = $"{AppProtocolScheme}://scan?path={Uri.EscapeDataString(path)}";
                 Log.Information("Invoke: launching URI '{Uri}'", protocolUri);
-                
+
                 var startInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = protocolUri,
@@ -183,7 +183,7 @@ public static partial class ExplorerCommandServer
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Invoke failed");                
+                Log.Error(ex, "Invoke failed");
             }
             finally
             {
