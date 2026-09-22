@@ -1,0 +1,43 @@
+name: Build MSIX
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Decode signing certificate
+        if: ${{ secrets.MSIX_SIGNING_CERT_BASE64 != '' }}
+        shell: pwsh
+        run: |
+          $bytes = [Convert]::FromBase64String("${{ secrets.MSIX_SIGNING_CERT_BASE64 }}")
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\signing.pfx", $bytes)
+
+      - name: Build MSIX
+        shell: pwsh
+        run: |
+          $certArgs = @{}
+          if (Test-Path "$env:RUNNER_TEMP\signing.pfx") {
+            $certArgs["CertificatePath"] = "$env:RUNNER_TEMP\signing.pfx"
+            $certArgs["CertificatePassword"] = "${{ secrets.MSIX_SIGNING_CERT_PASSWORD }}"
+          }
+          .\build_msix.ps1 -Configuration Release -Platform x64 `
+            -PackageVersion "1.0.${{ github.run_number }}.0" `
+            @certArgs
+
+      - name: Upload MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Volumetric-msix-x64
+          path: artifacts/**/*.msix
+          if-no-files-found: error

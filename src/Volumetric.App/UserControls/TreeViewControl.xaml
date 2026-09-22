@@ -7,7 +7,6 @@
 
     <UserControl.Resources>
         <converters:NodeSummaryConverter x:Key="NodeSummaryConverter" />
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -36,7 +35,6 @@
                 <TreeView.ItemTemplate>
                     <DataTemplate x:DataType="vm:NodeViewModel">
                         <TreeViewItem ItemsSource="{x:Bind Children}"
-                                      Visibility="{x:Bind IsSearchMatch, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                       AutomationProperties.Name="{x:Bind AccessibleName, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal" Spacing="12">
                                 <StackPanel.ContextFlyout>
