@@ -37,6 +37,7 @@ public partial class App
             Serilog.Log.Fatal(e.Exception, "WinUI Application.UnhandledException (Handled will be set to true)");
             e.Handled = true;
         };
+        LegacyRegistryCleanup.RemoveStaleClassicContextMenuKeys();
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -89,6 +90,7 @@ public partial class App
         services.AddScoped<IFolderPickerService, FolderPickerService>();
         services.AddScoped<IWindowHandleProvider, WindowHandleProvider>();
         services.AddScoped<IScanStateService, ScanStateService>();
+        services.AddScoped<JumpListService>();
         services.AddSingleton<WindowManagerService>();
         services.AddSingleton<IWindowManagerService>(sp => sp.GetRequiredService<WindowManagerService>());
         services.AddScoped<IDialogService, WinUiDialogService>();

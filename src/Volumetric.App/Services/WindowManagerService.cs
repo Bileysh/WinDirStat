@@ -245,6 +245,7 @@ public class WindowManagerService : IWindowManagerService
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        scope.ServiceProvider.GetRequiredService<JumpListService>().Initialize();
         var mainPage = new MainPage(viewModel, xamlRootProvider);
         return mainPage;
     }
@@ -286,6 +287,7 @@ public class WindowManagerService : IWindowManagerService
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         App.RootViewModel = viewModel;
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd = WindowNative.GetWindowHandle(window);
+        scope.ServiceProvider.GetRequiredService<JumpListService>().Initialize();
 
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
         var mainPage = new MainPage(viewModel, xamlRootProvider);
