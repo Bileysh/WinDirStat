@@ -3,6 +3,7 @@ namespace Volumetric.Core.Interfaces;
 public static class ResourceKeys
 {
     public const string InvalidPathTitle = "InvalidPathTitle";
+    public const string TrayIconToolTipText = "TrayIconToolTipText";
 
     public const string AboutTitle = "AboutTitle";
     public const string AboutMessage = "AboutMessage";

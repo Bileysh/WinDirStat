@@ -361,8 +361,17 @@
     <data name="TrayMenuOpen.Text" xml:space="preserve">
     <value>Open</value>
   </data>
+    <data name="TrayMenuScan.Text" xml:space="preserve">
+    <value>Scan folder...</value>
+  </data>
     <data name="TrayMenuExit.Text" xml:space="preserve">
     <value>Exit</value>
+  </data>
+    <data name="TrayIconToolTipText" xml:space="preserve">
+    <value>Volumetric</value>
+  </data>
+    <data name="TitleBarSearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search results</value>
   </data>
     <data name="MenuFileExportScan.Text" xml:space="preserve">
     <value>Export scan…</value>

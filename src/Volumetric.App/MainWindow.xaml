@@ -20,16 +20,37 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="Volumetric" />
+        <Grid Grid.Row="0" Height="48">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="280" />
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="AppTitleBar" Grid.Column="0" Background="Transparent" Padding="12,0">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="/Assets/AppIcon.ico" Width="18" Height="18" />
+                    <TextBlock Text="Volumetric" VerticalAlignment="Center" FontSize="12" />
+                </StackPanel>
+            </Grid>
+
+            <AutoSuggestBox x:Name="SearchBox" Grid.Column="1" VerticalAlignment="Center"
+                             Margin="0,8,12,8" QueryIcon="Find" x:Uid="TitleBarSearchBox"
+                             Text="{x:Bind ViewModel.SearchText, Mode=OneWay}"
+                             TextChanged="SearchBox_OnTextChanged" />
+        </Grid>
 
         <Frame x:Name="RootFrame" Grid.Row="1" />
 
         <tb:TaskbarIcon x:Name="TrayIcon"
                         ToolTipText="Volumetric"
+                        LeftClickCommand="{x:Bind RestoreWindowCommand}"
                         DoubleClickCommand="{x:Bind RestoreWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
+                    <MenuFlyoutItem x:Uid="TrayMenuScan" Command="{x:Bind ScanFromTrayCommand}"
+                                    Icon="Find" />
                     <MenuFlyoutItem x:Uid="TrayMenuOpen" Command="{x:Bind RestoreWindowCommand}" Icon="NewWindow" />
+                    <MenuFlyoutSeparator />
                     <MenuFlyoutItem x:Uid="TrayMenuExit" Command="{x:Bind ExitCommand}" Icon="Cancel" />
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
