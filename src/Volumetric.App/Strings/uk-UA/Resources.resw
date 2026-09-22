@@ -282,16 +282,16 @@
     <value>{0}: залишилось лише {1} ({2}% вільно)</value>
   </data>
     <data name="WindowTitle_New" xml:space="preserve">
-    <value>Volumetric - Нове вікно</value>
+    <value>Volumetric - Новий екран</value>
   </data>
     <data name="WindowTitle_Statistics" xml:space="preserve">
-    <value>Статистика (окреме вікно)</value>
+    <value>Статистика (відокремлено)</value>
   </data>
     <data name="WindowTitle_TreeView" xml:space="preserve">
-    <value>Дерево каталогів (окреме вікно)</value>
+    <value>Дерево каталогів (відокремлено)</value>
   </data>
     <data name="WindowTitle_TreeMap" xml:space="preserve">
-    <value>Карта файлів (окреме вікно)</value>
+    <value>Карта файлів (відокремлено)</value>
   </data>
     <data name="FolderPickerTitle" xml:space="preserve">
     <value>Виберіть папку для сканування</value>
@@ -415,5 +415,20 @@
   </data>
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Шлях не знайдено</value>
+  </data>
+      <data name="MainVerticalSplitter.AutomationProperties.Name" xml:space="preserve">
+      <value>Вертикальний розділювач панелей</value>
+  </data>
+      <data name="MainHorizontalSplitter.AutomationProperties.Name" xml:space="preserve">
+      <value>Горизонтальний розділювач панелей</value>
+  </data>
+      <data name="SettingsScanInterval.AutomationProperties.Name" xml:space="preserve">
+      <value>Інтервал сканування у хвилинах</value>
+  </data>
+      <data name="SettingsSpaceThreshold.AutomationProperties.Name" xml:space="preserve">
+      <value>Поріг вільного місця у відсотках</value>
+  </data>
+    <data name="SettingsHardLinksToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Враховувати hard link'и</value>
   </data>
 </root>

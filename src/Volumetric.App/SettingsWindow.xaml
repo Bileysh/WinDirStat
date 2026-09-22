@@ -6,13 +6,13 @@
     <Grid Background="Transparent">
         <ScrollViewer Padding="32">
             <StackPanel Spacing="24" MaxWidth="800" HorizontalAlignment="Stretch">
-                
+
                 <TextBlock x:Uid="SettingsHeader" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,0,0,8" />
 
                 <StackPanel Spacing="12">
                     <TextBlock x:Uid="BgScanSettingsTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                    
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1" CornerRadius="8">
                         <StackPanel>
@@ -21,17 +21,17 @@
                                     <TextBlock x:Uid="ScanIntervalInputHeader" Style="{ThemeResource BodyTextBlockStyle}" />
                                     <TextBlock x:Uid="ScanIntervalInputDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <NumberBox Grid.Column="1" Value="{x:Bind ViewModel.ScanIntervalMinutes, Mode=TwoWay}" Minimum="15" Maximum="1440" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
+                                <NumberBox x:Uid="SettingsScanInterval" Grid.Column="1" Value="{x:Bind ViewModel.ScanIntervalMinutes, Mode=TwoWay}" Minimum="15" Maximum="1440" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
                             </Grid>
-                            
+
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                            
+
                             <Grid Padding="16" ColumnDefinitions="*, Auto">
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
                                     <TextBlock x:Uid="SpaceThresholdInputHeader" Style="{ThemeResource BodyTextBlockStyle}" />
                                     <TextBlock x:Uid="SpaceThresholdInputDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <NumberBox Grid.Column="1" Value="{x:Bind ViewModel.LowFreeSpaceThresholdPercent, Mode=TwoWay}" Minimum="1" Maximum="50" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
+                                <NumberBox x:Uid="SettingsSpaceThreshold" Grid.Column="1" Value="{x:Bind ViewModel.LowFreeSpaceThresholdPercent, Mode=TwoWay}" Minimum="1" Maximum="50" SpinButtonPlacementMode="Compact" Width="140" VerticalAlignment="Center" />
                             </Grid>
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
@@ -40,7 +40,7 @@
                                     <TextBlock x:Uid="AccountForHardLinksHeader" Style="{ThemeResource BodyTextBlockStyle}" />
                                     <TextBlock x:Uid="AccountForHardLinksDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
-                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.AccountForHardLinks, Mode=TwoWay}"
+                                <ToggleSwitch x:Uid="SettingsHardLinksToggle" Grid.Column="1" IsOn="{x:Bind ViewModel.AccountForHardLinks, Mode=TwoWay}"
                                               OnContent="" OffContent="" VerticalAlignment="Center" />
                             </Grid>
                         </StackPanel>
@@ -49,8 +49,8 @@
 
                 <StackPanel Spacing="12">
                     <TextBlock x:Uid="DataSettingsTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                    
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1" CornerRadius="8">
                         <StackPanel>
@@ -67,7 +67,7 @@
                             </Grid>
 
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                            
+
                             <Grid Padding="16" ColumnDefinitions="*, Auto">
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
                                     <TextBlock x:Uid="TestNotificationHeader" Style="{ThemeResource BodyTextBlockStyle}" />

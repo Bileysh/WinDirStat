@@ -245,7 +245,7 @@
     <value>{0}: only {1} left ({2}% free)</value>
   </data>
     <data name="WindowTitle_New" xml:space="preserve">
-    <value>Volumetric - New window</value>
+    <value>Volumetric - New screen</value>
   </data>
     <data name="WindowTitle_Statistics" xml:space="preserve">
     <value>Statistics (Detached)</value>
@@ -378,5 +378,20 @@
   </data>
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Path not found</value>
+  </data>
+    <data name="MainVerticalSplitter.AutomationProperties.Name" xml:space="preserve">
+    <value>Vertical panels splitter</value>
+  </data>
+     <data name="MainHorizontalSplitter.AutomationProperties.Name" xml:space="preserve">
+     <value>Horizontal panels splitter</value>
+  </data>
+      <data name="SettingsScanInterval.AutomationProperties.Name" xml:space="preserve">
+      <value>Background scan interval in minutes</value>
+  </data>
+      <data name="SettingsSpaceThreshold.AutomationProperties.Name" xml:space="preserve">
+      <value>Low free space threshold in percent</value>
+  </data>
+      <data name="SettingsHardLinksToggle.AutomationProperties.Name" xml:space="preserve">
+      <value>Account for hard links</value>
   </data>
 </root>
