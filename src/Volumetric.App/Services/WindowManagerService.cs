@@ -210,6 +210,16 @@ public class WindowManagerService : IWindowManagerService
             .Activate();
     }
 
+    public void OpenScanReportWindow(string reportHtml)
+    {
+        var webView = new WebView2();
+        webView.Loaded += (_, _) => webView.NavigateToString(reportHtml);
+
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), webView,
+                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight)
+            .Activate();
+    }
+
     public void OpenSettingsWindow()
     {
         var scope = _scopeFactory.CreateScope();

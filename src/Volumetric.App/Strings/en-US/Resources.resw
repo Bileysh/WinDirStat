@@ -370,11 +370,47 @@
     <data name="MenuFileImportScan.Text" xml:space="preserve">
     <value>Import scan…</value>
   </data>
+    <data name="MenuFileOpenReport.Text" xml:space="preserve">
+    <value>Open scan report…</value>
+  </data>
     <data name="ExportCompleteTitle" xml:space="preserve">
     <value>Scan exported</value>
   </data>
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Export failed</value>
+  </data>
+    <data name="WindowTitle_ScanReport" xml:space="preserve">
+    <value>Scan report</value>
+  </data>
+    <data name="ReportTitle" xml:space="preserve">
+    <value>Scan size report</value>
+  </data>
+    <data name="ReportRootPath" xml:space="preserve">
+    <value>Root path</value>
+  </data>
+    <data name="ReportScannedAt" xml:space="preserve">
+    <value>Scanned at (UTC)</value>
+  </data>
+    <data name="ReportTotalSize" xml:space="preserve">
+    <value>Total size</value>
+  </data>
+    <data name="ReportSizeBreakdownByCategory" xml:space="preserve">
+    <value>Size breakdown by category</value>
+  </data>
+    <data name="ReportSizeBreakdownByExtension" xml:space="preserve">
+    <value>Size breakdown by extension</value>
+  </data>
+    <data name="ReportColumnType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+    <data name="ReportColumnSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+    <data name="ReportColumnFiles" xml:space="preserve">
+    <value>Files</value>
+  </data>
+    <data name="ReportColumnPercent" xml:space="preserve">
+    <value>Percent</value>
   </data>
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Path not found</value>

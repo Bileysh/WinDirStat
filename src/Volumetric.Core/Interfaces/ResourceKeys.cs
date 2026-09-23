@@ -50,4 +50,16 @@ public static class ResourceKeys
     public const string WindowTitle_Statistics = "WindowTitle_Statistics";
     public const string WindowTitle_TreeMap = "WindowTitle_TreeMap";
     public const string WindowTitle_TreeView = "WindowTitle_TreeView";
+    public const string WindowTitle_ScanReport = "WindowTitle_ScanReport";
+
+    public const string ReportTitle = "ReportTitle";
+    public const string ReportRootPath = "ReportRootPath";
+    public const string ReportScannedAt = "ReportScannedAt";
+    public const string ReportTotalSize = "ReportTotalSize";
+    public const string ReportSizeBreakdownByCategory = "ReportSizeBreakdownByCategory";
+    public const string ReportSizeBreakdownByExtension = "ReportSizeBreakdownByExtension";
+    public const string ReportColumnType = "ReportColumnType";
+    public const string ReportColumnSize = "ReportColumnSize";
+    public const string ReportColumnFiles = "ReportColumnFiles";
+    public const string ReportColumnPercent = "ReportColumnPercent";
 }
