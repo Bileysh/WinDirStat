@@ -26,7 +26,8 @@ public class MainPageViewModelTests
             new FakeBackgroundScanSettingsService(),
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
-            new FakeAppLogger());
+            new FakeAppLogger(),
+            new FakeRecentScansService());
 
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
@@ -54,7 +55,8 @@ public class MainPageViewModelTests
             new FakeBackgroundScanSettingsService(),
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
-            new FakeAppLogger());
+            new FakeAppLogger(),
+            new FakeRecentScansService());
 
         var vmB = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -71,7 +73,8 @@ public class MainPageViewModelTests
             new FakeBackgroundScanSettingsService(),
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
-            new FakeAppLogger());
+            new FakeAppLogger(),
+            new FakeRecentScansService());
 
         await vmA.OpenFolderCommand.ExecuteAsync(null);
 

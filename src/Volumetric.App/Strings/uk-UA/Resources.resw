@@ -308,6 +308,9 @@
     <data name="SelectDriveHeader.Text" xml:space="preserve">
     <value>Оберіть диск для сканування</value>
   </data>
+    <data name="RecentScansHeader.Text" xml:space="preserve">
+    <value>Останні сканування</value>
+  </data>
     <data name="SelectCustomFolderButton.Content" xml:space="preserve">
     <value>Обрати іншу папку…</value>
   </data>

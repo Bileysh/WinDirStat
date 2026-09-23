@@ -271,6 +271,9 @@
     <data name="SelectDriveHeader.Text" xml:space="preserve">
     <value>Select a drive to scan</value>
   </data>
+    <data name="RecentScansHeader.Text" xml:space="preserve">
+    <value>Recent scans</value>
+  </data>
     <data name="SelectCustomFolderButton.Content" xml:space="preserve">
     <value>Select custom folder…</value>
   </data>

@@ -91,6 +91,7 @@ public partial class App
         services.AddScoped<IWindowHandleProvider, WindowHandleProvider>();
         services.AddScoped<IScanStateService, ScanStateService>();
         services.AddScoped<JumpListService>();
+        services.AddScoped<IRecentScansService>(sp => sp.GetRequiredService<JumpListService>());
         services.AddSingleton<WindowManagerService>();
         services.AddSingleton<IWindowManagerService>(sp => sp.GetRequiredService<WindowManagerService>());
         services.AddScoped<IDialogService, WinUiDialogService>();
