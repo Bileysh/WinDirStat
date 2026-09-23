@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string" />
+                            <xsd:attribute name="type" type="xsd:string" />
+                            <xsd:attribute name="mimetype" type="xsd:string" />
+                            <xsd:attribute ref="xml:space" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string" />
+                            <xsd:attribute name="name" type="xsd:string" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+                            <xsd:attribute ref="xml:space" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" />
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+
+    <data name="ToggleGroupBy.OnContent" xml:space="preserve">
+    <value>За типом</value>
+  </data>
+    <data name="ToggleGroupBy.OffContent" xml:space="preserve">
+    <value>За розширенням</value>
+  </data>
+    <data name="NoDataText.Text" xml:space="preserve">
+    <value>НЕМАЄ ДАНИХ</value>
+  </data>
+    <data name="Category_Development" xml:space="preserve">
+    <value>Розробка</value>
+  </data>
+    <data name="Category_VirtualDisks" xml:space="preserve">
+    <value>Віртуальні диски</value>
+  </data>
+    <data name="Category_System" xml:space="preserve">
+    <value>Системні файли</value>
+  </data>
+    <data name="Category_Documents" xml:space="preserve">
+    <value>Документи</value>
+  </data>
+    <data name="Category_Videos" xml:space="preserve">
+    <value>Відео</value>
+  </data>
+    <data name="Category_Audio" xml:space="preserve">
+    <value>Аудіо</value>
+  </data>
+    <data name="Category_Images" xml:space="preserve">
+    <value>Зображення</value>
+  </data>
+    <data name="Category_Archives" xml:space="preserve">
+    <value>Архіви</value>
+  </data>
+    <data name="Category_Executables" xml:space="preserve">
+    <value>Програми</value>
+  </data>
+    <data name="Category_Folder" xml:space="preserve">
+    <value>Папки</value>
+  </data>
+    <data name="Category_Other" xml:space="preserve">
+    <value>Інше</value>
+  </data>
+    <data name="MenuFile.Title" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+    <data name="MenuFileOpenFolder.Text" xml:space="preserve">
+    <value>Відкрити папку...</value>
+  </data>
+  <data name="MenuFileRescanElevated.Text" xml:space="preserve">
+    <value>Пересканувати з правами адміністратора</value>
+  </data>
+    <data name="MenuFileExit.Text" xml:space="preserve">
+    <value>Вихід</value>
+  </data>
+    <data name="MenuWindow.Title" xml:space="preserve">
+    <value>Вікно</value>
+  </data>
+    <data name="MenuWindowOpenNew.Text" xml:space="preserve">
+    <value>Відкрити в новому вікні</value>
+  </data>
+    <data name="MenuOptions.Title" xml:space="preserve">
+    <value>Параметри</value>
+  </data>
+    <data name="MenuOptionsLanguage.Text" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+    <data name="MenuOptionsAccountForHardLinks.Text" xml:space="preserve">
+    <value>Враховувати hard link'и</value>
+  </data>
+     <data name="MenuOptionsTheme.Text" xml:space="preserve">
+     <value>Перемкнути тему</value>
+  </data>
+    <data name="MenuHelp.Title" xml:space="preserve">
+    <value>Довідка</value>
+  </data>
+    <data name="MenuHelpAbout.Text" xml:space="preserve">
+    <value>Про Volumetric</value>
+  </data>
+    <data name="TreeViewHeader.Text" xml:space="preserve">
+    <value>Дерево файлів</value>
+  </data>
+    <data name="TreeColumnName.Text" xml:space="preserve">
+    <value>Ім'я</value>
+  </data>
+    <data name="TreeColumnSizeLogical.Text" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
+    <data name="TreeColumnSizeLogical.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Сума розмірів файлів за даними файлової системи (Logical)</value>
+  </data>
+    <data name="TreeColumnSizePhysical.Text" xml:space="preserve">
+    <value>На диску</value>
+  </data>
+    <data name="TreeColumnSizePhysical.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Реально зайняте місце на диску з урахуванням округлення по кластерах і hard link'ів (Physical)</value>
+  </data>
+    <data name="TreeColumnLastModified.Text" xml:space="preserve">
+    <value>Змінено</value>
+  </data>
+    <data name="TreeColumnPercent.Text" xml:space="preserve">
+    <value>%</value>
+  </data>
+    <data name="StatisticsHeader.Text" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+    <data name="TreeMapHeader.Text" xml:space="preserve">
+    <value>Мапа файлів</value>
+  </data>
+    <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити в окремому вікні</value>
+  </data>
+  <data name="OpenTreeViewWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Відкрити дерево файлів в окремому вікні</value>
+  </data>
+    <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити в окремому вікні</value>
+  </data>
+  <data name="OpenStatisticsWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Відкрити статистику в окремому вікні</value>
+  </data>
+    <data name="OpenTreeMapWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити в окремому вікні</value>
+  </data>
+  <data name="OpenTreeMapWindowButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Відкрити карту дерева в окремому вікні</value>
+  </data>
+    <data name="CancelScanButton.Content" xml:space="preserve">
+    <value>Скасувати сканування</value>
+  </data>
+    <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Повернутися на рівень вище</value>
+  </data>
+  <data name="NavigateUpButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Повернутися на рівень вище</value>
+  </data>
+    <data name="ScanCompleteTitle" xml:space="preserve">
+    <value>Сканування завершено</value>
+  </data>
+    <data name="ScanCompleteMessageFormat" xml:space="preserve">
+    <value>Час: {0:F1} сек. Файлів: {1} Папок: {2}</value>
+  </data>
+    <data name="ScanProgressFormat" xml:space="preserve">
+    <value>Файлів: {0:N0}  Папок: {1:N0}</value>
+  </data>
+    <data name="AboutTitle" xml:space="preserve">
+    <value>Про програму</value>
+  </data>
+    <data name="AboutMessage" xml:space="preserve">
+    <value>Volumetric - це безкоштовна програма для аналізу використання дискового простору на вашому комп'ютері. Вона дозволяє візуалізувати структуру файлів та папок, визначати, які файли займають найбільше місця, та ефективно керувати вашим дисковим простором.</value>
+  </data>
+    <data name="FilesText" xml:space="preserve">
+    <value>файлів</value>
+  </data>
+    <data name="FoldersText" xml:space="preserve">
+    <value>папок</value>
+  </data>
+  <data name="AccessibleName_Folder" xml:space="preserve">
+    <value>{0}, папка, {1}, {2}</value>
+  </data>
+  <data name="AccessibleName_File" xml:space="preserve">
+    <value>{0}, файл, {1}, змінено {2}</value>
+  </data>
+    <data name="AccessDeniedText" xml:space="preserve">
+    <value>Доступ заборонено</value>
+  </data>
+    <data name="ScanErrorText" xml:space="preserve">
+    <value>Помилка сканування</value>
+  </data>
+    <data name="ReparsePointText" xml:space="preserve">
+    <value>Точка з'єднання (Junction) — не сканується для уникнення зациклень</value>
+  </data>
+    <data name="HardLinkTooltipText" xml:space="preserve">
+    <value>Hard link — фізичне місце на диску вже враховано для іншого файлу в цьому дереві, SizePhysical тут навмисно 0</value>
+  </data>
+    <data name="ScanIntervalStatus" xml:space="preserve">
+    <value>Інтервал сканування: {0} хв.</value>
+  </data>
+    <data name="LowSpaceThresholdStatus" xml:space="preserve">
+    <value>Поріг попередження: {0}%.</value>
+  </data>
+    <data name="AccountForHardLinksEnabledStatus" xml:space="preserve">
+    <value>Врахування hard link'ів увімкнено — сканування точніше, але повільніше.</value>
+  </data>
+    <data name="AccountForHardLinksDisabledStatus" xml:space="preserve">
+    <value>Врахування hard link'ів вимкнено — сканування швидше.</value>
+  </data>
+    <data name="SettingsExportedStatus" xml:space="preserve">
+    <value>Налаштування збережено у {0}.</value>
+  </data>
+    <data name="SettingsImportedStatus" xml:space="preserve">
+    <value>Налаштування імпортовано з {0}.</value>
+  </data>
+    <data name="SettingsImportFailedStatus" xml:space="preserve">
+    <value>Не вдалось імпортувати: {0}</value>
+  </data>
+  <data name="SettingsError_IntervalTooSmall" xml:space="preserve">
+    <value>Інтервал сканування закороткий (мінімум 15 хвилин).</value>
+  </data>
+  <data name="SettingsError_ThresholdOutOfRange" xml:space="preserve">
+    <value>Поріг вільного місця має бути в межах 1%–50%.</value>
+  </data>
+  <data name="SettingsError_InvalidFormat" xml:space="preserve">
+    <value>Файл налаштувань містить невалідний JSON.</value>
+  </data>
+    <data name="TestScanCompletedStatus" xml:space="preserve">
+    <value>Тестовий скан виконано — перевір тост.</value>
+  </data>
+    <data name="NoExtensionLabel" xml:space="preserve">
+    <value>(без розширення)</value>
+  </data>
+    <data name="DriveStatusNotificationTitle" xml:space="preserve">
+    <value>Стан дисків</value>
+  </data>
+    <data name="DriveStatusSummaryLine" xml:space="preserve">
+    <value>{0} — вільно {1} з {2}</value>
+  </data>
+    <data name="LowSpaceNotificationTitle" xml:space="preserve">
+    <value>Мало вільного місця</value>
+  </data>
+    <data name="LowSpaceNotificationBody" xml:space="preserve">
+    <value>{0}: залишилось лише {1} ({2}% вільно)</value>
+  </data>
+    <data name="WindowTitle_New" xml:space="preserve">
+    <value>Volumetric - Нове вікно</value>
+  </data>
+    <data name="WindowTitle_Statistics" xml:space="preserve">
+    <value>Статистика (окреме вікно)</value>
+  </data>
+    <data name="WindowTitle_TreeView" xml:space="preserve">
+    <value>Дерево каталогів (окреме вікно)</value>
+  </data>
+    <data name="WindowTitle_TreeMap" xml:space="preserve">
+    <value>Карта файлів (окреме вікно)</value>
+  </data>
+    <data name="FolderPickerTitle" xml:space="preserve">
+    <value>Виберіть папку для сканування</value>
+  </data>
+    <data name="MenuShowInExplorer.Text" xml:space="preserve">
+    <value>Показати в Провіднику</value>
+  </data>
+    <data name="OpenInExplorerFailedTitle" xml:space="preserve">
+    <value>Не вдалося відкрити провідник</value>
+  </data>
+    <data name="ShowPropertiesFailedTitle" xml:space="preserve">
+    <value>Не вдалося відкрити властивості</value>
+  </data>
+    <data name="SelectDriveHeader.Text" xml:space="preserve">
+    <value>Оберіть диск для сканування</value>
+  </data>
+    <data name="SelectCustomFolderButton.Content" xml:space="preserve">
+    <value>Обрати іншу папку…</value>
+  </data>
+    <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Оновити список дисків</value>
+  </data>
+  <data name="RefreshDrivesButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Оновити список дисків</value>
+  </data>
+    <data name="MenuShowProperties.Text" xml:space="preserve">
+    <value>Властивості</value>
+  </data>
+    <data name="MenuCopyName.Text" xml:space="preserve">
+    <value>Копіювати назву</value>
+  </data>
+    <data name="MenuCopyPath.Text" xml:space="preserve">
+    <value>Копіювати шлях</value>
+  </data>
+    <data name="MenuOptionsSettings.Text" xml:space="preserve">
+    <value>Налаштування...</value>
+  </data>
+    <data name="WindowTitle_Settings" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+    <data name="SettingsHeader.Text" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+    <data name="BgScanSettingsTitle.Text" xml:space="preserve">
+    <value>Фонове сканування</value>
+  </data>
+    <data name="ScanIntervalInputHeader.Text" xml:space="preserve">
+    <value>Інтервал сканування (хвилини)</value>
+  </data>
+    <data name="ScanIntervalInputDesc.Text" xml:space="preserve">
+    <value>Як часто запускатиметься перевірка (мінімум 15).</value>
+  </data>
+    <data name="SpaceThresholdInputHeader.Text" xml:space="preserve">
+    <value>Поріг вільного місця (%)</value>
+  </data>
+    <data name="SpaceThresholdInputDesc.Text" xml:space="preserve">
+    <value>Сповіщати, якщо вільного місця менше цього відсотка.</value>
+  </data>
+    <data name="AccountForHardLinksHeader.Text" xml:space="preserve">
+    <value>Враховувати hard link'и</value>
+  </data>
+    <data name="AccountForHardLinksDesc.Text" xml:space="preserve">
+    <value>Точніший підрахунок зайнятого місця на томах із багатьма hard link'ами (напр. C:\Windows\WinSxS), ціною повільнішого сканування.</value>
+  </data>
+    <data name="DataSettingsTitle.Text" xml:space="preserve">
+    <value>Дані та конфігурація</value>
+  </data>
+    <data name="ExportImportHeader.Text" xml:space="preserve">
+    <value>Експорт та імпорт</value>
+  </data>
+    <data name="ExportImportDesc.Text" xml:space="preserve">
+    <value>Збереження налаштувань у файл JSON.</value>
+  </data>
+    <data name="ExportSettingsBtn.Content" xml:space="preserve">
+    <value>Експорт</value>
+  </data>
+    <data name="ImportSettingsBtn.Content" xml:space="preserve">
+    <value>Імпорт</value>
+  </data>
+    <data name="TestNotificationHeader.Text" xml:space="preserve">
+    <value>Тестування</value>
+  </data>
+    <data name="TestNotificationDesc.Text" xml:space="preserve">
+    <value>Примусовий запуск фонової перевірки дисків.</value>
+  </data>
+    <data name="TestNotificationBtn.Content" xml:space="preserve">
+    <value>Запустити тест</value>
+  </data>
+    <data name="SettingsScanIntervalNumberBox.Header" xml:space="preserve">
+    <value>Інтервал фонового сканування (хв)</value>
+  </data>
+    <data name="SettingsThresholdSliderLabel.Text" xml:space="preserve">
+    <value>Поріг попередження про вільне місце (%)</value>
+  </data>
+    <data name="SettingsExportButton.Content" xml:space="preserve">
+    <value>Експорт...</value>
+  </data>
+    <data name="SettingsImportButton.Content" xml:space="preserve">
+    <value>Імпорт...</value>
+  </data>
+    <data name="SettingsTestScanButton.Content" xml:space="preserve">
+    <value>Тестовий скан зараз</value>
+  </data>
+    <data name="TrayMenuOpen.Text" xml:space="preserve">
+    <value>Відкрити</value>
+  </data>
+    <data name="TrayMenuExit.Text" xml:space="preserve">
+    <value>Вихід</value>
+  </data>
+    <data name="MenuFileExportScan.Text" xml:space="preserve">
+    <value>Експортувати скан…</value>
+  </data>
+    <data name="MenuFileImportScan.Text" xml:space="preserve">
+    <value>Імпортувати скан…</value>
+  </data>
+    <data name="ExportCompleteTitle" xml:space="preserve">
+    <value>Скан експортовано</value>
+  </data>
+    <data name="ExportErrorTitle" xml:space="preserve">
+    <value>Не вдалося експортувати</value>
+  </data>
+    <data name="InvalidPathTitle" xml:space="preserve">
+    <value>Шлях не знайдено</value>
+  </data>
+</root>

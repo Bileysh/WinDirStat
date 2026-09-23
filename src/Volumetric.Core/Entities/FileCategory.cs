@@ -1,0 +1,16 @@
+﻿namespace Volumetric.Core.Entities;
+
+public enum FileCategory
+{
+    Documents,
+    Videos,
+    Audio,
+    Images,
+    Archives,
+    Executables,
+    Development,
+    VirtualDisks,
+    System,
+    Folder,
+    Other = 999
+}

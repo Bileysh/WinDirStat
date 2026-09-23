@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+        xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+        xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+        xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+        xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+        xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+        xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+        xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+        xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+        xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+        IgnorableNamespaces="uap rescap com desktop uap5 desktop4 desktop5">
+
+    <Identity
+            Name="4B18DC31-5920-4065-AAE7-05908E7C027E"
+            Publisher="CN=AppPublisher"
+            Version="1.0.1.0"/>
+
+    <mp:PhoneIdentity PhoneProductId="4B18DC31-5920-4065-AAE7-05908E7C027E"
+                      PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+    <Properties>
+        <DisplayName>Volumetric</DisplayName>
+        <PublisherDisplayName>AppPublisher</PublisherDisplayName>
+        <Logo>Assets\StoreLogo.png</Logo>
+    </Properties>
+
+    <Dependencies>
+        <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0"/>
+        <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0"/>
+    </Dependencies>
+
+    <Resources>
+        <Resource Language="x-generate"/>
+    </Resources>
+
+    <Applications>
+        <Application Id="App"
+                     Executable="$targetnametoken$.exe"
+                     EntryPoint="$targetentrypoint$">
+            <uap:VisualElements
+                    DisplayName="Volumetric"
+                    Description="Volumetric"
+                    BackgroundColor="transparent"
+                    Square150x150Logo="Assets\Square150x150Logo.png"
+                    Square44x44Logo="Assets\Square44x44Logo.png">
+                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+                <uap:SplashScreen Image="Assets\SplashScreen.png"/>
+            </uap:VisualElements>
+            <Extensions>
+                <Extension Category="windows.backgroundTasks"
+                           EntryPoint="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.Task">
+                    <BackgroundTasks>
+                        <Task Type="timer"/>
+                    </BackgroundTasks>
+                </Extension>
+
+                <uap:Extension Category="windows.fileTypeAssociation">
+                    <uap:FileTypeAssociation Name="volumetric-scan">
+                        <uap:SupportedFileTypes>
+                            <uap:FileType>.volscan</uap:FileType>
+                            <uap:FileType>.wdsscan</uap:FileType>
+                        </uap:SupportedFileTypes>
+                    </uap:FileTypeAssociation>
+                </uap:Extension>
+
+                <uap:Extension Category="windows.protocol">
+                    <uap:Protocol Name="volumetric">
+                        <uap:DisplayName>Volumetric</uap:DisplayName>
+                    </uap:Protocol>
+                </uap:Extension>
+
+                <uap5:Extension Category="windows.startupTask">
+                    <uap5:StartupTask
+                            TaskId="Volumetric.StartupTask"
+                            Enabled="false"
+                            DisplayName="Volumetric background scanning"/>
+                </uap5:Extension>
+
+                <uap5:Extension Category="windows.appExecutionAlias">
+                    <uap5:AppExecutionAlias>
+                        <uap5:ExecutionAlias Alias="volumetric.exe" />
+                    </uap5:AppExecutionAlias>
+                </uap5:Extension>
+
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="Volumetric.App.exe" DisplayName="Volumetric Background Scan"
+                                       LaunchAndActivationPermission="O:PSG:BUD:(A;;11;;;IU)(A;;11;;;S-1-15-2-1)S:(ML;;NX;;;LW)">
+                            <com:Class Id="F14A5D3E-9B71-4C82-8E2A-6D9F3C1B7A44"
+                                       DisplayName="Volumetric Background Scan Task"/>
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+
+                <desktop:Extension Category="windows.toastNotificationActivation">
+                    <desktop:ToastNotificationActivation ToastActivatorCLSID="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03"/>
+                </desktop:Extension>
+
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="Volumetric.App.exe" DisplayName="Volumetric"
+                                       Arguments="----AppNotificationActivated:">
+                            <com:Class Id="9B6C1E7A-3D4F-4E2B-8A6D-2C7F5E1B9A03"
+                                       DisplayName="Volumetric Toast Activator"/>
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="Volumetric.App.exe" DisplayName="Volumetric Explorer Command"
+                                       Arguments="--explorer-command-server">
+                            <com:Class Id="6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21"
+                                       DisplayName="Scan with Volumetric"/>
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+
+                <desktop4:Extension Category="windows.fileExplorerContextMenus">
+                    <desktop4:FileExplorerContextMenus>
+                        <desktop5:ItemType Type="Directory">
+                            <desktop5:Verb Id="ScanWithVolumetricFolder" Clsid="6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21" />
+                        </desktop5:ItemType>
+                        <desktop5:ItemType Type="Directory\Background">
+                            <desktop5:Verb Id="ScanWithVolumetricBackground" Clsid="6C3F1A9D-2E48-4B7A-9F0C-1D8E5A3B7C21" />
+                        </desktop5:ItemType>
+                    </desktop4:FileExplorerContextMenus>
+                </desktop4:Extension>
+
+            </Extensions>
+        </Application>
+    </Applications>
+
+    <Extensions>
+        <Extension Category="windows.activatableClass.inProcessServer">
+            <InProcessServer>
+                <Path>Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.dll</Path>
+                <ActivatableClass
+                        ActivatableClassId="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.Task"
+                        ThreadingModel="both"/>
+            </InProcessServer>
+        </Extension>
+    </Extensions>
+
+    <Capabilities>
+        <rescap:Capability Name="runFullTrust"/>
+    </Capabilities>
+</Package>

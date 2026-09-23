@@ -1,0 +1,82 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+        <RootNamespace>Volumetric_App</RootNamespace>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <Platforms>x86;x64;ARM64</Platforms>
+        <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and '$(Platform)' == 'x86'">win-x86</RuntimeIdentifier>
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and '$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and '$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+        <PublishProfile Condition="Exists('Properties\PublishProfiles\win-$(Platform).pubxml')">win-$(Platform).pubxml</PublishProfile>
+        <UseWinUI>true</UseWinUI>
+        <WinUISDKReferences>false</WinUISDKReferences>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefaultLanguage>uk-UA</DefaultLanguage>
+        <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+        <StartupObject>Volumetric_App.Program</StartupObject>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Platform)' == 'x86'">
+        <LargeAddressAware>true</LargeAddressAware>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(Platform)' == 'x86'">
+        <PackageReference Include="LargeAddressAware" Version="1.0.6"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Assets\AppIcon.ico"/>
+        <Content Include="Assets\*.png"/>
+        <Content Include="Properties\launchSettings.json"/>
+        <Content Include="Strings\en-US\Resources.resw"/>
+        <Content Include="Strings\uk-UA\Resources.resw"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Manifest Include="$(ApplicationManifest)"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <ProjectCapability Include="Msix"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Serilog" Version="4.2.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219"/>
+        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.1.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10"/>
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526"/>
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools.WinApp" Version="0.5.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Volumetric.Core\Volumetric.Core.csproj"/>
+        <ProjectReference Include="..\Volumetric.Services\Volumetric.Services.csproj"/>
+        <ProjectReference Include="..\Volumetric.ViewModels\Volumetric.ViewModels.csproj"/>
+        <ProjectReference Include="..\Volumetric.WinRT\Volumetric.WinRT.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Remove="UserControls\App.xaml"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Properties\launchSettings.json"/>
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+        <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+        <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+        <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+    </PropertyGroup>
+</Project>
