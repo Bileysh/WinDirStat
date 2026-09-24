@@ -177,10 +177,16 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     {
         var existing = RecentScans.FirstOrDefault(r =>
             string.Equals(r.FullPath, path, StringComparison.OrdinalIgnoreCase));
-        if (existing is not null) RecentScans.Remove(existing);
+        if (existing is not null)
+        {
+            RecentScans.Remove(existing);
+        }
 
         RecentScans.Insert(0, new RecentScanItemViewModel(path));
-        while (RecentScans.Count > MaxRecentScans) RecentScans.RemoveAt(RecentScans.Count - 1);
+        while (RecentScans.Count > MaxRecentScans)
+        {
+            RecentScans.RemoveAt(RecentScans.Count - 1);
+        }
     }
 
     private void LoadAvailableDrives()
