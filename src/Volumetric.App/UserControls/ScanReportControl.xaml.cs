@@ -1,13 +1,12 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System.Text;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Serilog;
 
 namespace Volumetric_App.UserControls;
 
 public sealed partial class ScanReportControl : UserControl
 {
-    private readonly WebView2 _webView = new();
     private readonly string _html;
     private Task? _initializationTask;
     private bool _failureDisplayed;
@@ -16,20 +15,21 @@ public sealed partial class ScanReportControl : UserControl
     public ScanReportControl(string html)
     {
         _html = html;
-        Content = _webView;
-        Loaded += OnLoaded;
-        Unloaded += OnUnloaded;
+        InitializeComponent();
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        _webView.Close();
+        ReportWebView.Close();
         DeleteReportFile();
     }
 
     private void DeleteReportFile()
     {
-        if (_reportPath is null) return;
+        if (_reportPath is null)
+        {
+            return;
+        }
 
         try
         {
@@ -55,36 +55,28 @@ public sealed partial class ScanReportControl : UserControl
     {
         try
         {
-            await _webView.EnsureCoreWebView2Async();
+            await ReportWebView.EnsureCoreWebView2Async();
 
             _reportPath = Path.Combine(Path.GetTempPath(), $"volumetric-report-{Guid.NewGuid():N}.html");
             await File.WriteAllTextAsync(_reportPath, _html, new UTF8Encoding(true));
-            _webView.Source = new Uri(_reportPath);
+            ReportWebView.Source = new Uri(_reportPath);
         }
         catch (Exception ex)
         {
             _failureDisplayed = true;
             Log.Error(ex, "Failed to initialize WebView2 scan report.");
-            Content = CreateFailureView(ex);
+            ShowFailure(ex);
         }
     }
 
-    private static TextBlock CreateFailureView(Exception exception)
+    private void ShowFailure(Exception exception)
     {
         var innerInfo = exception.InnerException is { } inner
-            ? $"\nInner: {inner.GetType().Name}: {inner.Message}"
-            : "";
+            ? $"{Environment.NewLine}{inner.GetType().Name}: {inner.Message}"
+            : string.Empty;
 
-        return new TextBlock
-        {
-            Text = "Unable to load the scan report because WebView2 could not be initialized.\n\n" +
-                   "Verify that the Microsoft Edge WebView2 Runtime is installed, then restart Volumetric.\n" +
-                   "Download: https://developer.microsoft.com/microsoft-edge/webview2/\n\n" +
-                   $"Technical details: {exception.GetType().Name} (0x{exception.HResult:X8}): {exception.Message}" +
-                   innerInfo,
-            Margin = new Thickness(16),
-            TextWrapping = TextWrapping.Wrap,
-            IsTextSelectionEnabled = true
-        };
+        FailureDetailsText.Text = $"{exception.GetType().Name} (0x{exception.HResult:X8}): {exception.Message}{innerInfo}";
+        ReportWebView.Visibility = Visibility.Collapsed;
+        FailurePanel.Visibility = Visibility.Visible;
     }
 }

@@ -17,14 +17,17 @@ public class WindowManagerService : IWindowManagerService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
+    private readonly ScanReportHtmlBuilder _scanReportHtmlBuilder;
     private readonly List<Window> _openWindows = new();
 
     public WindowManagerService(IServiceScopeFactory scopeFactory,
-        IThemeService themeService, ILocalizationService localizationService)
+        IThemeService themeService, ILocalizationService localizationService,
+        ScanReportHtmlBuilder scanReportHtmlBuilder)
     {
         _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
+        _scanReportHtmlBuilder = scanReportHtmlBuilder;
 
         _themeService.ThemeChanged += OnThemeChanged;
     }
@@ -211,7 +214,7 @@ public class WindowManagerService : IWindowManagerService
     }
     public void OpenScanReportWindow(FileSystemNode rootNode)
     {
-        var report = new ScanReportControl(ScanReportHtmlBuilder.Build(rootNode));
+        var report = new ScanReportControl(_scanReportHtmlBuilder.Build(rootNode));
         CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), report, 900, 650)
             .Activate();
     }
