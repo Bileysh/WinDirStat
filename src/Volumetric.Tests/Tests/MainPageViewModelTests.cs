@@ -28,8 +28,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            new FakeScanReportService());
+            new FakeRecentScansService());
 
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
@@ -58,8 +57,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            new FakeScanReportService());
+            new FakeRecentScansService());
 
         var vmB = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -77,8 +75,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            new FakeScanReportService());
+            new FakeRecentScansService());
 
         await vmA.OpenFolderCommand.ExecuteAsync(null);
 
@@ -88,10 +85,9 @@ public class MainPageViewModelTests
     }
 
     [Fact]
-    public async Task OpenScanReportAsync_WithScanResult_OpensWindowWithGeneratedHtml()
+    public Task OpenScanReportAsync_WithScanResult_OpensWindowWithRootNode()
     {
         var fakeWindowManager = new FakeWindowManagerService();
-        var fakeReportService = new FakeScanReportService { ReportHtmlToReturn = "<html><body>report</body></html>" };
         var vm = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
             new FakeFolderPickerService(),
@@ -108,8 +104,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            fakeReportService);
+            new FakeRecentScansService());
 
         var root = new FileSystemNode
         {
@@ -127,9 +122,8 @@ public class MainPageViewModelTests
         root.AddChild(child);
         vm.LoadImportedResult(root);
 
-        await vm.OpenScanReportCommand.ExecuteAsync(null);
-
-        Assert.NotNull(fakeReportService.LastResult);
-        Assert.Equal(fakeReportService.ReportHtmlToReturn, fakeWindowManager.LastReportHtml);
+        vm.OpenScanReportCommand.Execute(null);
+        Assert.Same(root, fakeWindowManager.LastReportedRootNode);
+        return Task.CompletedTask;
     }
 }

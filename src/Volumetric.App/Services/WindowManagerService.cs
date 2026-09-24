@@ -209,14 +209,10 @@ public class WindowManagerService : IWindowManagerService
                 WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight)
             .Activate();
     }
-
-    public void OpenScanReportWindow(string reportHtml)
+    public void OpenScanReportWindow(FileSystemNode rootNode)
     {
-        var webView = new WebView2();
-        webView.Loaded += (_, _) => webView.NavigateToString(reportHtml);
-
-        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), webView,
-                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight)
+        var report = new ScanReportControl(ScanReportHtmlBuilder.Build(rootNode));
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), report, 900, 650)
             .Activate();
     }
 

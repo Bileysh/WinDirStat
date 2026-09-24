@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Volumetric.ViewModels;
 
 namespace Volumetric_App.UserControls;
@@ -19,12 +18,27 @@ public sealed partial class DriveSelectorControl : UserControl
 
     public DriveSelectorControl() => InitializeComponent();
 
-    private void OnDriveTapped(object sender, TappedRoutedEventArgs e)
+    private void OnSelectCustomFolderClick(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.OpenFolderCommand.CanExecute(null) == true)
+        {
+            ViewModel.OpenFolderCommand.Execute(null);
+        }
+    }
+
+    private void OnRefreshDrivesClick(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.RefreshDrivesCommand.CanExecute(null) == true)
+        {
+            ViewModel.RefreshDrivesCommand.Execute(null);
+        }
+    }
+
+    private void OnDriveClicked(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { DataContext: DriveItemViewModel drive })
         {
             ViewModel?.SelectDriveCommand.Execute(drive);
-            e.Handled = true;
         }
     }
 

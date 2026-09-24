@@ -1,4 +1,5 @@
-﻿﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text;
 using Volumetric.Core.Classification;
 using Volumetric.Core.Entities;
@@ -56,9 +57,10 @@ public static class ScanReportHtmlBuilder
 
             builder.Append($"""<text x="0" y="{y + barHeight / 2 + 4}" font-size="12">{Html(entry.Label)}</text>""");
             builder.Append(
-                $"""<rect x="{labelWidth}" y="{y}" width="{barWidth:F1}" height="{barHeight}" rx="3" fill="{color}"/>""");
+                $"""<rect x="{labelWidth}" y="{y}" width="{barWidth.ToString("F1", CultureInfo.InvariantCulture)}" height="{barHeight}" rx="3" fill="{color}"/>""");
+            var textX = (labelWidth + barWidth + 8).ToString("F1", CultureInfo.InvariantCulture);
             builder.Append(
-                $"""<text x="{labelWidth + barWidth + 8}" y="{y + barHeight / 2 + 4}" font-size="12">{FormatBytes(entry.TotalSize)} ({entry.PercentOfTotal:F1}%)</text>""");
+                $"""<text x="{textX}" y="{y + barHeight / 2 + 4}" font-size="12">{FormatBytes(entry.TotalSize)} ({entry.PercentOfTotal:F1}%)</text>""");
         }
 
         builder.Append("</svg>");
