@@ -26,11 +26,15 @@ public sealed class VolumetricTools
         [Description("Absolute path of the folder or drive to scan, e.g. C:\\Users or D:\\.")] string path)
     {
         if (string.IsNullOrWhiteSpace(path) || !Path.IsPathFullyQualified(path))
+        {
             throw new McpException("'path' must be an absolute path such as C:\\Users.");
+        }
 
         var fullPath = Path.GetFullPath(path);
         if (!Directory.Exists(fullPath))
+        {
             throw new McpException($"Directory not found: {fullPath}");
+        }
 
         var job = _jobs.Start(fullPath);
         return new ScanStartedInfo(job.Id, job.RootPath, job.State.ToString());
@@ -63,8 +67,10 @@ public sealed class VolumetricTools
         var job = FindJob(scanId);
         var result = job.Result;
         if (job.State != ScanJobState.Completed || result is null)
-            throw new McpException(
-                $"Scan {job.Id} is {job.State}" + (job.Error is null ? "; results are not available yet." : $": {job.Error}"));
+        {
+            var detail = job.Error is null ? "; results are not available yet." : $": {job.Error}";
+            throw new McpException($"Scan {job.Id} is {job.State}{detail}");
+        }
 
         var limit = Math.Clamp(topN, 1, MaxTopN);
         var root = result.RootNode;
@@ -102,16 +108,27 @@ public sealed class VolumetricTools
             var node = stack.Pop();
             if (node.IsDirectory)
             {
-                foreach (var child in node.Children) stack.Push(child);
+                foreach (var child in node.Children)
+                {
+                    stack.Push(child);
+                }
+
                 continue;
             }
 
             files.Enqueue(node, node.SizeLogical);
-            if (files.Count > limit) files.Dequeue();
+            if (files.Count > limit)
+            {
+                files.Dequeue();
+            }
         }
 
         var top = new List<FileSystemNode>(files.Count);
-        while (files.Count > 0) top.Add(files.Dequeue());
+        while (files.Count > 0)
+        {
+            top.Add(files.Dequeue());
+        }
+
         top.Reverse();
         return top;
     }

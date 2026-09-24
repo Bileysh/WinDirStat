@@ -46,12 +46,18 @@ public sealed class ScanJobManager
 
     private void PruneFinishedJobs()
     {
-        if (_jobs.Count < MaxRetainedJobs) return;
+        if (_jobs.Count < MaxRetainedJobs)
+        {
+            return;
+        }
 
         var oldestFinished = _jobs.Values
             .Where(j => j.State != ScanJobState.Running)
             .OrderBy(j => j.FinishedAtUtc)
             .FirstOrDefault();
-        if (oldestFinished is not null) _jobs.TryRemove(oldestFinished.Id, out _);
+        if (oldestFinished is not null)
+        {
+            _jobs.TryRemove(oldestFinished.Id, out _);
+        }
     }
 }
