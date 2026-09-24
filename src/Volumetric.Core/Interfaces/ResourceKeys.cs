@@ -63,4 +63,9 @@ public static class ResourceKeys
     public const string ReportColumnSize = "ReportColumnSize";
     public const string ReportColumnFiles = "ReportColumnFiles";
     public const string ReportColumnPercent = "ReportColumnPercent";
+    public const string ReportAllFilesAndFolders = "ReportAllFilesAndFolders";
+    public const string ReportColumnPath = "ReportColumnPath";
+    public const string ReportColumnModified = "ReportColumnModified";
+    public const string ReportKindFolder = "ReportKindFolder";
+    public const string ReportKindFile = "ReportKindFile";
 }

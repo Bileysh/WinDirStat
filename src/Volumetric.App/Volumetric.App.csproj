@@ -38,6 +38,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Templates\*.html;Templates\*.css"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <Manifest Include="$(ApplicationManifest)"/>
     </ItemGroup>
 

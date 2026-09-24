@@ -4,11 +4,17 @@ using System.Text;
 using Volumetric.Core.Classification;
 using Volumetric.Core.Entities;
 using Volumetric.Core.Interfaces;
+using Volumetric.Core.Reports;
 
 namespace Volumetric.Services;
 
 public class ScanReportService : IScanReportService
 {
+    private static readonly string PageTemplate = LoadTemplate("ScanReportPage.html");
+    private static readonly string StyleSheet = LoadTemplate("ScanReport.css");
+    private static readonly string TableTemplate = LoadTemplate("ScanReportTable.html");
+    private static readonly string TableRowTemplate = LoadTemplate("ScanReportTableRow.html");
+
     private readonly ILocalizationService _localizationService;
 
     public ScanReportService(ILocalizationService localizationService)
@@ -18,91 +24,52 @@ public class ScanReportService : IScanReportService
 
     public string GenerateReportHtml(ScanResult result)
     {
-        var reportTitle = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportTitle));
-        var rootPathLabel = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportRootPath));
-        var scannedAtLabel = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportScannedAt));
-        var totalSizeLabel = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportTotalSize));
-        var byCategoryTitle = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportSizeBreakdownByCategory));
-        var byExtensionTitle = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportSizeBreakdownByExtension));
-        var typeColumn = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportColumnType));
-        var sizeColumn = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportColumnSize));
-        var filesColumn = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportColumnFiles));
-        var percentColumn = HtmlEncode(_localizationService.GetString(ResourceKeys.ReportColumnPercent));
-        var noExtensionLabel = HtmlEncode(_localizationService.GetString(ResourceKeys.NoExtensionLabel));
+        var tables = new StringBuilder();
+        AppendTable(tables, ResourceKeys.ReportSizeBreakdownByCategory, result.StatisticsByCategory);
+        AppendTable(tables, ResourceKeys.ReportSizeBreakdownByExtension, result.StatisticsByExtension);
 
-        var html = new StringBuilder();
-        html.AppendLine("<!doctype html>");
-        html.AppendLine("<html lang=\"en\">");
-        html.AppendLine("<head>");
-        html.AppendLine("  <meta charset=\"utf-8\" />");
-        html.AppendLine("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />");
-        html.AppendLine($"  <title>{reportTitle}</title>");
-        html.AppendLine("  <style>");
-        html.AppendLine("    body { font-family: Segoe UI, Arial, sans-serif; margin: 20px; color: #1f1f1f; }");
-        html.AppendLine("    h1, h2 { margin-bottom: 8px; }");
-        html.AppendLine("    .meta { margin-bottom: 20px; }");
-        html.AppendLine("    .meta div { margin-bottom: 4px; }");
-        html.AppendLine("    table { border-collapse: collapse; width: 100%; margin-bottom: 24px; }");
-        html.AppendLine("    th, td { border: 1px solid #d0d0d0; padding: 8px; text-align: left; }");
-        html.AppendLine("    th { background: #f3f3f3; }");
-        html.AppendLine("    td.number { text-align: right; white-space: nowrap; }");
-        html.AppendLine("  </style>");
-        html.AppendLine("</head>");
-        html.AppendLine("<body>");
-        html.AppendLine($"  <h1>{reportTitle}</h1>");
-        html.AppendLine("  <div class=\"meta\">");
-        html.AppendLine($"    <div><strong>{rootPathLabel}:</strong> {HtmlEncode(result.RootPath)}</div>");
-        html.AppendLine(
-            $"    <div><strong>{scannedAtLabel}:</strong> {HtmlEncode(result.ScannedAt.ToString("u", CultureInfo.InvariantCulture))}</div>");
-        html.AppendLine($"    <div><strong>{totalSizeLabel}:</strong> {HtmlEncode(SizeFormatter.Format(result.TotalSize))}</div>");
-        html.AppendLine("  </div>");
-
-        AppendTable(html, byCategoryTitle, result.StatisticsByCategory, typeColumn, sizeColumn, filesColumn, percentColumn, noExtensionLabel);
-        AppendTable(html, byExtensionTitle, result.StatisticsByExtension, typeColumn, sizeColumn, filesColumn, percentColumn, noExtensionLabel);
-
-        html.AppendLine("</body>");
-        html.AppendLine("</html>");
-        return html.ToString();
+        return HtmlTemplate.Render(PageTemplate,
+            ("language", HtmlEncode(_localizationService.CurrentLanguage)),
+            ("title", Localize(ResourceKeys.ReportTitle)),
+            ("style", StyleSheet),
+            ("rootPathLabel", Localize(ResourceKeys.ReportRootPath)),
+            ("rootPath", HtmlEncode(result.RootPath)),
+            ("scannedAtLabel", Localize(ResourceKeys.ReportScannedAt)),
+            ("scannedAt", HtmlEncode(result.ScannedAt.ToString("u", CultureInfo.InvariantCulture))),
+            ("totalSizeLabel", Localize(ResourceKeys.ReportTotalSize)),
+            ("totalSize", HtmlEncode(SizeFormatter.Format(result.TotalSize))),
+            ("tables", tables.ToString()));
     }
 
-    private static void AppendTable(
-        StringBuilder html,
-        string sectionTitle,
-        IReadOnlyList<FileTypeStatisticsEntry> entries,
-        string typeColumn,
-        string sizeColumn,
-        string filesColumn,
-        string percentColumn,
-        string noExtensionLabel)
+    private void AppendTable(StringBuilder html, string sectionTitleKey, IReadOnlyList<FileTypeStatisticsEntry> entries)
     {
-        html.AppendLine($"  <h2>{sectionTitle}</h2>");
-        html.AppendLine("  <table>");
-        html.AppendLine("    <thead>");
-        html.AppendLine("      <tr>");
-        html.AppendLine($"        <th>{typeColumn}</th>");
-        html.AppendLine($"        <th>{sizeColumn}</th>");
-        html.AppendLine($"        <th>{filesColumn}</th>");
-        html.AppendLine($"        <th>{percentColumn}</th>");
-        html.AppendLine("      </tr>");
-        html.AppendLine("    </thead>");
-        html.AppendLine("    <tbody>");
+        var noExtensionLabel = Localize(ResourceKeys.NoExtensionLabel);
 
+        var rows = new StringBuilder();
         foreach (var entry in entries)
         {
-            var label = string.IsNullOrWhiteSpace(entry.Label)
-                ? noExtensionLabel
-                : HtmlEncode(entry.Label);
-            html.AppendLine("      <tr>");
-            html.AppendLine($"        <td>{label}</td>");
-            html.AppendLine($"        <td class=\"number\">{HtmlEncode(SizeFormatter.Format(entry.TotalSize))}</td>");
-            html.AppendLine($"        <td class=\"number\">{entry.FileCount.ToString(CultureInfo.InvariantCulture)}</td>");
-            html.AppendLine($"        <td class=\"number\">{entry.PercentOfTotal.ToString("F2", CultureInfo.InvariantCulture)}%</td>");
-            html.AppendLine("      </tr>");
+            var label = string.IsNullOrWhiteSpace(entry.Label) ? noExtensionLabel : HtmlEncode(entry.Label);
+            rows.Append(HtmlTemplate.Render(TableRowTemplate,
+                ("label", label),
+                ("size", HtmlEncode(SizeFormatter.Format(entry.TotalSize))),
+                ("files", entry.FileCount.ToString(CultureInfo.InvariantCulture)),
+                ("percent", entry.PercentOfTotal.ToString("F2", CultureInfo.InvariantCulture))));
         }
 
-        html.AppendLine("    </tbody>");
-        html.AppendLine("  </table>");
+        html.Append(HtmlTemplate.Render(TableTemplate,
+            ("sectionTitle", Localize(sectionTitleKey)),
+            ("typeColumn", Localize(ResourceKeys.ReportColumnType)),
+            ("sizeColumn", Localize(ResourceKeys.ReportColumnSize)),
+            ("filesColumn", Localize(ResourceKeys.ReportColumnFiles)),
+            ("percentColumn", Localize(ResourceKeys.ReportColumnPercent)),
+            ("rows", rows.ToString())));
     }
 
+    // Returns HTML-encoded text so it can be placed straight into a template.
+    private string Localize(string key) => HtmlEncode(_localizationService.GetString(key));
+
     private static string HtmlEncode(string value) => WebUtility.HtmlEncode(value);
+
+    private static string LoadTemplate(string fileName) =>
+        HtmlTemplate.Load(typeof(ScanReportService).Assembly, fileName);
 }

@@ -1,0 +1,38 @@
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 20px;
+    color: #1f1f1f;
+}
+
+h1, h2 {
+    margin-bottom: 8px;
+}
+
+.meta {
+    margin-bottom: 20px;
+}
+
+.meta div {
+    margin-bottom: 4px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+th, td {
+    border: 1px solid #d0d0d0;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background: #f3f3f3;
+}
+
+td.number {
+    text-align: right;
+    white-space: nowrap;
+}

@@ -427,6 +427,30 @@
     <data name="ReportColumnPercent" xml:space="preserve">
     <value>Percent</value>
   </data>
+    <data name="ReportAllFilesAndFolders" xml:space="preserve">
+    <value>All files and folders</value>
+  </data>
+    <data name="ReportColumnPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+    <data name="ReportColumnModified" xml:space="preserve">
+    <value>Modified</value>
+  </data>
+    <data name="ReportKindFolder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+    <data name="ReportKindFile" xml:space="preserve">
+    <value>File</value>
+  </data>
+    <data name="ScanReportLoadFailedText.Text" xml:space="preserve">
+    <value>Unable to load the scan report because WebView2 could not be initialized. Verify that the Microsoft Edge WebView2 Runtime is installed, then restart Volumetric.</value>
+  </data>
+    <data name="ScanReportDownloadWebView2Link.Content" xml:space="preserve">
+    <value>Download the WebView2 Runtime</value>
+  </data>
+    <data name="ScanReportTechnicalDetailsLabel.Text" xml:space="preserve">
+    <value>Technical details</value>
+  </data>
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Path not found</value>
   </data>
