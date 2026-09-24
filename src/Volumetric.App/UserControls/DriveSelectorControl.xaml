@@ -14,7 +14,8 @@
 
             <TextBlock x:Uid="SelectDriveHeader" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" />
 
-            <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableDrives, Mode=OneWay}">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableDrives, Mode=OneWay}"
+                          HorizontalContentAlignment="Stretch">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Spacing="8" />
@@ -22,10 +23,15 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:DriveItemViewModel">
-                        <Border Padding="12" CornerRadius="4" BorderThickness="1"
+                        <Button Padding="12" CornerRadius="4" BorderThickness="1"
                                 BorderBrush="{ThemeResource SystemControlForegroundChromeDisabledLowBrush}"
                                 Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
-                                Tapped="OnDriveTapped">
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                MinHeight="0"
+                                Click="OnDriveClicked"
+                                AutomationProperties.Name="{x:Bind DisplayName}"
+                                AutomationProperties.HelpText="{x:Bind CapacitySummary}">
                             <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*,Auto">
                                 <FontIcon Grid.Row="0" Grid.Column="0" Glyph="&#xEDA2;" FontSize="16"
                                           Margin="0,0,8,0" VerticalAlignment="Center" />
@@ -43,14 +49,14 @@
                                              Margin="0,8,0,0"
                                              Minimum="0" Maximum="100" Value="{x:Bind UsedPercent}" />
                             </Grid>
-                        </Border>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                <Button x:Uid="SelectCustomFolderButton" Command="{x:Bind ViewModel.OpenFolderCommand}" />
-                <Button x:Uid="RefreshDrivesButton" Command="{x:Bind ViewModel.RefreshDrivesCommand}">
+                <Button x:Uid="SelectCustomFolderButton" Click="OnSelectCustomFolderClick" />
+                <Button x:Uid="RefreshDrivesButton" Click="OnRefreshDrivesClick">
                     <FontIcon Glyph="&#xE72C;" FontSize="14" />
                 </Button>
             </StackPanel>

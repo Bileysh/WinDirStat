@@ -62,6 +62,9 @@
     <data name="ToggleGroupBy.OnContent" xml:space="preserve">
     <value>За типом</value>
   </data>
+  <data name="MenuFileOpenScanReport.Text" xml:space="preserve">
+    <value>Відкрити HTML-звіт сканування</value>
+  </data>
     <data name="ToggleGroupBy.OffContent" xml:space="preserve">
     <value>За розширенням</value>
   </data>

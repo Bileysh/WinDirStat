@@ -1,19 +1,17 @@
-﻿﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.Web.WebView2.Core;
+using System.Text;
 using Serilog;
-using Windows.Storage;
-
 
 namespace Volumetric_App.UserControls;
 
 public sealed partial class ScanReportControl : UserControl
 {
-    private static readonly Lazy<Task<CoreWebView2Environment>> EnvironmentTask = new(CreateEnvironmentAsync);
     private readonly WebView2 _webView = new();
     private readonly string _html;
     private Task? _initializationTask;
     private bool _failureDisplayed;
+    private string? _reportPath;
 
     public ScanReportControl(string html)
     {
@@ -25,9 +23,24 @@ public sealed partial class ScanReportControl : UserControl
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        // The window that hosts this control is closing - without this, the
-        // underlying CoreWebView2 browser process leaks for the app's lifetime.
         _webView.Close();
+        DeleteReportFile();
+    }
+
+    private void DeleteReportFile()
+    {
+        if (_reportPath is null) return;
+
+        try
+        {
+            File.Delete(_reportPath);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Could not delete temporary scan report file {Path}.", _reportPath);
+        }
+
+        _reportPath = null;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -42,9 +55,11 @@ public sealed partial class ScanReportControl : UserControl
     {
         try
         {
-            var environment = await EnvironmentTask.Value;
-            await _webView.EnsureCoreWebView2Async(environment);
-            _webView.NavigateToString(_html);
+            await _webView.EnsureCoreWebView2Async();
+
+            _reportPath = Path.Combine(Path.GetTempPath(), $"volumetric-report-{Guid.NewGuid():N}.html");
+            await File.WriteAllTextAsync(_reportPath, _html, new UTF8Encoding(true));
+            _webView.Source = new Uri(_reportPath);
         }
         catch (Exception ex)
         {
@@ -54,27 +69,22 @@ public sealed partial class ScanReportControl : UserControl
         }
     }
 
-
-    private static async Task<CoreWebView2Environment> CreateEnvironmentAsync()
+    private static TextBlock CreateFailureView(Exception exception)
     {
-        // WebView2 defaults to a user-data folder next to the exe, which is read-only
-        // for an installed MSIX package (Program Files\WindowsApps\...) - it must be
-        // pointed at somewhere the app can actually write, hence LocalFolder here.
-        var userDataFolder = Path.Combine(ApplicationData.Current.LocalFolder.Path, "WebView2", "ScanReport");
+        var innerInfo = exception.InnerException is { } inner
+            ? $"\nInner: {inner.GetType().Name}: {inner.Message}"
+            : "";
 
-        Directory.CreateDirectory(userDataFolder);
-
-        return await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
+        return new TextBlock
+        {
+            Text = "Unable to load the scan report because WebView2 could not be initialized.\n\n" +
+                   "Verify that the Microsoft Edge WebView2 Runtime is installed, then restart Volumetric.\n" +
+                   "Download: https://developer.microsoft.com/microsoft-edge/webview2/\n\n" +
+                   $"Technical details: {exception.GetType().Name} (0x{exception.HResult:X8}): {exception.Message}" +
+                   innerInfo,
+            Margin = new Thickness(16),
+            TextWrapping = TextWrapping.Wrap,
+            IsTextSelectionEnabled = true
+        };
     }
-
-    private static TextBlock CreateFailureView(Exception exception) => new()
-    {
-        Text = "Unable to load the scan report because WebView2 could not be initialized.\n\n" +
-               "Verify that the Microsoft Edge WebView2 Runtime is installed, then restart Volumetric.\n" +
-               "Download: https://developer.microsoft.com/microsoft-edge/webview2/\n\n" +
-               $"Technical details: {exception.Message}",
-        Margin = new Thickness(16),
-        TextWrapping = TextWrapping.Wrap,
-        IsTextSelectionEnabled = true
-    };
 }

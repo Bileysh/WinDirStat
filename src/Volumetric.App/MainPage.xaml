@@ -48,14 +48,15 @@
                         <FontIcon Glyph="&#xE74E;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="MenuFileOpenScanReport"
+                                Command="{x:Bind ViewModel.OpenScanReportCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE774;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutItem x:Uid="MenuFileImportScan" Command="{x:Bind ViewModel.ImportScanResultsCommand}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE8E5;" />
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem x:Uid="MenuFileOpenReport" Command="{x:Bind ViewModel.OpenScanReportCommand}">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE9D9;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator />

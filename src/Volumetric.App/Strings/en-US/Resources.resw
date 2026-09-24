@@ -25,6 +25,9 @@
     <data name="ToggleGroupBy.OnContent" xml:space="preserve">
     <value>By Type</value>
   </data>
+  <data name="MenuFileOpenScanReport.Text" xml:space="preserve">
+    <value>Open HTML scan report</value>
+  </data>
     <data name="ToggleGroupBy.OffContent" xml:space="preserve">
     <value>By Extension</value>
   </data>
