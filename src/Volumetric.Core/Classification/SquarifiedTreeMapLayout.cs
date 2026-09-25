@@ -15,7 +15,10 @@ public static class SquarifiedTreeMapLayout
             .ToList();
 
         var result = new List<TreeMapRect>();
-        if (childrenData.Count == 0 || width <= 0 || height <= 0) return result;
+        if (childrenData.Count == 0 || width <= 0 || height <= 0)
+        {
+            return result;
+        }
 
         var totalWeight = childrenData.Sum(c => c.Weight);
         var scale = (width * height) / totalWeight;
@@ -46,7 +49,9 @@ public static class SquarifiedTreeMapLayout
         }
 
         if (row.Count > 0)
+        {
             LayoutRow(row, rect, result);
+        }
 
         return result;
     }
@@ -54,7 +59,10 @@ public static class SquarifiedTreeMapLayout
     private static double Worst(List<Item> row, double sideLength)
     {
         var sum = row.Sum(i => i.Area);
-        if (sum == 0) return double.MaxValue;
+        if (sum == 0)
+        {
+            return double.MaxValue;
+        }
 
         var max = row.Max(i => i.Area);
         var min = row.Min(i => i.Area);
@@ -67,7 +75,10 @@ public static class SquarifiedTreeMapLayout
         List<Item> row, (double X, double Y, double W, double H) rect, List<TreeMapRect> result)
     {
         var rowArea = row.Sum(i => i.Area);
-        if (rowArea == 0) return rect;
+        if (rowArea == 0)
+        {
+            return rect;
+        }
 
         if (rect.W <= rect.H)
         {

@@ -126,8 +126,6 @@ public sealed class ScanReportHtmlBuilder
     };
 
     private string Localize(string key) => _localizationService.GetString(key);
-
-    // SVG attributes must use '.' as the decimal separator regardless of the UI culture.
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     private static string Decimal(double value) => value.ToString("F1", CultureInfo.InvariantCulture);

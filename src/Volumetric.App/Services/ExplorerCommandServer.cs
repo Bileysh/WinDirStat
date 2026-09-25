@@ -167,7 +167,10 @@ public static partial class ExplorerCommandServer
             {
                 var path = GetFirstSelectedPath(itemsPtr);
                 Log.Information("Invoke: resolved path = '{Path}'", path);
-                if (path is null) return S_OK;
+                if (path is null)
+                {
+                    return S_OK;
+                }
 
                 var protocolUri = $"{AppProtocolScheme}://scan?path={Uri.EscapeDataString(path)}";
                 Log.Information("Invoke: launching URI '{Uri}'", protocolUri);
@@ -195,18 +198,37 @@ public static partial class ExplorerCommandServer
 
         private static string? GetFirstSelectedPath(IntPtr itemsPtr)
         {
-            if (itemsPtr == IntPtr.Zero) return null;
+            if (itemsPtr == IntPtr.Zero)
+            {
+                return null;
+            }
 
             if (ComWrappers.GetOrCreateObjectForComInstance(itemsPtr, CreateObjectFlags.UniqueInstance)
-                is not IShellItemArray itemsArray) return null;
+                is not IShellItemArray itemsArray)
+            {
+                return null;
+            }
 
-            if (itemsArray.GetCount(out var count) != S_OK || count == 0) return null;
-            if (itemsArray.GetItemAt(0, out var itemPtr) != S_OK) return null;
+            if (itemsArray.GetCount(out var count) != S_OK || count == 0)
+            {
+                return null;
+            }
+
+            if (itemsArray.GetItemAt(0, out var itemPtr) != S_OK)
+            {
+                return null;
+            }
 
             if (ComWrappers.GetOrCreateObjectForComInstance(itemPtr, CreateObjectFlags.UniqueInstance)
-                is not IShellItem item) return null;
+                is not IShellItem item)
+            {
+                return null;
+            }
 
-            if (item.GetDisplayName(SIGDN_FILESYSPATH, out var namePtr) != S_OK) return null;
+            if (item.GetDisplayName(SIGDN_FILESYSPATH, out var namePtr) != S_OK)
+            {
+                return null;
+            }
 
             return Marshal.PtrToStringUni(namePtr);
         }

@@ -52,7 +52,11 @@ public static class FileStatisticsAggregator
         }
 
         foreach (var child in node.Children)
+        {
             foreach (var file in EnumerateFiles(child))
+            {
                 yield return file;
+            }
+        }
     }
 }
