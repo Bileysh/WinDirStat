@@ -37,12 +37,16 @@ public class WindowManagerService : IWindowManagerService
         var theme = isDark ? ElementTheme.Dark : ElementTheme.Light;
 
         if (App.MainWindow?.Content is FrameworkElement mainContent)
+        {
             mainContent.RequestedTheme = theme;
+        }
 
         foreach (var window in _openWindows)
         {
             if (window.Content is FrameworkElement fe)
+            {
                 fe.RequestedTheme = theme;
+            }
         }
     }
 
@@ -67,11 +71,14 @@ public class WindowManagerService : IWindowManagerService
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
             MicaController.IsSupported())
+        {
             newWindow.SystemBackdrop = new MicaBackdrop();
+        }
 
         var scope = _scopeFactory.CreateScope();
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        scope.ServiceProvider.GetRequiredService<JumpListService>().Initialize();
         var page = new MainPage(viewModel, xamlRootProvider);
 
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
@@ -101,7 +108,9 @@ public class WindowManagerService : IWindowManagerService
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
             MicaController.IsSupported())
+        {
             newWindow.SystemBackdrop = new MicaBackdrop();
+        }
 
         var rootGrid = new Grid
         {
@@ -155,8 +164,15 @@ public class WindowManagerService : IWindowManagerService
     {
         window.Activated += (_, e) =>
         {
-            if (e.WindowActivationState == WindowActivationState.Deactivated) return;
-            if (root.XamlRoot is not null) xamlRootProvider.XamlRoot = root.XamlRoot;
+            if (e.WindowActivationState == WindowActivationState.Deactivated)
+            {
+                return;
+            }
+
+            if (root.XamlRoot is not null)
+            {
+                xamlRootProvider.XamlRoot = root.XamlRoot;
+            }
         };
     }
 
@@ -229,7 +245,9 @@ public class WindowManagerService : IWindowManagerService
 
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
             MicaController.IsSupported())
+        {
             window.SystemBackdrop = new MicaBackdrop();
+        }
 
         if (window.Content is FrameworkElement fe)
         {
@@ -261,7 +279,10 @@ public class WindowManagerService : IWindowManagerService
 
     public void SetRootWindowHandle(Window window)
     {
-        if (_rootWindowScope is null) return;
+        if (_rootWindowScope is null)
+        {
+            return;
+        }
 
         var handleProvider = _rootWindowScope.ServiceProvider.GetRequiredService<IWindowHandleProvider>();
         handleProvider.Hwnd = WindowNative.GetWindowHandle(window);
@@ -281,7 +302,10 @@ public class WindowManagerService : IWindowManagerService
 
         _openWindows.Clear();
 
-        if (App.MainWindow is not MainWindow window) return;
+        if (App.MainWindow is not MainWindow window)
+        {
+            return;
+        }
 
         window.CurrentPage?.ViewModel.Dispose();
         var previousResult = _rootWindowScope?.ServiceProvider.GetService<IScanStateService>()?.CurrentResult;
@@ -291,7 +315,9 @@ public class WindowManagerService : IWindowManagerService
         _rootWindowScope = scope;
 
         if (previousResult is not null)
+        {
             scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
+        }
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         App.RootViewModel = viewModel;
