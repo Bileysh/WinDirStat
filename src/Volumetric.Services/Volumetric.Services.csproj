@@ -4,10 +4,6 @@
     <ProjectReference Include="..\Volumetric.Core\Volumetric.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\*.html;Templates\*.css" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
