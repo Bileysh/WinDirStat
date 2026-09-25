@@ -78,7 +78,10 @@ public sealed class BackgroundScanTask : IBackgroundTask
 
         foreach (var drive in DriveInfo.GetDrives())
         {
-            if (!drive.IsReady) continue;
+            if (!drive.IsReady)
+            {
+                continue;
+            }
 
             try
             {
@@ -100,7 +103,10 @@ public sealed class BackgroundScanTask : IBackgroundTask
     }
     private static void ShowNotifications(IReadOnlyList<DriveScanResult> results)
     {
-        if (results.Count == 0) return;
+        if (results.Count == 0)
+        {
+            return;
+        }
 
         var summaryLines = results.Select(r =>
             string.Format(GetString(DriveStatusSummaryLineKey), r.DriveName, FormatBytes(r.FreeBytes), FormatBytes(r.TotalBytes)));

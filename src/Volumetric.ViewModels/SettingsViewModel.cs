@@ -81,7 +81,10 @@ public partial class SettingsViewModel : ObservableObject
     private async Task ExportAsync()
     {
         var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "volumetric-settings", WindowHandle);
-        if (fileName is null) return;
+        if (fileName is null)
+        {
+            return;
+        }
 
         StatusMessage = string.Format(_localizationService.GetString(ResourceKeys.SettingsExportedStatus), fileName);
     }
@@ -90,7 +93,10 @@ public partial class SettingsViewModel : ObservableObject
     private async Task ImportAsync()
     {
         var result = await _fileService.ImportAsync(WindowHandle);
-        if (result is null) return;
+        if (result is null)
+        {
+            return;
+        }
 
         var validationResult = _settings.ImportFromJson(result.Value.Json);
 

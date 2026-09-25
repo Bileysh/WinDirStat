@@ -12,9 +12,14 @@ public class DriveInfoService : IDriveInfoService
         foreach (var drive in DriveInfo.GetDrives())
         {
             if (drive.DriveType is not (DriveType.Fixed or DriveType.Removable or DriveType.Network))
+            {
                 continue;
+            }
 
-            if (!drive.IsReady) continue;
+            if (!drive.IsReady)
+            {
+                continue;
+            }
 
             try
             {

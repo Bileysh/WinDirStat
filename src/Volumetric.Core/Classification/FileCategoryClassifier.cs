@@ -17,7 +17,10 @@ public static class FileCategoryClassifier
 
         void Add(FileCategory category, params string[] extensions)
         {
-            foreach (var ext in extensions) map[ext] = category;
+            foreach (var ext in extensions)
+            {
+                map[ext] = category;
+            }
         }
 
         Add(FileCategory.Development, ".cs", ".cpp", ".h", ".hpp", ".js", ".ts", ".json", ".xml", ".csproj", ".sln",
