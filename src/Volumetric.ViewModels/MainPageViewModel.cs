@@ -25,7 +25,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private readonly IFileExplorerService _fileExplorerService;
     private readonly IBackgroundScanSettingsService _backgroundScanSettingsService;
     private readonly IScanResultFileService _scanResultFileService;
-    private readonly IScanReportService _scanReportService;
     private readonly IWindowHandleProvider _windowHandleProvider;
     private readonly IAppLogger _appLogger;
     private readonly IRecentScansService _recentScansService;
@@ -39,8 +38,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         IDriveInfoService driveInfoService, IClipboardService clipboardService,
         IFileExplorerService fileExplorerService, IBackgroundScanSettingsService backgroundScanSettingsService,
         IScanResultFileService scanResultFileService, IWindowHandleProvider windowHandleProvider,
-        IAppLogger appLogger, IRecentScansService recentScansService,
-        IScanReportService scanReportService)
+        IAppLogger appLogger, IRecentScansService recentScansService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -55,21 +53,18 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _fileExplorerService = fileExplorerService;
         _backgroundScanSettingsService = backgroundScanSettingsService;
         _scanResultFileService = scanResultFileService;
-        _scanReportService = scanReportService;
         _windowHandleProvider = windowHandleProvider;
         _appLogger = appLogger;
         _recentScansService = recentScansService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
+        LoadAvailableDrives();
+        _ = LoadRecentScansAsync();
+
         if (_scanStateService.CurrentResult is not null)
         {
             OnStateChanged(this, _scanStateService.CurrentResult);
-        }
-        else
-        {
-            LoadAvailableDrives();
-            _ = LoadRecentScansAsync();
         }
     }
 
@@ -173,6 +168,25 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
         RefreshStatistics();
         RefreshTreeMap();
+        AddToRecentScans(result.RootPath);
+    }
+
+    private const int MaxRecentScans = 5;
+
+    private void AddToRecentScans(string path)
+    {
+        var existing = RecentScans.FirstOrDefault(r =>
+            string.Equals(r.FullPath, path, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            RecentScans.Remove(existing);
+        }
+
+        RecentScans.Insert(0, new RecentScanItemViewModel(path));
+        while (RecentScans.Count > MaxRecentScans)
+        {
+            RecentScans.RemoveAt(RecentScans.Count - 1);
+        }
     }
 
     private void LoadAvailableDrives()
@@ -470,22 +484,12 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     }
 
     [RelayCommand(CanExecute = nameof(HasScanResult))]
-    private async Task OpenScanReportAsync()
+    private void OpenScanReport()
     {
         var result = _scanStateService.CurrentResult;
-        if (result is null) return;
-
-        try
+        if (result is not null)
         {
-            var reportHtml = _scanReportService.GenerateReportHtml(result);
-            _windowManagerService.OpenScanReportWindow(reportHtml);
-        }
-        catch (Exception ex)
-        {
-            _appLogger.Warning(ex, "[MainPageViewModel] Failed to generate scan report.");
-            await _dialogService.ShowMessageAsync(
-                _localizationService.GetString(ResourceKeys.ExportErrorTitle),
-                ex.Message);
+            _windowManagerService.OpenScanReportWindow(result.RootNode);
         }
     }
 

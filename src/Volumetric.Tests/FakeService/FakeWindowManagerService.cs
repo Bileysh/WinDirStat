@@ -5,7 +5,7 @@ namespace Volumetric.Tests.FakeService;
 
 public class FakeWindowManagerService : IWindowManagerService
 {
-    public string? LastReportHtml { get; private set; }
+    public FileSystemNode? LastReportedRootNode { get; private set; }
 
     public void OpenMainWindow(string? initialScanPath = null)
     {
@@ -27,9 +27,9 @@ public class FakeWindowManagerService : IWindowManagerService
     {
     }
 
-    public void OpenScanReportWindow(string reportHtml)
+    public void OpenScanReportWindow(FileSystemNode rootNode)
     {
-        LastReportHtml = reportHtml;
+        LastReportedRootNode = rootNode;
     }
 
     public void ReloadMainWindowContent()

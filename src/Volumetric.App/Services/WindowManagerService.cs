@@ -17,14 +17,17 @@ public class WindowManagerService : IWindowManagerService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
+    private readonly ScanReportHtmlBuilder _scanReportHtmlBuilder;
     private readonly List<Window> _openWindows = new();
 
     public WindowManagerService(IServiceScopeFactory scopeFactory,
-        IThemeService themeService, ILocalizationService localizationService)
+        IThemeService themeService, ILocalizationService localizationService,
+        ScanReportHtmlBuilder scanReportHtmlBuilder)
     {
         _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
+        _scanReportHtmlBuilder = scanReportHtmlBuilder;
 
         _themeService.ThemeChanged += OnThemeChanged;
     }
@@ -209,14 +212,10 @@ public class WindowManagerService : IWindowManagerService
                 WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight)
             .Activate();
     }
-
-    public void OpenScanReportWindow(string reportHtml)
+    public void OpenScanReportWindow(FileSystemNode rootNode)
     {
-        var webView = new WebView2();
-        webView.Loaded += (_, _) => webView.NavigateToString(reportHtml);
-
-        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), webView,
-                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight)
+        var report = new ScanReportControl(_scanReportHtmlBuilder.Build(rootNode));
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), report, 900, 650)
             .Activate();
     }
 
