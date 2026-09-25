@@ -33,6 +33,8 @@
                                            Opacity="0.7" FontSize="12" VerticalAlignment="Center" />
 
                                 <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                                             IsTabStop="False"
+                                             AutomationProperties.AccessibilityView="Raw"
                                              Margin="0,8,0,0"
                                              Minimum="0" Maximum="100" Value="{x:Bind UsedPercent}" />
                             </Grid>

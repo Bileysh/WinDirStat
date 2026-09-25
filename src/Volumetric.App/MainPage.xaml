@@ -124,7 +124,7 @@
                     </Grid>
                 </Border>
 
-                <sizers:GridSplitter Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
+                <sizers:GridSplitter x:Uid="MainVerticalSplitter" Grid.Column="1" Width="8" Cursor="SizeWestEast" Background="Transparent"
                                      ResizeBehavior="BasedOnAlignment" />
 
                 <Border Grid.Column="2" Margin="8" CornerRadius="8" BorderThickness="1"
@@ -146,7 +146,7 @@
                 </Border>
             </Grid>
 
-            <sizers:GridSplitter Grid.Row="2" Height="8" Cursor="SizeNorthSouth" Background="Transparent"
+            <sizers:GridSplitter x:Uid="MainHorizontalSplitter" Grid.Row="2" Height="8" Cursor="SizeNorthSouth" Background="Transparent"
                                  ResizeBehavior="BasedOnAlignment" />
 
             <Border Grid.Row="3" Margin="8" CornerRadius="8" BorderThickness="1"
