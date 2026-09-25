@@ -19,7 +19,7 @@ dotnet_diagnostic.IDE0055.severity = error
 
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true
-csharp_prefer_braces = true
+csharp_prefer_braces = true:warning
 
 csharp_style_namespace_declarations = file_scoped:warning
 

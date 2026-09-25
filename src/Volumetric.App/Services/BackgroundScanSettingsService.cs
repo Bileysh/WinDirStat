@@ -41,12 +41,18 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
         try
         {
             var dto = JsonSerializer.Deserialize(json, SettingsJsonContext.Default.SettingsDto);
-            if (dto is null) return SettingsValidationError.InvalidFormat;
+            if (dto is null)
+            {
+                return SettingsValidationError.InvalidFormat;
+            }
 
             var validation =
                 BackgroundScanSettingsValidator.ValidateImport(dto.ScanIntervalMinutes,
                     dto.LowFreeSpaceThresholdPercent);
-            if (validation != SettingsValidationError.None) return validation;
+            if (validation != SettingsValidationError.None)
+            {
+                return validation;
+            }
 
             ScanIntervalMinutes = dto.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = dto.LowFreeSpaceThresholdPercent;

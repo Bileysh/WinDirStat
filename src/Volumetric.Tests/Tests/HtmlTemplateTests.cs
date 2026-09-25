@@ -28,10 +28,10 @@ public class HtmlTemplateTests
     }
 
     [Fact]
-    public void Load_ReadsEmbeddedTemplateFromServicesAssembly()
+    public void Load_ReadsEmbeddedTemplateFromAssembly()
     {
-        var template = HtmlTemplate.Load(typeof(Volumetric.Services.ScanReportService).Assembly, "ScanReportPage.html");
+        var template = HtmlTemplate.Load(typeof(HtmlTemplateTests).Assembly, "HtmlTemplateSample.html");
 
-        Assert.Contains("{{tables}}", template);
+        Assert.Contains("{{title}}", template);
     }
 }

@@ -20,7 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Templates\*.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Volumetric.Core\Volumetric.Core.csproj" />
+    <ProjectReference Include="..\Volumetric.Mcp\Volumetric.Mcp.csproj" />
     <ProjectReference Include="..\Volumetric.Services\Volumetric.Services.csproj" />
     <ProjectReference Include="..\Volumetric.ViewModels\Volumetric.ViewModels.csproj" />
   </ItemGroup>

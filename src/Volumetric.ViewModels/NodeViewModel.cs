@@ -17,6 +17,7 @@ public partial class NodeViewModel : ObservableObject
     private readonly IFileExplorerService? _fileExplorerService;
     private readonly IAppLogger? _appLogger;
     private List<NodeViewModel>? _children;
+    private SearchFilter? _searchFilter;
 
     public NodeViewModel(FileSystemNode node, long parentSizeLogical = 0,
         ILocalizationService? localizationService = null, INotificationService? notificationService = null,
@@ -43,37 +44,43 @@ public partial class NodeViewModel : ObservableObject
     public int ChildFileCount => _node.Children.Count(c => !c.IsDirectory);
     public int ChildDirectoryCount => _node.Children.Count(c => c.IsDirectory);
 
-    public IReadOnlyList<NodeViewModel> Children =>
-        _children ??= _node.Children
-            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService,
-                _clipboardService, _fileExplorerService, _appLogger))
-            .ToList();
+    public IReadOnlyList<NodeViewModel> Children => _children ??= CreateChildren();
+
+    internal bool AreChildrenMaterialized => _children is not null;
 
     [ObservableProperty] public partial bool IsSearchMatch { get; set; } = true;
 
     public bool ApplySearchFilter(string? query)
     {
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            IsSearchMatch = true;
-            if (_children is not null)
-            {
-                foreach (var child in _children) child.ApplySearchFilter(null);
-            }
-
-            return true;
-        }
-
-        var childMatch = false;
-        foreach (var child in Children)
-        {
-            if (child.ApplySearchFilter(query)) childMatch = true;
-        }
-
-        var selfMatch = Name.Contains(query, StringComparison.OrdinalIgnoreCase);
-        IsSearchMatch = selfMatch || childMatch;
+        ApplySearchFilter(string.IsNullOrWhiteSpace(query) ? null : new SearchFilter(_node, query));
         return IsSearchMatch;
     }
+
+    private void ApplySearchFilter(SearchFilter? filter)
+    {
+        _searchFilter = filter;
+        IsSearchMatch = filter?.IsVisible(_node) ?? true;
+
+        if (_children is null)
+        {
+            return;
+        }
+
+        foreach (var child in _children)
+        {
+            child.ApplySearchFilter(filter);
+        }
+    }
+
+    private List<NodeViewModel> CreateChildren() =>
+        _node.Children
+            .Select(c => new NodeViewModel(c, _node.SizeLogical, _localizationService, _notificationService,
+                _clipboardService, _fileExplorerService, _appLogger)
+            {
+                _searchFilter = _searchFilter,
+                IsSearchMatch = _searchFilter?.IsVisible(c) ?? true
+            })
+            .ToList();
 
     public string ChildSummaryFormatted => IsDirectory
         ? $"{ChildFileCount} {_localizationService?.GetString(ResourceKeys.FilesText)}, {ChildDirectoryCount} {_localizationService?.GetString(ResourceKeys.FoldersText)}"
@@ -100,13 +107,17 @@ public partial class NodeViewModel : ObservableObject
             var parts = new List<string> { Name };
 
             if (HasStatusIcon && !string.IsNullOrEmpty(StatusTooltip))
+            {
                 parts.Add(StatusTooltip);
+            }
 
             parts.Add(SizeLogicalFormatted);
             parts.Add(PercentOfParentFormatted);
 
             if (IsDirectory && !string.IsNullOrEmpty(ChildSummaryFormatted))
+            {
                 parts.Add(ChildSummaryFormatted);
+            }
 
             return string.Join(", ", parts);
         }
@@ -140,7 +151,10 @@ public partial class NodeViewModel : ObservableObject
     [RelayCommand]
     private void OpenInExplorer()
     {
-        if (string.IsNullOrEmpty(_node.FullPath)) return;
+        if (string.IsNullOrEmpty(_node.FullPath))
+        {
+            return;
+        }
 
         try
         {
@@ -158,7 +172,10 @@ public partial class NodeViewModel : ObservableObject
     [RelayCommand]
     private void ShowProperties()
     {
-        if (string.IsNullOrEmpty(_node.FullPath)) return;
+        if (string.IsNullOrEmpty(_node.FullPath))
+        {
+            return;
+        }
 
         try
         {
@@ -180,13 +197,17 @@ public partial class NodeViewModel : ObservableObject
     private void CopyPath()
     {
         if (!string.IsNullOrEmpty(_node.FullPath))
+        {
             _clipboardService?.CopyText(_node.FullPath);
+        }
     }
 
     [RelayCommand]
     private void CopyName()
     {
         if (!string.IsNullOrEmpty(Name))
+        {
             _clipboardService?.CopyText(Name);
+        }
     }
 }

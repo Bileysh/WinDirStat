@@ -36,7 +36,10 @@ public sealed class ScanResultFileService : IScanResultFileService
         WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 
         var file = await picker.PickSaveFileAsync();
-        if (file is null) return null;
+        if (file is null)
+        {
+            return null;
+        }
 
         using var stream = await file.OpenStreamForWriteAsync();
         stream.SetLength(0);
@@ -52,7 +55,10 @@ public sealed class ScanResultFileService : IScanResultFileService
         WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 
         var file = await picker.PickSingleFileAsync();
-        if (file is null) return null;
+        if (file is null)
+        {
+            return null;
+        }
 
         using var stream = await file.OpenStreamForReadAsync();
         var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
