@@ -49,6 +49,32 @@ public partial class NodeViewModel : ObservableObject
                 _clipboardService, _fileExplorerService, _appLogger))
             .ToList();
 
+    [ObservableProperty] public partial bool IsSearchMatch { get; set; } = true;
+
+    public bool ApplySearchFilter(string? query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            IsSearchMatch = true;
+            if (_children is not null)
+            {
+                foreach (var child in _children) child.ApplySearchFilter(null);
+            }
+
+            return true;
+        }
+
+        var childMatch = false;
+        foreach (var child in Children)
+        {
+            if (child.ApplySearchFilter(query)) childMatch = true;
+        }
+
+        var selfMatch = Name.Contains(query, StringComparison.OrdinalIgnoreCase);
+        IsSearchMatch = selfMatch || childMatch;
+        return IsSearchMatch;
+    }
+
     public string ChildSummaryFormatted => IsDirectory
         ? $"{ChildFileCount} {_localizationService?.GetString(ResourceKeys.FilesText)}, {ChildDirectoryCount} {_localizationService?.GetString(ResourceKeys.FoldersText)}"
         : string.Empty;

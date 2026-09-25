@@ -71,6 +71,14 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     public partial ObservableCollection<NodeViewModel> RootNodes { get; set; } = [];
 
     [ObservableProperty]
+    public partial string SearchText { get; set; } = string.Empty;
+
+    partial void OnSearchTextChanged(string value)
+    {
+        foreach (var root in RootNodes) root.ApplySearchFilter(value);
+    }
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowDriveSelector))]
     [NotifyPropertyChangedFor(nameof(IsNoDataVisible))]
     public partial bool IsScanning { get; set; }
@@ -141,6 +149,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
                 fileExplorerService: _fileExplorerService, appLogger: _appLogger)
         ];
         HasScanResult = true;
+        SearchText = string.Empty;
 
         _treeMapHistory.Clear();
         CurrentTreeMapRoot = result.RootNode;

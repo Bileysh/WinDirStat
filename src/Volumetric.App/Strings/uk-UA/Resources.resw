@@ -398,8 +398,17 @@
     <data name="TrayMenuOpen.Text" xml:space="preserve">
     <value>Відкрити</value>
   </data>
+    <data name="TrayMenuScan.Text" xml:space="preserve">
+    <value>Сканувати папку...</value>
+  </data>
     <data name="TrayMenuExit.Text" xml:space="preserve">
     <value>Вихід</value>
+  </data>
+    <data name="TrayIconToolTipText" xml:space="preserve">
+    <value>Volumetric</value>
+  </data>
+    <data name="TitleBarSearchBox.PlaceholderText" xml:space="preserve">
+    <value>Пошук результатів</value>
   </data>
     <data name="MenuFileExportScan.Text" xml:space="preserve">
     <value>Експортувати скан…</value>
