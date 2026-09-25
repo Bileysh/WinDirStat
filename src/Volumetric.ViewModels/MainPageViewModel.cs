@@ -25,8 +25,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private readonly IFileExplorerService _fileExplorerService;
     private readonly IBackgroundScanSettingsService _backgroundScanSettingsService;
     private readonly IScanResultFileService _scanResultFileService;
+    private readonly IScanReportService _scanReportService;
     private readonly IWindowHandleProvider _windowHandleProvider;
     private readonly IAppLogger _appLogger;
+    private readonly IRecentScansService _recentScansService;
 
     private CancellationTokenSource? _scanCts;
     private string? _lastScanPath;
@@ -37,7 +39,8 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         IDriveInfoService driveInfoService, IClipboardService clipboardService,
         IFileExplorerService fileExplorerService, IBackgroundScanSettingsService backgroundScanSettingsService,
         IScanResultFileService scanResultFileService, IWindowHandleProvider windowHandleProvider,
-        IAppLogger appLogger)
+        IAppLogger appLogger, IRecentScansService recentScansService,
+        IScanReportService scanReportService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -52,8 +55,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _fileExplorerService = fileExplorerService;
         _backgroundScanSettingsService = backgroundScanSettingsService;
         _scanResultFileService = scanResultFileService;
+        _scanReportService = scanReportService;
         _windowHandleProvider = windowHandleProvider;
         _appLogger = appLogger;
+        _recentScansService = recentScansService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
@@ -64,6 +69,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         else
         {
             LoadAvailableDrives();
+            _ = LoadRecentScansAsync();
         }
     }
 
@@ -106,6 +112,12 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [ObservableProperty]
     public partial ObservableCollection<DriveItemViewModel> AvailableDrives { get; set; } = [];
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasRecentScans))]
+    public partial ObservableCollection<RecentScanItemViewModel> RecentScans { get; set; } = [];
+
+    public bool HasRecentScans => RecentScans.Count > 0;
+
     public bool ShowDriveSelector => !IsScanning && !HasScanResult;
 
     [ObservableProperty]
@@ -136,7 +148,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         RescanElevatedCommand.NotifyCanExecuteChanged();
     }
 
-    partial void OnHasScanResultChanged(bool value) => ExportScanResultsCommand.NotifyCanExecuteChanged();
+    partial void OnHasScanResultChanged(bool value)
+    {
+        ExportScanResultsCommand.NotifyCanExecuteChanged();
+        OpenScanReportCommand.NotifyCanExecuteChanged();
+    }
 
     private void OnStateChanged(object? sender, ScanResult? result)
     {
@@ -165,8 +181,30 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         AvailableDrives = new ObservableCollection<DriveItemViewModel>(drives);
     }
 
+    private async Task LoadRecentScansAsync()
+    {
+        try
+        {
+            var paths = await _recentScansService.GetRecentPathsAsync();
+            RecentScans = new ObservableCollection<RecentScanItemViewModel>(
+                paths.Select(path => new RecentScanItemViewModel(path)));
+        }
+        catch (Exception ex)
+        {
+            _appLogger.Warning(ex, "[MainPageViewModel] Failed to load recent scans");
+        }
+    }
+
     [RelayCommand]
     private void RefreshDrives() => LoadAvailableDrives();
+
+    [RelayCommand]
+    private async Task OpenRecentScanAsync(RecentScanItemViewModel? recentScan)
+    {
+        if (recentScan is null) return;
+
+        await ScanPathAsync(recentScan.FullPath);
+    }
 
     private void RefreshStatistics()
     {
@@ -428,6 +466,26 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         {
             var title = _localizationService.GetString(ResourceKeys.ExportErrorTitle);
             await _dialogService.ShowMessageAsync(title, ex.Message);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(HasScanResult))]
+    private async Task OpenScanReportAsync()
+    {
+        var result = _scanStateService.CurrentResult;
+        if (result is null) return;
+
+        try
+        {
+            var reportHtml = _scanReportService.GenerateReportHtml(result);
+            _windowManagerService.OpenScanReportWindow(reportHtml);
+        }
+        catch (Exception ex)
+        {
+            _appLogger.Warning(ex, "[MainPageViewModel] Failed to generate scan report.");
+            await _dialogService.ShowMessageAsync(
+                _localizationService.GetString(ResourceKeys.ExportErrorTitle),
+                ex.Message);
         }
     }
 

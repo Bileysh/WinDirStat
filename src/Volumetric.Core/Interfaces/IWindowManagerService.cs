@@ -9,6 +9,7 @@ public interface IWindowManagerService
     void OpenStatisticsWindow(IMainPageViewModel viewModel);
     void OpenTreeViewWindow(IMainPageViewModel viewModel);
     void OpenTreeMapWindow(IMainPageViewModel viewModel);
+    void OpenScanReportWindow(string reportHtml);
     void ReloadMainWindowContent();
     void OpenSettingsWindow();
     void ExitApplication();

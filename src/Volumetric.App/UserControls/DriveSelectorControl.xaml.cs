@@ -27,4 +27,12 @@ public sealed partial class DriveSelectorControl : UserControl
             e.Handled = true;
         }
     }
+
+    private void OnRecentScanClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: RecentScanItemViewModel recentScan })
+        {
+            ViewModel?.OpenRecentScanCommand.Execute(recentScan);
+        }
+    }
 }
