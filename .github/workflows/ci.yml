@@ -39,3 +39,16 @@ jobs:
         with:
           name: test-results
           path: TestResults
+
+      - name: Restore UI tests
+        run: dotnet restore src/Volumetric.UITests/Volumetric.UITests.csproj -p:Platform=x64
+
+      - name: Build UI tests
+        run: dotnet build src/Volumetric.UITests/Volumetric.UITests.csproj --configuration Release --no-restore -p:Platform=x64
+
+      - name: Run UI tests
+        run: >
+          dotnet test src/Volumetric.UITests/Volumetric.UITests.csproj
+          --configuration Release --no-build -p:Platform=x64
+          --logger "trx;LogFileName=ui-test-results.trx"
+          --results-directory TestResults
