@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -32,6 +33,7 @@ public sealed partial class MainWindow : Window
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
+        ApplyTransparentTitleBarButtons();
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
@@ -43,6 +45,22 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Changed += AppWindow_Changed;
         Activated += (_, _) => UpdateTitleBarInsets();
+    }
+
+    private void ApplyTransparentTitleBarButtons()
+    {
+        if (!AppWindowTitleBar.IsCustomizationSupported())
+        {
+            return;
+        }
+
+        var titleBar = AppWindow.TitleBar;
+        titleBar.BackgroundColor = Microsoft.UI.Colors.Transparent;
+        titleBar.InactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+        titleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
+        titleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+        titleBar.ButtonHoverBackgroundColor = Microsoft.UI.Colors.Transparent;
+        titleBar.ButtonPressedBackgroundColor = Microsoft.UI.Colors.Transparent;
     }
 
     private void AppWindow_Changed(Microsoft.UI.Windowing.AppWindow sender,
@@ -69,11 +87,17 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var titleBar = AppWindow.TitleBar;
-        var scale = Content?.XamlRoot?.RasterizationScale ?? 1.0;
-        var reservedInset = Math.Max(titleBar.RightInset, titleBar.LeftInset) / scale;
+        try
+        {
+            var titleBar = AppWindow.TitleBar;
+            var scale = Content?.XamlRoot?.RasterizationScale ?? 1.0;
+            var reservedInset = Math.Max(titleBar.RightInset, titleBar.LeftInset) / scale;
 
-        SearchBox.Margin = new Thickness(0, 8, Math.Max(12, reservedInset), 8);
+            SearchBox.Margin = new Thickness(0, 8, Math.Max(12, reservedInset), 8);
+        }
+        catch (COMException)
+        {
+        }
     }
 
     private void RestoreWindow()

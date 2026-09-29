@@ -62,6 +62,9 @@
     <data name="ToggleGroupBy.OnContent" xml:space="preserve">
     <value>За типом</value>
   </data>
+  <data name="MenuFileOpenScanReport.Text" xml:space="preserve">
+    <value>Відкрити HTML-звіт сканування</value>
+  </data>
     <data name="ToggleGroupBy.OffContent" xml:space="preserve">
     <value>За розширенням</value>
   </data>
@@ -460,6 +463,30 @@
   </data>
     <data name="ReportColumnPercent" xml:space="preserve">
     <value>Відсоток</value>
+  </data>
+    <data name="ReportAllFilesAndFolders" xml:space="preserve">
+    <value>Усі файли та папки</value>
+  </data>
+    <data name="ReportColumnPath" xml:space="preserve">
+    <value>Шлях</value>
+  </data>
+    <data name="ReportColumnModified" xml:space="preserve">
+    <value>Змінено</value>
+  </data>
+    <data name="ReportKindFolder" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+    <data name="ReportKindFile" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+    <data name="ScanReportLoadFailedText.Text" xml:space="preserve">
+    <value>Не вдалося завантажити звіт сканування, бо WebView2 не вдалося ініціалізувати. Переконайтеся, що встановлено Microsoft Edge WebView2 Runtime, і перезапустіть Volumetric.</value>
+  </data>
+    <data name="ScanReportDownloadWebView2Link.Content" xml:space="preserve">
+    <value>Завантажити WebView2 Runtime</value>
+  </data>
+    <data name="ScanReportTechnicalDetailsLabel.Text" xml:space="preserve">
+    <value>Технічні подробиці</value>
   </data>
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Шлях не знайдено</value>

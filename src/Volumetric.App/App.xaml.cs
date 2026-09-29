@@ -94,6 +94,7 @@ public partial class App
         services.AddScoped<IRecentScansService>(sp => sp.GetRequiredService<JumpListService>());
         services.AddSingleton<WindowManagerService>();
         services.AddSingleton<IWindowManagerService>(sp => sp.GetRequiredService<WindowManagerService>());
+        services.AddSingleton<ScanReportHtmlBuilder>();
         services.AddScoped<IDialogService, WinUiDialogService>();
         services.AddScoped<ICurrentXamlRootProvider, CurrentXamlRootProvider>();
         services.AddSingleton<ILocalizationService, WinUiLocalizationService>();
