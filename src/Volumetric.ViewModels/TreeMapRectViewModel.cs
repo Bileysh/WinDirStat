@@ -58,7 +58,10 @@ public partial class TreeMapRectViewModel
     [RelayCommand]
     private void OpenInExplorer()
     {
-        if (string.IsNullOrEmpty(Node.FullPath)) return;
+        if (string.IsNullOrEmpty(Node.FullPath))
+        {
+            return;
+        }
 
         try
         {
@@ -76,7 +79,10 @@ public partial class TreeMapRectViewModel
     [RelayCommand]
     private void ShowProperties()
     {
-        if (string.IsNullOrEmpty(Node.FullPath)) return;
+        if (string.IsNullOrEmpty(Node.FullPath))
+        {
+            return;
+        }
 
         try
         {

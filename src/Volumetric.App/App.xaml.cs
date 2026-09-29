@@ -111,7 +111,6 @@ public partial class App
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IFileExplorerService, FileExplorerService>();
         services.AddSingleton<IScanResultFileService, ScanResultFileService>();
-        services.AddSingleton<IScanReportService, ScanReportService>();
         return services.BuildServiceProvider();
     }
 }

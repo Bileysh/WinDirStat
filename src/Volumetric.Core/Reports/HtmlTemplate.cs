@@ -3,9 +3,6 @@ using System.Text.RegularExpressions;
 
 namespace Volumetric.Core.Reports;
 
-/// <summary>
-/// Loads HTML/CSS templates embedded in an assembly and fills their {{token}} placeholders.
-/// </summary>
 public static partial class HtmlTemplate
 {
     [GeneratedRegex(@"\{\{(\w+)\}\}")]
@@ -22,10 +19,6 @@ public static partial class HtmlTemplate
         return reader.ReadToEnd();
     }
 
-    /// <summary>
-    /// Replaces every {{token}} in a single pass. Values are inserted verbatim, so callers must HTML-encode
-    /// untrusted text first; a value is never scanned again, so a file named "{{x}}" cannot inject a token.
-    /// </summary>
     public static string Render(string template, params (string Name, string Value)[] values)
     {
         return TokenPattern().Replace(template, match =>

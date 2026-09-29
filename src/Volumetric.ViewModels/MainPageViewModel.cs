@@ -151,7 +151,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private void OnStateChanged(object? sender, ScanResult? result)
     {
-        if (result is null) return;
+        if (result is null)
+        {
+            return;
+        }
 
         RootNodes =
         [
@@ -215,7 +218,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private async Task OpenRecentScanAsync(RecentScanItemViewModel? recentScan)
     {
-        if (recentScan is null) return;
+        if (recentScan is null)
+        {
+            return;
+        }
 
         await ScanPathAsync(recentScan.FullPath);
     }
@@ -223,7 +229,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private void RefreshStatistics()
     {
         var currentResult = _scanStateService.CurrentResult;
-        if (currentResult is null) return;
+        if (currentResult is null)
+        {
+            return;
+        }
 
         var stats = GroupByCategory
             ? currentResult.StatisticsByCategory
@@ -237,7 +246,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private async Task OpenFolderAsync()
     {
         var path = await _folderPickerService.PickFolderAsync();
-        if (path is null) return;
+        if (path is null)
+        {
+            return;
+        }
 
         await ScanPathAsync(path);
     }
@@ -245,7 +257,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private async Task SelectDriveAsync(DriveItemViewModel? drive)
     {
-        if (drive is null) return;
+        if (drive is null)
+        {
+            return;
+        }
 
         await ScanPathAsync(drive.RootPath);
     }
@@ -323,8 +338,14 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private void CountNodes(FileSystemNode node, ref int fileCount, ref int folderCount)
     {
-        if (node.IsDirectory) folderCount++;
-        else fileCount++;
+        if (node.IsDirectory)
+        {
+            folderCount++;
+        }
+        else
+        {
+            fileCount++;
+        }
 
         foreach (var child in node.Children)
         {
@@ -353,9 +374,20 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private void RefreshTreeMap()
     {
-        if (CurrentTreeMapRoot is null) return;
-        if (_treeMapWidth <= 0) return;
-        if (_treeMapHeight <= 0) return;
+        if (CurrentTreeMapRoot is null)
+        {
+            return;
+        }
+
+        if (_treeMapWidth <= 0)
+        {
+            return;
+        }
+
+        if (_treeMapHeight <= 0)
+        {
+            return;
+        }
 
         var rects = SquarifiedTreeMapLayout.Compute(CurrentTreeMapRoot, 0, 0, _treeMapWidth, _treeMapHeight);
         var viewModels = rects.Select(r =>
@@ -424,7 +456,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private void ChangeLanguage(string cultureCode)
     {
-        if (_localizationService.CurrentLanguage == cultureCode) return;
+        if (_localizationService.CurrentLanguage == cultureCode)
+        {
+            return;
+        }
 
         _localizationService.SetLanguage(cultureCode);
 
@@ -461,7 +496,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private async Task ExportScanResultsAsync()
     {
         var result = _scanStateService.CurrentResult;
-        if (result is null) return;
+        if (result is null)
+        {
+            return;
+        }
 
         try
         {
@@ -497,7 +535,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private async Task ImportScanResultsAsync()
     {
         var imported = await _scanResultFileService.ImportAsync(_windowHandleProvider.Hwnd);
-        if (imported is null) return;
+        if (imported is null)
+        {
+            return;
+        }
 
         LoadImportedResult(imported.Value.RootNode);
     }
@@ -520,7 +561,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             p.EndsWith(".volscan", StringComparison.OrdinalIgnoreCase) ||
             p.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
 
-        if (scanPath is null) return;
+        if (scanPath is null)
+        {
+            return;
+        }
 
         var rootNode = await _scanResultFileService.ImportFromPathAsync(scanPath);
         if (rootNode is not null)
@@ -538,7 +582,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             var root = TreeMapAbsoluteRootPath;
             var current = CurrentTreeMapRoot?.FullPath ?? string.Empty;
             if (string.IsNullOrEmpty(root) || !current.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+            {
                 return string.Empty;
+            }
+
             return current[root.Length..];
         }
     }

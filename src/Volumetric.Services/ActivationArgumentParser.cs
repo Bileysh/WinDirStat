@@ -19,22 +19,34 @@ public static partial class ActivationArgumentParser
     {
         ArgumentNullException.ThrowIfNull(pathExists);
 
-        if (string.IsNullOrWhiteSpace(rawArgs)) return new ParsedLaunch(ParsedKind.None, null);
+        if (string.IsNullOrWhiteSpace(rawArgs))
+        {
+            return new ParsedLaunch(ParsedKind.None, null);
+        }
 
         var tokens = SplitCommandLine(rawArgs);
         var path = tokens.Length > 0 ? tokens[^1] : null;
 
-        if (string.IsNullOrWhiteSpace(path)) return new ParsedLaunch(ParsedKind.None, null);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return new ParsedLaunch(ParsedKind.None, null);
+        }
 
         return new ParsedLaunch(pathExists(path) ? ParsedKind.Path : ParsedKind.InvalidPath, path);
     }
 
     public static string? ExtractPathFromProtocolUri(string? uriString, string pathMarker = DefaultProtocolPathMarker)
     {
-        if (string.IsNullOrEmpty(uriString)) return null;
+        if (string.IsNullOrEmpty(uriString))
+        {
+            return null;
+        }
 
         var pathIdx = uriString.IndexOf(pathMarker, StringComparison.OrdinalIgnoreCase);
-        if (pathIdx < 0) return null;
+        if (pathIdx < 0)
+        {
+            return null;
+        }
 
         var path = Uri.UnescapeDataString(uriString[(pathIdx + pathMarker.Length)..]).Trim();
         return string.IsNullOrEmpty(path) ? null : path;
@@ -42,10 +54,16 @@ public static partial class ActivationArgumentParser
 
     public static string[] SplitCommandLine(string commandLine)
     {
-        if (string.IsNullOrWhiteSpace(commandLine)) return [];
+        if (string.IsNullOrWhiteSpace(commandLine))
+        {
+            return [];
+        }
 
         var argv = CommandLineToArgvW(commandLine, out var argc);
-        if (argv == IntPtr.Zero) return [];
+        if (argv == IntPtr.Zero)
+        {
+            return [];
+        }
 
         try
         {

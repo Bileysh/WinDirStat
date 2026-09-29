@@ -43,10 +43,14 @@ public static class PrivilegeHelper
         try
         {
             if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out var tokenHandle))
+            {
                 return false;
+            }
 
             if (!LookupPrivilegeValue(null, SE_BACKUP_NAME, out var luid))
+            {
                 return false;
+            }
 
             var tp = new TOKEN_PRIVILEGES
             {

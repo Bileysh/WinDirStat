@@ -63,9 +63,15 @@ public class FileIdentityService : IFileIdentityService
             FILE_FLAG_BACKUP_SEMANTICS,
             IntPtr.Zero);
 
-        if (handle.IsInvalid) return null;
+        if (handle.IsInvalid)
+        {
+            return null;
+        }
 
-        if (!GetFileInformationByHandle(handle, out var info)) return null;
+        if (!GetFileInformationByHandle(handle, out var info))
+        {
+            return null;
+        }
 
         var fileIndex = ((ulong)info.FileIndexHigh << 32) | info.FileIndexLow;
         return new FileIdentity(info.VolumeSerialNumber, fileIndex, info.NumberOfLinks);

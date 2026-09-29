@@ -62,7 +62,10 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
     {
         results = new Dictionary<string, FileSystemNode>();
 
-        if (paths.Count == 0) return true;
+        if (paths.Count == 0)
+        {
+            return true;
+        }
 
         var inputFile = Path.Combine(Path.GetTempPath(), $"volumetric-elevated-scan-in-{Guid.NewGuid():N}.txt");
         var outputFile = Path.Combine(Path.GetTempPath(), $"volumetric-elevated-scan-{Guid.NewGuid():N}.json");
@@ -114,7 +117,6 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
             }
             catch
             {
-                // ignored
             }
 
             try
@@ -123,7 +125,6 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
             }
             catch
             {
-                // ignored
             }
         }
     }
@@ -168,7 +169,9 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
 
             var hr = CoGetObject(moniker, ref bindOptions, ref iid, out var comObject);
             if (hr != 0 || comObject is not IApplicationActivationManager manager)
+            {
                 return false;
+            }
 
             hr = manager.ActivateApplication(appUserModelId, arguments, 0, out _);
             return hr == 0;

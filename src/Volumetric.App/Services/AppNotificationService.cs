@@ -8,7 +8,10 @@ public class AppNotificationService : INotificationService
 {
     public void ShowNotification(string? title, string? message, string? path = null)
     {
-        if (!Program.NotificationsRegistered) return;
+        if (!Program.NotificationsRegistered)
+        {
+            return;
+        }
 
         var builder = new AppNotificationBuilder()
             .AddText(title)

@@ -41,7 +41,9 @@ public sealed class BackgroundTaskRegistrar(IBackgroundScanSettingsService setti
         {
             var legacy = BackgroundTaskRegistration.AllTasks.Values.FirstOrDefault(t => t.Name == legacyName);
             if (legacy is null)
+            {
                 continue;
+            }
 
             Log.Information("Migrating orphaned legacy background task registration '{LegacyTaskName}'", legacyName);
             legacy.Unregister(cancelTask: false);
