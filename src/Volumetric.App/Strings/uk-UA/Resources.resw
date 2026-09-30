@@ -413,6 +413,9 @@
     <data name="TrayIconToolTipText" xml:space="preserve">
     <value>Volumetric</value>
   </data>
+    <data name="TrayIconScanningToolTipFormat" xml:space="preserve">
+    <value>Volumetric — Сканування… Файлів: {0:N0}  Папок: {1:N0}</value>
+  </data>
     <data name="TitleBarSearchBox.PlaceholderText" xml:space="preserve">
     <value>Пошук результатів</value>
   </data>
