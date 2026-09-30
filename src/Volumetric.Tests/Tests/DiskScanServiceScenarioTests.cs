@@ -7,6 +7,17 @@ namespace Volumetric.Tests.Tests;
 public class DiskScanServiceScenarioTests
 {
     [Fact]
+    public async Task ScanAsync_UnreachableNetworkPath_ReturnsGracefulErrorInsteadOfThrowing()
+    {
+        var service = new DiskScanService(new FileIdentityService());
+
+        var result = await service.ScanAsync(@"\\volumetric-unreachable-host\share");
+
+        Assert.NotEqual(ScanStatus.Ok, result.RootNode.Status);
+        Assert.Equal(0, result.TotalSize);
+    }
+
+    [Fact]
     public async Task ScanAsync_DeeplyNestedDirectories_AggregatesSizeCorrectly()
     {
         var tempRoot = Directory.CreateTempSubdirectory();

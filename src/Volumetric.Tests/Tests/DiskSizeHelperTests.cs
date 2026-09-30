@@ -20,4 +20,12 @@ public class DiskSizeHelperTests
     {
         Assert.Equal(12345, DiskSizeHelper.RoundUpToCluster(12345, 0));
     }
+
+    [Fact]
+    public void GetClusterSize_UnreachableUncRoot_FallsBackToDefault()
+    {
+        var clusterSize = DiskSizeHelper.GetClusterSize(@"\\volumetric-unreachable-host\share\");
+
+        Assert.Equal(4096u, clusterSize);
+    }
 }
