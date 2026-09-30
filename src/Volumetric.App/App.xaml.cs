@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+using Serilog;
 using Volumetric_App.Services;
 using Volumetric.Core.Interfaces;
 using Volumetric.Services;
@@ -60,6 +61,7 @@ public partial class App
 
         Services.GetRequiredService<INotificationService>();
         Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
+        _ = LogWindowsHelloAvailabilityAsync();
 
         ActivationDispatcher.Handle(_initialActivationArgs, isColdStart: true);
 
@@ -69,6 +71,25 @@ public partial class App
             ActivationDispatcher.HandleExtracted(
                 new ActivationDispatcher.ExtractedActivation(ActivationDispatcher.ActivationAction.Path, pendingPath),
                 isColdStart: true);
+        }
+    }
+
+    private static async Task LogWindowsHelloAvailabilityAsync()
+    {
+        try
+        {
+            var service = StaticServices?.GetService<IWindowsHelloAvailabilityService>();
+            if (service is null)
+            {
+                return;
+            }
+
+            var availability = await service.CheckAvailabilityAsync();
+            Log.Information("Windows Hello availability on this device: {Availability}", availability);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Windows Hello availability check failed");
         }
     }
 
@@ -105,6 +126,7 @@ public partial class App
         services.AddSingleton<IBackgroundScanSettingsService, BackgroundScanSettingsService>();
         services.AddSingleton<IBackgroundScanTaskRegistrar, BackgroundTaskRegistrar>();
         services.AddSingleton<ISettingsFileService, SettingsFileService>();
+        services.AddSingleton<IWindowsHelloAvailabilityService, WindowsHelloAvailabilityService>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<SettingsWindow>();
         services.AddSingleton<IBackgroundScanTestRunner, BackgroundScanTestRunner>();
