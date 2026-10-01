@@ -18,16 +18,18 @@ public class WindowManagerService : IWindowManagerService
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
     private readonly ScanReportHtmlBuilder _scanReportHtmlBuilder;
+    private readonly AppLockViewModel _appLock;
     private readonly List<Window> _openWindows = new();
 
     public WindowManagerService(IServiceScopeFactory scopeFactory,
         IThemeService themeService, ILocalizationService localizationService,
-        ScanReportHtmlBuilder scanReportHtmlBuilder)
+        ScanReportHtmlBuilder scanReportHtmlBuilder, AppLockViewModel appLock)
     {
         _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
         _scanReportHtmlBuilder = scanReportHtmlBuilder;
+        _appLock = appLock;
 
         _themeService.ThemeChanged += OnThemeChanged;
     }
@@ -52,6 +54,11 @@ public class WindowManagerService : IWindowManagerService
 
     public void OpenMainWindow(string? initialScanPath = null)
     {
+        if (ShowLockedRootWindowInstead())
+        {
+            return;
+        }
+
         var (viewModel, _) = CreateAndShowNewMainWindow();
 
         if (!string.IsNullOrWhiteSpace(initialScanPath))
@@ -62,8 +69,24 @@ public class WindowManagerService : IWindowManagerService
 
     public void OpenMainWindowWithImportedResult(FileSystemNode rootNode)
     {
+        if (ShowLockedRootWindowInstead())
+        {
+            return;
+        }
+
         var (viewModel, _) = CreateAndShowNewMainWindow();
         viewModel.LoadImportedResult(rootNode);
+    }
+
+    private bool ShowLockedRootWindowInstead()
+    {
+        if (!_appLock.IsLocked)
+        {
+            return false;
+        }
+
+        (App.MainWindow as MainWindow)?.RestoreWindowCommand.Execute(null);
+        return true;
     }
 
     private (MainPageViewModel ViewModel, Window Window) CreateAndShowNewMainWindow()

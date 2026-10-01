@@ -15,8 +15,10 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IBackgroundScanTestRunner _testRunner;
     private readonly ILocalizationService _localizationService;
     private readonly ISecuritySettingsService _securitySettings;
+    private readonly IWindowsHelloService _windowsHello;
 
     private readonly bool _isInitialized;
+    private bool _isRevertingWindowsHelloToggle;
 
     [ObservableProperty]
     public partial uint ScanIntervalMinutes { get; set; }
@@ -31,6 +33,19 @@ public partial class SettingsViewModel : ObservableObject
     public partial bool EncryptScanResults { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsWindowsHelloToggleEnabled))]
+    public partial bool RequireWindowsHelloOnLaunch { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsWindowsHelloToggleEnabled))]
+    public partial bool IsWindowsHelloAvailable { get; private set; }
+
+    public bool IsWindowsHelloToggleEnabled => IsWindowsHelloAvailable || RequireWindowsHelloOnLaunch;
+
+    [ObservableProperty]
+    public partial string? WindowsHelloUnavailableReason { get; private set; }
+
+    [ObservableProperty]
     public partial string? StatusMessage { get; set; }
 
     public IntPtr WindowHandle { get; set; }
@@ -41,7 +56,8 @@ public partial class SettingsViewModel : ObservableObject
         ISettingsFileService fileService,
         IBackgroundScanTestRunner testRunner,
         ILocalizationService localizationService,
-        ISecuritySettingsService securitySettings)
+        ISecuritySettingsService securitySettings,
+        IWindowsHelloService windowsHello)
     {
         _settings = settings;
         _registrar = registrar;
@@ -49,13 +65,57 @@ public partial class SettingsViewModel : ObservableObject
         _testRunner = testRunner;
         _localizationService = localizationService;
         _securitySettings = securitySettings;
+        _windowsHello = windowsHello;
 
         ScanIntervalMinutes = settings.ScanIntervalMinutes;
         LowFreeSpaceThresholdPercent = settings.LowFreeSpaceThresholdPercent;
         AccountForHardLinks = settings.AccountForHardLinks;
         EncryptScanResults = securitySettings.EncryptScanResults;
+        RequireWindowsHelloOnLaunch = securitySettings.RequireWindowsHelloOnLaunch;
 
         _isInitialized = true;
+    }
+
+    public async Task LoadWindowsHelloAvailabilityAsync()
+    {
+        var availability = await _windowsHello.CheckAvailabilityAsync();
+
+        IsWindowsHelloAvailable = availability == WindowsHelloAvailability.Available;
+        WindowsHelloUnavailableReason = IsWindowsHelloAvailable
+            ? null
+            : _localizationService.GetString($"{ResourceKeys.WindowsHelloUnavailablePrefix}{availability}");
+    }
+
+    partial void OnRequireWindowsHelloOnLaunchChanged(bool value)
+    {
+        if (!_isInitialized || _isRevertingWindowsHelloToggle) return;
+
+        if (value)
+        {
+            _ = ConfirmEnableWindowsHelloAsync();
+            return;
+        }
+
+        _securitySettings.RequireWindowsHelloOnLaunch = false;
+        StatusMessage = _localizationService.GetString(ResourceKeys.RequireWindowsHelloDisabledStatus);
+    }
+
+    private async Task ConfirmEnableWindowsHelloAsync()
+    {
+        var result = await _windowsHello.RequestVerificationAsync(WindowHandle,
+            _localizationService.GetString(ResourceKeys.WindowsHelloEnablePrompt));
+
+        if (result == WindowsHelloVerificationResult.Verified)
+        {
+            _securitySettings.RequireWindowsHelloOnLaunch = true;
+            StatusMessage = _localizationService.GetString(ResourceKeys.RequireWindowsHelloEnabledStatus);
+            return;
+        }
+
+        _isRevertingWindowsHelloToggle = true;
+        RequireWindowsHelloOnLaunch = false;
+        _isRevertingWindowsHelloToggle = false;
+        StatusMessage = _localizationService.GetString(ResourceKeys.WindowsHelloVerificationFailed);
     }
 
     partial void OnEncryptScanResultsChanged(bool value)

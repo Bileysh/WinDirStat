@@ -22,13 +22,15 @@ public sealed partial class MainWindow : Window
     private readonly TrayStatusUpdateThrottle _trayUpdateThrottle = new(TrayUpdateThrottleMs);
 
     public MainPageViewModel ViewModel { get; private set; }
+    public AppLockViewModel LockViewModel { get; }
     public ICommand RestoreWindowCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand ScanFromTrayCommand { get; }
 
-    public MainWindow(MainPage mainPage)
+    public MainWindow(MainPage mainPage, AppLockViewModel lockViewModel)
     {
         ViewModel = mainPage.ViewModel;
+        LockViewModel = lockViewModel;
         _localizationService = App.StaticServices?.GetService<ILocalizationService>();
 
         RestoreWindowCommand = new RelayCommand(RestoreWindow);
@@ -36,6 +38,7 @@ public sealed partial class MainWindow : Window
         ScanFromTrayCommand = new RelayCommand(ScanFromTray);
 
         InitializeComponent();
+        LockViewModel.WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
@@ -160,7 +163,7 @@ public sealed partial class MainWindow : Window
     private void ScanFromTray()
     {
         RestoreWindow();
-        if (ViewModel.OpenFolderCommand.CanExecute(null))
+        if (LockViewModel.IsUnlocked && ViewModel.OpenFolderCommand.CanExecute(null))
         {
             ViewModel.OpenFolderCommand.Execute(null);
         }

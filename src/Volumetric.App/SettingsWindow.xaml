@@ -62,6 +62,20 @@
                                 <ToggleSwitch x:Uid="SettingsEncryptScanResultsToggle" Grid.Column="1" IsOn="{x:Bind ViewModel.EncryptScanResults, Mode=TwoWay}"
                                               OnContent="" OffContent="" VerticalAlignment="Center" />
                             </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid Padding="16" ColumnDefinitions="*, Auto">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                                    <TextBlock x:Uid="RequireWindowsHelloHeader" Style="{ThemeResource BodyTextBlockStyle}" />
+                                    <TextBlock x:Uid="RequireWindowsHelloDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{x:Bind ViewModel.WindowsHelloUnavailableReason, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource SystemFillColorCautionBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                </StackPanel>
+                                <ToggleSwitch x:Uid="SettingsRequireWindowsHelloToggle" Grid.Column="1" IsOn="{x:Bind ViewModel.RequireWindowsHelloOnLaunch, Mode=TwoWay}"
+                                              IsEnabled="{x:Bind ViewModel.IsWindowsHelloToggleEnabled, Mode=OneWay}"
+                                              OnContent="" OffContent="" VerticalAlignment="Center" />
+                            </Grid>
                         </StackPanel>
                     </Border>
                 </StackPanel>
