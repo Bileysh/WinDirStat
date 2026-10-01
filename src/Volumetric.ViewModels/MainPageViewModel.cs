@@ -287,6 +287,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public async Task ScanPathAsync(string? path, bool useElevatedFallbackForAccessDenied = false)
     {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
         CancelScan();
         _scanCts = new CancellationTokenSource();
         _lastScanPath = path;
@@ -534,7 +539,21 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private async Task ImportScanResultsAsync()
     {
-        var imported = await _scanResultFileService.ImportAsync(_windowHandleProvider.Hwnd);
+        (FileSystemNode RootNode, string FileName)? imported;
+        try
+        {
+            imported = await _scanResultFileService.ImportAsync(_windowHandleProvider.Hwnd);
+        }
+        catch (Exception ex)
+        {
+            var title = _localizationService.GetString(ResourceKeys.ImportErrorTitle);
+            var message = ex is ScanResultKeyUnavailableException
+                ? _localizationService.GetString(ResourceKeys.ImportKeyUnavailableMessage)
+                : ex.Message;
+            await _dialogService.ShowMessageAsync(title, message);
+            return;
+        }
+
         if (imported is null)
         {
             return;

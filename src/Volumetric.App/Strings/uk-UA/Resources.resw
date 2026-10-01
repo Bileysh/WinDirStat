@@ -434,6 +434,78 @@
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Не вдалося експортувати</value>
   </data>
+    <data name="ImportErrorTitle" xml:space="preserve">
+    <value>Не вдалося імпортувати</value>
+  </data>
+    <data name="ImportKeyUnavailableMessage" xml:space="preserve">
+    <value>Цей файл скану зашифровано, а ключ до нього недоступний поточному користувачу Windows.</value>
+  </data>
+    <data name="SecuritySettingsTitle.Text" xml:space="preserve">
+    <value>Безпека</value>
+  </data>
+    <data name="EncryptScanResultsHeader.Text" xml:space="preserve">
+    <value>Шифрувати експортовані результати сканування</value>
+  </data>
+    <data name="EncryptScanResultsDesc.Text" xml:space="preserve">
+    <value>Файли .volscan шифруються ключем, що зберігається в Windows Credential Locker. Відкрити їх може лише ваш обліковий запис Windows.</value>
+  </data>
+    <data name="SettingsEncryptScanResultsToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Шифрувати експортовані результати сканування</value>
+  </data>
+    <data name="EncryptScanResultsEnabledStatus" xml:space="preserve">
+    <value>Експортовані результати сканування буде зашифровано.</value>
+  </data>
+    <data name="EncryptScanResultsDisabledStatus" xml:space="preserve">
+    <value>Експортовані результати сканування зберігатимуться без шифрування.</value>
+  </data>
+    <data name="RequireWindowsHelloHeader.Text" xml:space="preserve">
+    <value>Вимагати Windows Hello під час запуску</value>
+  </data>
+    <data name="RequireWindowsHelloDesc.Text" xml:space="preserve">
+    <value>Volumetric відкривається лише після підтвердження особи через Windows Hello. Якщо Windows Hello стане недоступним, застосунок відкриється без перевірки.</value>
+  </data>
+    <data name="SettingsRequireWindowsHelloToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Вимагати Windows Hello під час запуску</value>
+  </data>
+    <data name="RequireWindowsHelloEnabledStatus" xml:space="preserve">
+    <value>Під час запуску Volumetric вимагатиметься Windows Hello.</value>
+  </data>
+    <data name="RequireWindowsHelloDisabledStatus" xml:space="preserve">
+    <value>Windows Hello більше не вимагається під час запуску.</value>
+  </data>
+    <data name="WindowsHelloLaunchPrompt" xml:space="preserve">
+    <value>Підтвердьте особу, щоб відкрити Volumetric</value>
+  </data>
+    <data name="WindowsHelloEnablePrompt" xml:space="preserve">
+    <value>Підтвердьте особу, щоб увімкнути вимогу Windows Hello під час запуску</value>
+  </data>
+    <data name="WindowsHelloVerificationFailed" xml:space="preserve">
+    <value>Перевірку Windows Hello не завершено.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_DeviceNotPresent" xml:space="preserve">
+    <value>Недоступно: на цьому ПК немає пристрою Windows Hello.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_NotConfiguredForUser" xml:space="preserve">
+    <value>Недоступно: Windows Hello не налаштовано для вашого облікового запису. Налаштуйте його в Параметри › Облікові записи › Параметри входу.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_DisabledByPolicy" xml:space="preserve">
+    <value>Недоступно: Windows Hello вимкнено груповою політикою.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_DeviceBusy" xml:space="preserve">
+    <value>Недоступно: пристрій Windows Hello зайнятий. Спробуйте пізніше.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_Unknown" xml:space="preserve">
+    <value>Недоступно: не вдалося визначити стан Windows Hello.</value>
+  </data>
+    <data name="AppLockedTitle.Text" xml:space="preserve">
+    <value>Volumetric заблоковано</value>
+  </data>
+    <data name="AppLockedDesc.Text" xml:space="preserve">
+    <value>Підтвердьте особу через Windows Hello, щоб продовжити.</value>
+  </data>
+    <data name="UnlockButton.Content" xml:space="preserve">
+    <value>Розблокувати</value>
+  </data>
     <data name="WindowTitle_ScanReport" xml:space="preserve">
     <value>Звіт сканування</value>
   </data>

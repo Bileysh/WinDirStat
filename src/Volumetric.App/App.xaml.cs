@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
-using Serilog;
 using Volumetric_App.Services;
 using Volumetric.Core.Interfaces;
 using Volumetric.Services;
@@ -53,15 +52,16 @@ public partial class App
         var windowManager = Services.GetRequiredService<WindowManagerService>();
         var mainPage = windowManager.CreateScopedMainPage();
         RootViewModel = mainPage.ViewModel;
-        _mWindow = new MainWindow(mainPage);
+        var appLock = Services.GetRequiredService<AppLockViewModel>();
+        _mWindow = new MainWindow(mainPage, appLock);
         MainWindow = _mWindow;
         _mWindow.Closed += OnMainWindowClosed;
         windowManager.SetRootWindowHandle(_mWindow);
         _mWindow.Activate();
+        _ = appLock.InitializeAsync();
 
         Services.GetRequiredService<INotificationService>();
         Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
-        _ = LogWindowsHelloAvailabilityAsync();
 
         ActivationDispatcher.Handle(_initialActivationArgs, isColdStart: true);
 
@@ -71,25 +71,6 @@ public partial class App
             ActivationDispatcher.HandleExtracted(
                 new ActivationDispatcher.ExtractedActivation(ActivationDispatcher.ActivationAction.Path, pendingPath),
                 isColdStart: true);
-        }
-    }
-
-    private static async Task LogWindowsHelloAvailabilityAsync()
-    {
-        try
-        {
-            var service = StaticServices?.GetService<IWindowsHelloAvailabilityService>();
-            if (service is null)
-            {
-                return;
-            }
-
-            var availability = await service.CheckAvailabilityAsync();
-            Log.Information("Windows Hello availability on this device: {Availability}", availability);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Windows Hello availability check failed");
         }
     }
 
@@ -126,12 +107,16 @@ public partial class App
         services.AddSingleton<IBackgroundScanSettingsService, BackgroundScanSettingsService>();
         services.AddSingleton<IBackgroundScanTaskRegistrar, BackgroundTaskRegistrar>();
         services.AddSingleton<ISettingsFileService, SettingsFileService>();
-        services.AddSingleton<IWindowsHelloAvailabilityService, WindowsHelloAvailabilityService>();
+        services.AddSingleton<IWindowsHelloService, WindowsHelloService>();
+        services.AddSingleton<AppLockViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<SettingsWindow>();
         services.AddSingleton<IBackgroundScanTestRunner, BackgroundScanTestRunner>();
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IFileExplorerService, FileExplorerService>();
+        services.AddSingleton<ISecuritySettingsService, SecuritySettingsService>();
+        services.AddSingleton<IScanResultKeyStore, CredentialLockerKeyStore>();
+        services.AddSingleton<ScanResultSerializer>();
         services.AddSingleton<IScanResultFileService, ScanResultFileService>();
         return services.BuildServiceProvider();
     }

@@ -10,7 +10,16 @@ public enum WindowsHelloAvailability
     Unknown
 }
 
-public interface IWindowsHelloAvailabilityService
+public enum WindowsHelloVerificationResult
+{
+    Verified,
+    Canceled,
+    Failed,
+    Unavailable
+}
+
+public interface IWindowsHelloService
 {
     Task<WindowsHelloAvailability> CheckAvailabilityAsync();
+    Task<WindowsHelloVerificationResult> RequestVerificationAsync(IntPtr ownerHwnd, string message);
 }

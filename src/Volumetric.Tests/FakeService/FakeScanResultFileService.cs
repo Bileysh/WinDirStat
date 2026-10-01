@@ -10,9 +10,16 @@ public class FakeScanResultFileService : IScanResultFileService
         throw new NotImplementedException();
     }
 
+    public Exception? ImportException { get; set; }
+
     public Task<(FileSystemNode RootNode, string FileName)?> ImportAsync(IntPtr ownerHwnd)
     {
-        throw new NotImplementedException();
+        if (ImportException is not null)
+        {
+            throw ImportException;
+        }
+
+        return Task.FromResult<(FileSystemNode RootNode, string FileName)?>(null);
     }
 
     public async Task<FileSystemNode?> ImportFromPathAsync(string filePath)

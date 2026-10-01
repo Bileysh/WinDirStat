@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -15,17 +13,12 @@ public sealed class ScanResultFileService : IScanResultFileService
     private const string Extension = ".volscan";
 
     private readonly IAppLogger _logger;
+    private readonly ScanResultSerializer _serializer;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        TypeInfoResolver = FileSystemNodeJsonContext.Default,
-        MaxDepth = 256,
-        PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
-    };
-
-    public ScanResultFileService(IAppLogger logger)
+    public ScanResultFileService(IAppLogger logger, ScanResultSerializer serializer)
     {
         _logger = logger;
+        _serializer = serializer;
     }
 
     public async Task<string?> ExportAsync(FileSystemNode rootNode, string suggestedFileName, IntPtr ownerHwnd)
@@ -42,8 +35,7 @@ public sealed class ScanResultFileService : IScanResultFileService
         }
 
         using var stream = await file.OpenStreamForWriteAsync();
-        stream.SetLength(0);
-        await JsonSerializer.SerializeAsync(stream, rootNode, JsonOptions);
+        await _serializer.WriteAsync(stream, rootNode);
 
         return file.Name;
     }
@@ -61,15 +53,9 @@ public sealed class ScanResultFileService : IScanResultFileService
         }
 
         using var stream = await file.OpenStreamForReadAsync();
-        var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
+        var rootNode = await _serializer.ReadAsync(stream);
 
-        if (rootNode is not null)
-        {
-            rootNode.EstablishParentLinksRecursively();
-            return (rootNode, file.Name);
-        }
-
-        return null;
+        return rootNode is null ? null : (rootNode, file.Name);
     }
 
     public async Task<FileSystemNode?> ImportFromPathAsync(string filePath)
@@ -77,9 +63,7 @@ public sealed class ScanResultFileService : IScanResultFileService
         try
         {
             await using var stream = File.OpenRead(filePath);
-            var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
-            rootNode?.EstablishParentLinksRecursively();
-            return rootNode;
+            return await _serializer.ReadAsync(stream);
         }
         catch (Exception ex)
         {

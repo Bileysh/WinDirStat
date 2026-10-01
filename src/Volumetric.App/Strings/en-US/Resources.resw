@@ -397,6 +397,78 @@
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Export failed</value>
   </data>
+    <data name="ImportErrorTitle" xml:space="preserve">
+    <value>Import failed</value>
+  </data>
+    <data name="ImportKeyUnavailableMessage" xml:space="preserve">
+    <value>This scan file is encrypted, and its key is not available for the current Windows user.</value>
+  </data>
+    <data name="SecuritySettingsTitle.Text" xml:space="preserve">
+    <value>Security</value>
+  </data>
+    <data name="EncryptScanResultsHeader.Text" xml:space="preserve">
+    <value>Encrypt exported scan results</value>
+  </data>
+    <data name="EncryptScanResultsDesc.Text" xml:space="preserve">
+    <value>Exported .volscan files are encrypted with a key kept in Windows Credential Locker. Only your Windows user account can open them.</value>
+  </data>
+    <data name="SettingsEncryptScanResultsToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Encrypt exported scan results</value>
+  </data>
+    <data name="EncryptScanResultsEnabledStatus" xml:space="preserve">
+    <value>Exported scan results will be encrypted.</value>
+  </data>
+    <data name="EncryptScanResultsDisabledStatus" xml:space="preserve">
+    <value>Exported scan results will be saved without encryption.</value>
+  </data>
+    <data name="RequireWindowsHelloHeader.Text" xml:space="preserve">
+    <value>Require Windows Hello on launch</value>
+  </data>
+    <data name="RequireWindowsHelloDesc.Text" xml:space="preserve">
+    <value>Volumetric opens only after you confirm your identity with Windows Hello. If Windows Hello becomes unavailable, the app opens without the check.</value>
+  </data>
+    <data name="SettingsRequireWindowsHelloToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Require Windows Hello on launch</value>
+  </data>
+    <data name="RequireWindowsHelloEnabledStatus" xml:space="preserve">
+    <value>Windows Hello will be required when Volumetric starts.</value>
+  </data>
+    <data name="RequireWindowsHelloDisabledStatus" xml:space="preserve">
+    <value>Windows Hello is no longer required on launch.</value>
+  </data>
+    <data name="WindowsHelloLaunchPrompt" xml:space="preserve">
+    <value>Confirm your identity to open Volumetric</value>
+  </data>
+    <data name="WindowsHelloEnablePrompt" xml:space="preserve">
+    <value>Confirm your identity to require Windows Hello on launch</value>
+  </data>
+    <data name="WindowsHelloVerificationFailed" xml:space="preserve">
+    <value>Windows Hello verification was not completed.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_DeviceNotPresent" xml:space="preserve">
+    <value>Unavailable: this PC has no Windows Hello device.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_NotConfiguredForUser" xml:space="preserve">
+    <value>Unavailable: Windows Hello is not set up for your account. Set it up in Settings › Accounts › Sign-in options.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_DisabledByPolicy" xml:space="preserve">
+    <value>Unavailable: Windows Hello is disabled by group policy.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_DeviceBusy" xml:space="preserve">
+    <value>Unavailable: the Windows Hello device is busy. Try again later.</value>
+  </data>
+    <data name="WindowsHelloUnavailable_Unknown" xml:space="preserve">
+    <value>Unavailable: the Windows Hello status could not be determined.</value>
+  </data>
+    <data name="AppLockedTitle.Text" xml:space="preserve">
+    <value>Volumetric is locked</value>
+  </data>
+    <data name="AppLockedDesc.Text" xml:space="preserve">
+    <value>Confirm your identity with Windows Hello to continue.</value>
+  </data>
+    <data name="UnlockButton.Content" xml:space="preserve">
+    <value>Unlock</value>
+  </data>
     <data name="WindowTitle_ScanReport" xml:space="preserve">
     <value>Scan report</value>
   </data>

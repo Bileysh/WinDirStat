@@ -37,6 +37,16 @@ public static class ResourceKeys
 
     public const string ExportCompleteTitle = "ExportCompleteTitle";
     public const string ExportErrorTitle = "ExportErrorTitle";
+    public const string ImportErrorTitle = "ImportErrorTitle";
+    public const string ImportKeyUnavailableMessage = "ImportKeyUnavailableMessage";
+    public const string EncryptScanResultsEnabledStatus = "EncryptScanResultsEnabledStatus";
+    public const string EncryptScanResultsDisabledStatus = "EncryptScanResultsDisabledStatus";
+    public const string RequireWindowsHelloEnabledStatus = "RequireWindowsHelloEnabledStatus";
+    public const string RequireWindowsHelloDisabledStatus = "RequireWindowsHelloDisabledStatus";
+    public const string WindowsHelloLaunchPrompt = "WindowsHelloLaunchPrompt";
+    public const string WindowsHelloEnablePrompt = "WindowsHelloEnablePrompt";
+    public const string WindowsHelloVerificationFailed = "WindowsHelloVerificationFailed";
+    public const string WindowsHelloUnavailablePrefix = "WindowsHelloUnavailable_";
     public const string SettingsExportedStatus = "SettingsExportedStatus";
     public const string SettingsImportedStatus = "SettingsImportedStatus";
     public const string SettingsErrorPrefix = "SettingsError_";
