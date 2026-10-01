@@ -33,7 +33,7 @@
                                       FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                       Opacity="0.8" />
 
-                            <TextBlock Text="{x:Bind Mode=OneWay, Converter={StaticResource StatisticsLabelConverter}}"
+                            <TextBlock Text="{x:Bind Converter={StaticResource StatisticsLabelConverter}}"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis" />
                         </StackPanel>

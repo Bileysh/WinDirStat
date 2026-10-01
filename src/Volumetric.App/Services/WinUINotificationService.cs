@@ -8,7 +8,7 @@ public class WinUiNotificationService : INotificationService
     {
         if (App.MainWindow is MainWindow win)
         {
-            win.ShowNotification(title, message);
+            win.ShowNotification(title ?? string.Empty, message ?? string.Empty);
         }
     }
 }

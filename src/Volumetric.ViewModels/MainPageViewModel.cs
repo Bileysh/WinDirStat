@@ -287,6 +287,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public async Task ScanPathAsync(string? path, bool useElevatedFallbackForAccessDenied = false)
     {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
         CancelScan();
         _scanCts = new CancellationTokenSource();
         _lastScanPath = path;

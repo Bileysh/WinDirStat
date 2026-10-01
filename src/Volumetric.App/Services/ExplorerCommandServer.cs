@@ -259,8 +259,7 @@ public static partial class ExplorerCommandServer
                     return S_OK;
                 }
 
-                var riidLocal = riid;
-                var hr = Marshal.QueryInterface(iUnknownPtr, ref riidLocal, out ppvObject);
+                var hr = Marshal.QueryInterface(iUnknownPtr, in riid, out ppvObject);
                 Marshal.Release(iUnknownPtr);
 
                 if (hr != S_OK)
