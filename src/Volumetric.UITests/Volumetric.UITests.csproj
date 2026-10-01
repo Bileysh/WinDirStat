@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Volumetric.App\Volumetric.App.csproj">
-      <AdditionalProperties>WindowsPackageType=None;BaseOutputPath=bin\ForUnitTests\</AdditionalProperties>
+      <AdditionalProperties>WindowsPackageType=None;BaseOutputPath=bin\ForUnitTests\;IntermediateOutputPath=obj\ForUnitTests\</AdditionalProperties>
     </ProjectReference>
     <ProjectReference Include="..\Volumetric.Core\Volumetric.Core.csproj" />
     <ProjectReference Include="..\Volumetric.ViewModels\Volumetric.ViewModels.csproj" />
