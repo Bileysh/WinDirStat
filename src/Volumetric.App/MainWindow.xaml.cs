@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
+using Volumetric_App.Services;
 using Volumetric.Core.Interfaces;
 using Volumetric.ViewModels;
 
@@ -17,10 +18,8 @@ public sealed partial class MainWindow : Window
     private const long TrayUpdateThrottleMs = 500;
 
     private readonly ILocalizationService? _localizationService;
-    private readonly System.Drawing.Icon _idleTrayIcon;
-    private readonly System.Drawing.Icon _scanningTrayIcon;
-    private readonly IntPtr _scanningTrayIconHandle;
-    private long _lastTrayUpdateTicks;
+    private readonly TrayIconSet _trayIcons;
+    private readonly TrayStatusUpdateThrottle _trayUpdateThrottle = new(TrayUpdateThrottleMs);
 
     public MainPageViewModel ViewModel { get; private set; }
     public ICommand RestoreWindowCommand { get; }
@@ -45,9 +44,7 @@ public sealed partial class MainWindow : Window
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
         var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
-        _idleTrayIcon = new System.Drawing.Icon(iconPath);
-        (_scanningTrayIcon, _scanningTrayIconHandle) = CreateScanningTrayIcon(_idleTrayIcon);
-        TrayIcon.Icon = _idleTrayIcon;
+        _trayIcons = new TrayIconSet(new System.Drawing.Icon(iconPath));
 
         RootFrame.Content = mainPage;
 
@@ -70,29 +67,16 @@ public sealed partial class MainWindow : Window
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainPageViewModel.IsScanning))
+        if (_trayUpdateThrottle.ShouldUpdate(e.PropertyName, Environment.TickCount64))
         {
-            UpdateTrayStatus();
-            return;
-        }
-
-        if (e.PropertyName is nameof(MainPageViewModel.ScanFilesCount) or nameof(MainPageViewModel.ScanFoldersCount))
-        {
-            var now = Environment.TickCount64;
-            if (now - _lastTrayUpdateTicks < TrayUpdateThrottleMs)
-            {
-                return;
-            }
-
             UpdateTrayStatus();
         }
     }
 
     private void UpdateTrayStatus()
     {
-        _lastTrayUpdateTicks = Environment.TickCount64;
-        var sourceIcon = ViewModel.IsScanning ? _scanningTrayIcon : _idleTrayIcon;
-        TrayIcon.Icon = (System.Drawing.Icon)sourceIcon.Clone();
+        _trayUpdateThrottle.MarkUpdated(Environment.TickCount64);
+        TrayIcon.Icon = _trayIcons.CreateIcon(ViewModel.IsScanning);
 
         var idleTooltip = _localizationService?.GetString(ResourceKeys.TrayIconToolTipText) ?? "Volumetric";
         var scanningFormat = _localizationService?.GetString(ResourceKeys.TrayIconScanningToolTipFormat)
@@ -101,29 +85,6 @@ public sealed partial class MainWindow : Window
         TrayIcon.ToolTipText = TrayIconStatusFormatter.BuildTooltip(ViewModel.IsScanning, ViewModel.ScanFilesCount,
             ViewModel.ScanFoldersCount, idleTooltip, scanningFormat);
     }
-
-    private static (System.Drawing.Icon Icon, IntPtr Handle) CreateScanningTrayIcon(System.Drawing.Icon baseIcon)
-    {
-        using var bitmap = baseIcon.ToBitmap();
-        using var graphics = System.Drawing.Graphics.FromImage(bitmap);
-        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-        var badgeSize = bitmap.Width / 2;
-        var badgeRect = new System.Drawing.Rectangle(bitmap.Width - badgeSize, bitmap.Height - badgeSize, badgeSize,
-            badgeSize);
-
-        using var badgeBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 16, 124, 16));
-        graphics.FillEllipse(badgeBrush, badgeRect);
-        using var borderPen = new System.Drawing.Pen(System.Drawing.Color.White, 1.5f);
-        graphics.DrawEllipse(borderPen, badgeRect);
-
-        var handle = bitmap.GetHicon();
-        return (System.Drawing.Icon.FromHandle(handle), handle);
-    }
-
-    [LibraryImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool DestroyIcon(IntPtr hIcon);
 
     private void ApplyTransparentTitleBarButtons()
     {
@@ -192,9 +153,7 @@ public sealed partial class MainWindow : Window
     private void ExitApp()
     {
         TrayIcon?.Dispose();
-        _idleTrayIcon.Dispose();
-        _scanningTrayIcon.Dispose();
-        DestroyIcon(_scanningTrayIconHandle);
+        _trayIcons.Dispose();
         Application.Current.Exit();
     }
 
