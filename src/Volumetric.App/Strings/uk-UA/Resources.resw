@@ -434,6 +434,30 @@
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Не вдалося експортувати</value>
   </data>
+    <data name="ImportErrorTitle" xml:space="preserve">
+    <value>Не вдалося імпортувати</value>
+  </data>
+    <data name="ImportKeyUnavailableMessage" xml:space="preserve">
+    <value>Цей файл скану зашифровано, а ключ до нього недоступний поточному користувачу Windows.</value>
+  </data>
+    <data name="SecuritySettingsTitle.Text" xml:space="preserve">
+    <value>Безпека</value>
+  </data>
+    <data name="EncryptScanResultsHeader.Text" xml:space="preserve">
+    <value>Шифрувати експортовані результати сканування</value>
+  </data>
+    <data name="EncryptScanResultsDesc.Text" xml:space="preserve">
+    <value>Файли .volscan шифруються ключем, що зберігається в Windows Credential Locker. Відкрити їх може лише ваш обліковий запис Windows.</value>
+  </data>
+    <data name="SettingsEncryptScanResultsToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Шифрувати експортовані результати сканування</value>
+  </data>
+    <data name="EncryptScanResultsEnabledStatus" xml:space="preserve">
+    <value>Експортовані результати сканування буде зашифровано.</value>
+  </data>
+    <data name="EncryptScanResultsDisabledStatus" xml:space="preserve">
+    <value>Експортовані результати сканування зберігатимуться без шифрування.</value>
+  </data>
     <data name="WindowTitle_ScanReport" xml:space="preserve">
     <value>Звіт сканування</value>
   </data>

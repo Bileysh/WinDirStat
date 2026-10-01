@@ -397,6 +397,30 @@
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Export failed</value>
   </data>
+    <data name="ImportErrorTitle" xml:space="preserve">
+    <value>Import failed</value>
+  </data>
+    <data name="ImportKeyUnavailableMessage" xml:space="preserve">
+    <value>This scan file is encrypted, and its key is not available for the current Windows user.</value>
+  </data>
+    <data name="SecuritySettingsTitle.Text" xml:space="preserve">
+    <value>Security</value>
+  </data>
+    <data name="EncryptScanResultsHeader.Text" xml:space="preserve">
+    <value>Encrypt exported scan results</value>
+  </data>
+    <data name="EncryptScanResultsDesc.Text" xml:space="preserve">
+    <value>Exported .volscan files are encrypted with a key kept in Windows Credential Locker. Only your Windows user account can open them.</value>
+  </data>
+    <data name="SettingsEncryptScanResultsToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Encrypt exported scan results</value>
+  </data>
+    <data name="EncryptScanResultsEnabledStatus" xml:space="preserve">
+    <value>Exported scan results will be encrypted.</value>
+  </data>
+    <data name="EncryptScanResultsDisabledStatus" xml:space="preserve">
+    <value>Exported scan results will be saved without encryption.</value>
+  </data>
     <data name="WindowTitle_ScanReport" xml:space="preserve">
     <value>Scan report</value>
   </data>

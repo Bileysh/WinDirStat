@@ -132,6 +132,9 @@ public partial class App
         services.AddSingleton<IBackgroundScanTestRunner, BackgroundScanTestRunner>();
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IFileExplorerService, FileExplorerService>();
+        services.AddSingleton<ISecuritySettingsService, SecuritySettingsService>();
+        services.AddSingleton<IScanResultKeyStore, CredentialLockerKeyStore>();
+        services.AddSingleton<ScanResultSerializer>();
         services.AddSingleton<IScanResultFileService, ScanResultFileService>();
         return services.BuildServiceProvider();
     }
