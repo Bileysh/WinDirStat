@@ -14,6 +14,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISettingsFileService _fileService;
     private readonly IBackgroundScanTestRunner _testRunner;
     private readonly ILocalizationService _localizationService;
+    private readonly ISecuritySettingsService _securitySettings;
 
     private readonly bool _isInitialized;
 
@@ -27,6 +28,9 @@ public partial class SettingsViewModel : ObservableObject
     public partial bool AccountForHardLinks { get; set; }
 
     [ObservableProperty]
+    public partial bool EncryptScanResults { get; set; }
+
+    [ObservableProperty]
     public partial string? StatusMessage { get; set; }
 
     public IntPtr WindowHandle { get; set; }
@@ -36,19 +40,31 @@ public partial class SettingsViewModel : ObservableObject
         IBackgroundScanTaskRegistrar registrar,
         ISettingsFileService fileService,
         IBackgroundScanTestRunner testRunner,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        ISecuritySettingsService securitySettings)
     {
         _settings = settings;
         _registrar = registrar;
         _fileService = fileService;
         _testRunner = testRunner;
         _localizationService = localizationService;
+        _securitySettings = securitySettings;
 
         ScanIntervalMinutes = settings.ScanIntervalMinutes;
         LowFreeSpaceThresholdPercent = settings.LowFreeSpaceThresholdPercent;
         AccountForHardLinks = settings.AccountForHardLinks;
+        EncryptScanResults = securitySettings.EncryptScanResults;
 
         _isInitialized = true;
+    }
+
+    partial void OnEncryptScanResultsChanged(bool value)
+    {
+        if (!_isInitialized) return;
+
+        _securitySettings.EncryptScanResults = value;
+        StatusMessage = _localizationService.GetString(
+            value ? ResourceKeys.EncryptScanResultsEnabledStatus : ResourceKeys.EncryptScanResultsDisabledStatus);
     }
 
     partial void OnScanIntervalMinutesChanged(uint value)
