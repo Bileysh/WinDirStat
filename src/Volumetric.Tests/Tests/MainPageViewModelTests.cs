@@ -84,6 +84,37 @@ public class MainPageViewModelTests
         Assert.False(vmB.IsScanning);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ScanPathAsync_MissingPath_DoesNothing(string? path)
+    {
+        var vm = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService(),
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        await vm.ScanPathAsync(path);
+
+        Assert.False(vm.IsScanning);
+        Assert.Empty(vm.RootNodes);
+        Assert.False(vm.RescanCommand.CanExecute(null));
+    }
+
     [Fact]
     public Task OpenScanReportAsync_WithScanResult_OpensWindowWithRootNode()
     {
