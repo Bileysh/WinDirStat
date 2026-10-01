@@ -102,6 +102,7 @@ public class ScanResultSerializerTests
     private sealed class FakeSecuritySettings(bool encrypt) : ISecuritySettingsService
     {
         public bool EncryptScanResults { get; set; } = encrypt;
+        public bool RequireWindowsHelloOnLaunch { get; set; }
     }
 
     private sealed class InMemoryKeyStore : IScanResultKeyStore
