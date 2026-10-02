@@ -66,7 +66,7 @@
                 <MenuFlyoutItem x:Uid="MenuWindowOpenNew" Icon="NewWindow"
                                 Command="{x:Bind ViewModel.OpenInNewWindowCommand}" />
             </MenuBarItem>
-            <MenuBarItem x:Uid="MenuOptions">
+            <MenuBarItem x:Uid="MenuOptions" AutomationProperties.AutomationId="MenuOptions">
                 <MenuFlyoutSubItem x:Uid="MenuOptionsLanguage" Icon="Globe">
                     <MenuFlyoutItem Text="Українська"
                                     Command="{x:Bind ViewModel.ChangeLanguageCommand}"
@@ -79,6 +79,7 @@
                                 Command="{x:Bind ViewModel.ToggleThemeCommand}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem x:Uid="MenuOptionsSettings" Icon="Setting"
+                                AutomationProperties.AutomationId="MenuOptionsSettings"
                                 Command="{x:Bind ViewModel.OpenSettingsCommand}" />
             </MenuBarItem>
 

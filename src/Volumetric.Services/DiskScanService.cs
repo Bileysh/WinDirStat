@@ -197,7 +197,7 @@ public class DiskScanService : IDiskScanService
                     {
                         Name = entry.Name,
                         IsDirectory = false,
-                        Extension = Path.GetExtension(entry.Name),
+                        Extension = string.Intern(Path.GetExtension(entry.Name)),
                         SizeLogical = entry.Length,
                         SizePhysical = physicalSize >= 0 ? physicalSize : entry.Length,
                         LastModified = entry.LastWriteTimeUtc

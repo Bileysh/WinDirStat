@@ -4,16 +4,33 @@ namespace Volumetric.UITests.E2E;
 
 public sealed class VolumetricAppFixture : IDisposable
 {
-    private const string PackageIdentityName = "4B18DC31-5920-4065-AAE7-05908E7C027E";
-    private const string ApplicationId = "App";
-    private static readonly Uri WinAppDriverUri = new("http://127.0.0.1:4723");
+    private readonly Process? _startedDriver;
+    private readonly WinAppDriverSession? _session;
 
-    public WinAppDriverSession Session { get; }
+    public WinAppDriverSession Session =>
+        _session ?? throw new InvalidOperationException(E2EPrerequisites.MissingPrerequisite.Value);
 
     public VolumetricAppFixture()
     {
+        if (E2EPrerequisites.MissingPrerequisite.Value is not null)
+        {
+            return;
+        }
+
         KillRunningInstances();
-        Session = WinAppDriverSession.StartAsync(WinAppDriverUri, ResolveAppUserModelId()).GetAwaiter().GetResult();
+        _startedDriver = WinAppDriverServer.EnsureRunning();
+
+        try
+        {
+            _session = WinAppDriverSession.StartAsync(WinAppDriverServer.Uri, VolumetricPackage.GetAppUserModelId())
+                .GetAwaiter().GetResult();
+        }
+        catch
+        {
+            KillRunningInstances();
+            StopStartedDriver();
+            throw;
+        }
     }
 
     private static void KillRunningInstances()
@@ -31,36 +48,20 @@ public sealed class VolumetricAppFixture : IDisposable
         }
     }
 
-    private static string ResolveAppUserModelId()
+    private void StopStartedDriver()
     {
-        var familyName = RunPowerShell(
-            $"(Get-AppxPackage -Name '{PackageIdentityName}' | Select-Object -First 1).PackageFamilyName");
-
-        if (string.IsNullOrWhiteSpace(familyName))
+        if (_startedDriver is { HasExited: false })
         {
-            throw new InvalidOperationException(
-                $"No installed package found for identity '{PackageIdentityName}'. Build and install Volumetric " +
-                "first (see src/Volumetric.UITests.E2E/README.md) and make sure WinAppDriver.exe is running.");
+            _startedDriver.Kill();
+            _startedDriver.WaitForExit(5000);
         }
 
-        return $"{familyName}!{ApplicationId}";
+        _startedDriver?.Dispose();
     }
 
-    private static string RunPowerShell(string command)
+    public void Dispose()
     {
-        var startInfo = new ProcessStartInfo("powershell.exe",
-            $"-NoProfile -NonInteractive -Command \"{command}\"")
-        {
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = Process.Start(startInfo)!;
-        var output = process.StandardOutput.ReadToEnd().Trim();
-        process.WaitForExit();
-        return output;
+        _session?.Dispose();
+        StopStartedDriver();
     }
-
-    public void Dispose() => Session.Dispose();
 }
