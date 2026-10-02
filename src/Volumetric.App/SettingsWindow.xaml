@@ -48,7 +48,8 @@
                 </StackPanel>
 
                 <StackPanel Spacing="12">
-                    <TextBlock x:Uid="SecuritySettingsTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:Uid="SecuritySettingsTitle" Style="{ThemeResource BodyStrongTextBlockStyle}"
+                               AutomationProperties.AutomationId="SecuritySettingsTitle" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -59,7 +60,8 @@
                                     <TextBlock x:Uid="EncryptScanResultsHeader" Style="{ThemeResource BodyTextBlockStyle}" />
                                     <TextBlock x:Uid="EncryptScanResultsDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
-                                <ToggleSwitch x:Uid="SettingsEncryptScanResultsToggle" Grid.Column="1" IsOn="{x:Bind ViewModel.EncryptScanResults, Mode=TwoWay}"
+                                <ToggleSwitch x:Uid="SettingsEncryptScanResultsToggle" Grid.Column="1"
+                                              AutomationProperties.AutomationId="EncryptScanResultsToggle" IsOn="{x:Bind ViewModel.EncryptScanResults, Mode=TwoWay}"
                                               OnContent="" OffContent="" VerticalAlignment="Center" />
                             </Grid>
 
@@ -72,7 +74,8 @@
                                     <TextBlock Text="{x:Bind ViewModel.WindowsHelloUnavailableReason, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource SystemFillColorCautionBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
                                 </StackPanel>
-                                <ToggleSwitch x:Uid="SettingsRequireWindowsHelloToggle" Grid.Column="1" IsOn="{x:Bind ViewModel.RequireWindowsHelloOnLaunch, Mode=TwoWay}"
+                                <ToggleSwitch x:Uid="SettingsRequireWindowsHelloToggle" Grid.Column="1"
+                                              AutomationProperties.AutomationId="RequireWindowsHelloToggle" IsOn="{x:Bind ViewModel.RequireWindowsHelloOnLaunch, Mode=TwoWay}"
                                               IsEnabled="{x:Bind ViewModel.IsWindowsHelloToggleEnabled, Mode=OneWay}"
                                               OnContent="" OffContent="" VerticalAlignment="Center" />
                             </Grid>
