@@ -9,19 +9,19 @@ public class VolumetricAppCollection : ICollectionFixture<VolumetricAppFixture>
 [Collection(VolumetricAppCollection.Name)]
 public class MainWindowTests(VolumetricAppFixture app)
 {
-    [Fact]
+    [E2EFact]
     public async Task MainWindow_Launches_WithExpectedTitle()
     {
         Assert.Equal("Volumetric", await app.Session.GetTitleAsync());
     }
 
-    [Fact]
+    [E2EFact]
     public async Task MainWindow_ShowsSearchBox()
     {
         Assert.True(await app.Session.ElementWithAccessibilityIdIsDisplayedAsync("SearchBox"));
     }
 
-    [Fact]
+    [E2EFact]
     public async Task MainWindow_ShowsResultsTree()
     {
         Assert.True(await app.Session.ElementWithAccessibilityIdIsDisplayedAsync("ListControl"));
