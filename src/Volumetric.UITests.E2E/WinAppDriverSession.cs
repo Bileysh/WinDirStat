@@ -14,11 +14,24 @@ public sealed class WinAppDriverSession : IDisposable
         _sessionId = sessionId;
     }
 
+    private const int AppLaunchTimeoutSeconds = 30;
+
     public static async Task<WinAppDriverSession> StartAsync(Uri serverUri, string appUserModelId)
     {
-        var http = new HttpClient { BaseAddress = serverUri, Timeout = TimeSpan.FromSeconds(30) };
+        var http = new HttpClient
+        {
+            BaseAddress = serverUri,
+            Timeout = TimeSpan.FromSeconds(AppLaunchTimeoutSeconds + 15)
+        };
 
-        var body = new { desiredCapabilities = new { app = appUserModelId } };
+        var body = new JsonObject
+        {
+            ["desiredCapabilities"] = new JsonObject
+            {
+                ["app"] = appUserModelId,
+                ["ms:waitForAppLaunch"] = AppLaunchTimeoutSeconds
+            }
+        };
         var response = await http.PostAsJsonAsync("session", body);
         var json = await response.Content.ReadFromJsonAsync<JsonNode>();
 
