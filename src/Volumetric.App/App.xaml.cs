@@ -38,6 +38,7 @@ public partial class App
             e.Handled = true;
         };
         LegacyRegistryCleanup.RemoveStaleClassicContextMenuKeys();
+        StartupTimeline.Mark("app constructed");
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -51,6 +52,8 @@ public partial class App
 
         var windowManager = Services.GetRequiredService<WindowManagerService>();
         var mainPage = windowManager.CreateScopedMainPage();
+        mainPage.Loaded += OnFirstMainPageLoaded;
+        StartupTimeline.Mark("main page created");
         RootViewModel = mainPage.ViewModel;
         var appLock = Services.GetRequiredService<AppLockViewModel>();
         _mWindow = new MainWindow(mainPage, appLock);
@@ -58,10 +61,12 @@ public partial class App
         _mWindow.Closed += OnMainWindowClosed;
         windowManager.SetRootWindowHandle(_mWindow);
         _mWindow.Activate();
+        StartupTimeline.Mark("main window activated");
         _ = appLock.InitializeAsync();
 
         Services.GetRequiredService<INotificationService>();
         Services.GetRequiredService<IBackgroundScanTaskRegistrar>().EnsureRegistered();
+        StartupTimeline.Mark("services ready");
 
         ActivationDispatcher.Handle(_initialActivationArgs, isColdStart: true);
 
@@ -72,6 +77,12 @@ public partial class App
                 new ActivationDispatcher.ExtractedActivation(ActivationDispatcher.ActivationAction.Path, pendingPath),
                 isColdStart: true);
         }
+    }
+
+    private static void OnFirstMainPageLoaded(object sender, RoutedEventArgs e)
+    {
+        ((MainPage)sender).Loaded -= OnFirstMainPageLoaded;
+        StartupTimeline.Mark("main page loaded");
     }
 
     private static void OnMainWindowClosed(object sender, WindowEventArgs args)

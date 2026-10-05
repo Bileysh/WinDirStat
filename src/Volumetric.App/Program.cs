@@ -58,6 +58,7 @@ public static partial class Program
         }
 
         AppLogger.Initialize("Interactive");
+        StartupTimeline.Mark("logger ready");
 
         AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
         NotificationsRegistered = NotificationRegistration.TryRegister("Interactive");
@@ -72,6 +73,7 @@ public static partial class Program
             return;
         }
 
+        StartupTimeline.Mark("single instance registered");
         RunAsInteractiveApp(activatedArgs);
     }
 
