@@ -100,8 +100,7 @@ public class DiskScanService : IDiskScanService
                                 continue;
                             }
 
-                            deniedNode.Children.Clear();
-                            deniedNode.Children.AddRange(elevatedNode.Children);
+                            deniedNode.ReplaceChildren(elevatedNode.Children);
                             deniedNode.EstablishParentLinksRecursively();
                             deniedNode.Status = elevatedNode.Status;
                             deniedNode.ErrorMessage = elevatedNode.ErrorMessage;

@@ -10,11 +10,11 @@ public class SquarifiedTreeMapLayoutTests
         Name = "root",
         IsDirectory = true,
         Children =
-        {
+        [
             new FileSystemNode { Name = "a", SizeLogical = 500 },
             new FileSystemNode { Name = "b", SizeLogical = 300 },
             new FileSystemNode { Name = "c", SizeLogical = 200 }
-        }
+        ]
     };
 
     [Fact]

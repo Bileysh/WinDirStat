@@ -13,11 +13,11 @@ public class FileStatisticsAggregatorTests
             Name = "root",
             IsDirectory = true,
             Children =
-            {
+            [
                 new FileSystemNode { Name = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
                 new FileSystemNode { Name = "b.mp4", Extension = ".mp4", SizeLogical = 200 },
                 new FileSystemNode { Name = "c.txt", Extension = ".txt", SizeLogical = 50 }
-            }
+            ]
         };
 
         var result = FileStatisticsAggregator.ByExtension(root);
@@ -36,10 +36,10 @@ public class FileStatisticsAggregatorTests
             Name = "root",
             IsDirectory = true,
             Children =
-            {
+            [
                 new FileSystemNode { Name = "a.mp4", Extension = ".mp4", SizeLogical = 100 },
                 new FileSystemNode { Name = "b.mkv", Extension = ".mkv", SizeLogical = 200 }
-            }
+            ]
         };
 
         var result = FileStatisticsAggregator.ByCategory(root);
