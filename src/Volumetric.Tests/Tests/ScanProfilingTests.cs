@@ -18,18 +18,22 @@ public class ScanProfilingTests(ITestOutputHelper output)
         using var uiThread = new RecordingUiContext();
         var scanState = new ScanStateService();
         var vm = CreateViewModel(scanState);
-        var scanFinished = new TaskCompletionSource();
+        var scanFinished = new TaskCompletionSource<long>(TaskCreationOptions.RunContinuationsAsynchronously);
         var total = Stopwatch.StartNew();
 
         uiThread.Post(async _ =>
         {
             await vm.ScanPathAsync(path);
-            scanFinished.SetResult();
+            scanFinished.SetResult(uiThread.CurrentCallbackNumber);
         }, null);
-        await scanFinished.Task;
+        var postScanCallbackNumber = await scanFinished.Task;
         total.Stop();
 
-        var callbacks = uiThread.Callbacks.ToList();
+        var drained = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        uiThread.Post(_ => drained.SetResult(), null);
+        await drained.Task;
+
+        var callbacks = uiThread.Callbacks.Where(c => c.Number <= postScanCallbackNumber).ToList();
         var nodes = CountNodes(scanState.CurrentResult!.RootNode);
 
         output.WriteLine($"Path                         : {path}");
@@ -39,7 +43,8 @@ public class ScanProfilingTests(ITestOutputHelper output)
         output.WriteLine($"UI busy total                : {callbacks.Sum(c => c.Duration.TotalMilliseconds):N0} ms");
         output.WriteLine($"Longest UI callback          : {callbacks.Max(c => c.Duration.TotalMilliseconds):N0} ms");
         output.WriteLine($"UI callbacks over 50 ms      : {callbacks.Count(c => c.Duration.TotalMilliseconds > 50):N0}");
-        output.WriteLine($"Post-scan UI work            : {callbacks[^1].Duration.TotalMilliseconds:N0} ms");
+        output.WriteLine(
+            $"Post-scan UI work            : {callbacks.Single(c => c.Number == postScanCallbackNumber).Duration.TotalMilliseconds:N0} ms");
         output.WriteLine($"Managed heap after scan      : {GC.GetTotalMemory(forceFullCollection: true) / 1024 / 1024:N0} MB");
         output.WriteLine($"Peak working set             : {Process.GetCurrentProcess().PeakWorkingSet64 / 1024 / 1024:N0} MB");
 
@@ -93,7 +98,7 @@ public class ScanProfilingTests(ITestOutputHelper output)
         }
     }
 
-    private sealed record UiCallback(TimeSpan StartedAt, TimeSpan Duration);
+    private sealed record UiCallback(long Number, TimeSpan Duration);
 
     private sealed class RecordingUiContext : SynchronizationContext, IDisposable
     {
@@ -102,6 +107,7 @@ public class ScanProfilingTests(ITestOutputHelper output)
         private readonly Thread _thread;
 
         public ConcurrentQueue<UiCallback> Callbacks { get; } = new();
+        public long CurrentCallbackNumber { get; private set; }
 
         public RecordingUiContext()
         {
@@ -119,9 +125,10 @@ public class ScanProfilingTests(ITestOutputHelper output)
             SetSynchronizationContext(this);
             foreach (var (callback, state) in _queue.GetConsumingEnumerable())
             {
+                CurrentCallbackNumber++;
                 var startedAt = _clock.Elapsed;
                 callback(state);
-                Callbacks.Enqueue(new UiCallback(startedAt, _clock.Elapsed - startedAt));
+                Callbacks.Enqueue(new UiCallback(CurrentCallbackNumber, _clock.Elapsed - startedAt));
             }
         }
 
