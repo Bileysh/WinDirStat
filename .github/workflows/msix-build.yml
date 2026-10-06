@@ -42,6 +42,34 @@ jobs:
                     -PackageVersion "1.0.${{ github.run_number }}.0" `
                     @certArgs
 
+            - name: Check package contents and size
+              shell: pwsh
+              run: |
+                  Add-Type -AssemblyName System.IO.Compression.FileSystem
+                  $msix = Get-ChildItem artifacts -Recurse -Filter *.msix |
+                      Where-Object { $_.DirectoryName -notmatch '\\Dependencies(\\|$)' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
+                  $zip = [IO.Compression.ZipFile]::OpenRead($msix.FullName)
+                  try {
+                      $unwanted = @($zip.Entries |
+                          Where-Object { $_.Name -match '^(onnxruntime|DirectML|Microsoft\.ML\.OnnxRuntime|Microsoft\.Windows\.AI\.)' } |
+                          ForEach-Object { $_.FullName })
+                  }
+                  finally {
+                      $zip.Dispose()
+                  }
+                  $sizeMb = [math]::Round($msix.Length / 1MB, 1)
+                  "| Package | Size |`n|---|---|`n| $($msix.Name) | $sizeMb MB |" >> $env:GITHUB_STEP_SUMMARY
+                  if ($unwanted.Count -gt 0) {
+                      Write-Error "Unused AI/ML binaries found in the package: $($unwanted -join ', ')"
+                      exit 1
+                  }
+                  if ($msix.Length -gt 70MB) {
+                      Write-Error "The package is $sizeMb MB, above the 70 MB budget."
+                      exit 1
+                  }
+
             - name: Upload MSIX artifact
               uses: actions/upload-artifact@v4
               with:
