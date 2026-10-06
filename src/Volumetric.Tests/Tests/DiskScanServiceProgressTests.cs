@@ -15,7 +15,7 @@ public class DiskScanServiceProgressTests
     [Fact]
     public async Task ScanAsync_WithoutProgress_DoesNotThrow()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[10]);
 
         var service = new DiskScanService(new FileIdentityService());
@@ -28,7 +28,7 @@ public class DiskScanServiceProgressTests
     [Fact]
     public async Task ScanAsync_BelowThrottleThreshold_ReportsNothing()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         for (var i = 0; i < 10; i++)
         {
             await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, $"f{i}.txt"), new byte[1]);
@@ -45,7 +45,7 @@ public class DiskScanServiceProgressTests
     [Fact]
     public async Task ScanAsync_AboveThrottleThreshold_ReportsAtExpectedCount()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         for (var i = 0; i < 70; i++)
         {
             await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, $"f{i}.txt"), new byte[1]);
@@ -65,7 +65,7 @@ public class DiskScanServiceProgressTests
     [Fact]
     public async Task ScanAsync_CountsFilesAndFoldersSeparately()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         for (var i = 0; i < 40; i++)
         {
             await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, $"f{i}.txt"), new byte[1]);

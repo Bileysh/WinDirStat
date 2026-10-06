@@ -20,7 +20,7 @@ public class DiskScanServiceScenarioTests
     [Fact]
     public async Task ScanAsync_DeeplyNestedDirectories_AggregatesSizeCorrectly()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         var deepest = tempRoot.FullName;
         const int depth = 300;
 
@@ -54,7 +54,7 @@ public class DiskScanServiceScenarioTests
     [Fact]
     public async Task ScanAsync_PathLongerThanMaxPath_StillScansSuccessfully()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         var deepPath = tempRoot.FullName;
         var segment = new string('a', 50);
 
@@ -80,7 +80,7 @@ public class DiskScanServiceScenarioTests
     [Fact]
     public async Task ScanAsync_DirectoryJunction_MarkedAsReparsePointAndNotTraversed()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         var realTarget = tempRoot.CreateSubdirectory("real-target");
         await File.WriteAllBytesAsync(Path.Combine(realTarget.FullName, "inside-target.txt"), new byte[1000]);
 
@@ -101,7 +101,7 @@ public class DiskScanServiceScenarioTests
     [Fact]
     public async Task ScanAsync_CancelledPartwayThroughALargeTree_ThrowsOperationCanceledException()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         for (var i = 0; i < 20; i++)
         {
             var dir = tempRoot.CreateSubdirectory($"d{i}");

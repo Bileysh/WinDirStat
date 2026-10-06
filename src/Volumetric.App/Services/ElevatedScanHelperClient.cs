@@ -95,8 +95,8 @@ public sealed class ElevatedScanHelperClient : IElevatedScanHelper
             }
 
             var json = File.ReadAllText(outputFile);
-            var deserialized =
-                JsonSerializer.Deserialize(json, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode);
+            var deserialized = LargeStack.Run(() =>
+                JsonSerializer.Deserialize(json, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode));
             results = deserialized ?? new Dictionary<string, FileSystemNode>();
             return true;
         }

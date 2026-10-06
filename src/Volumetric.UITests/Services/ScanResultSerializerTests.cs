@@ -73,6 +73,53 @@ public class ScanResultSerializerTests
         Assert.Equal(firstKey, keyStore.TryGetKey());
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void WriteThenRead_SixteenThousandLevelsDeep_RoundTripsFromAOneMegabyteStackThread(bool encrypt)
+    {
+        const int levels = 16_000;
+        Exception? failure = null;
+        FileSystemNode? deepest = null;
+
+        var uiLikeThread = new Thread(() =>
+        {
+            try
+            {
+                var root = new FileSystemNode { Name = "root", IsDirectory = true };
+                var current = root;
+                for (var i = 0; i < levels; i++)
+                {
+                    var next = new FileSystemNode { Name = $"d{i}", IsDirectory = true };
+                    current.AddChild(next);
+                    current = next;
+                }
+
+                var serializer = new ScanResultSerializer(new FakeSecuritySettings(encrypt), new InMemoryKeyStore());
+                using var stream = new MemoryStream();
+                serializer.WriteAsync(stream, root).GetAwaiter().GetResult();
+                stream.Position = 0;
+
+                deepest = serializer.ReadAsync(stream).GetAwaiter().GetResult();
+                while (deepest!.Children.Count > 0)
+                {
+                    deepest = deepest.Children[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                failure = ex;
+            }
+        }, maxStackSize: 1024 * 1024);
+
+        uiLikeThread.Start();
+        uiLikeThread.Join();
+
+        Assert.Null(failure);
+        Assert.Equal($"d{levels - 1}", deepest!.Name);
+        Assert.Equal($"d{levels - 2}", deepest.Parent!.Name);
+    }
+
     private static async Task<FileSystemNode?> ReadBackAsync(ScanResultSerializer serializer, MemoryStream stream)
     {
         stream.Position = 0;

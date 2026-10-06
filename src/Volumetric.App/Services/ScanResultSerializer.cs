@@ -11,7 +11,7 @@ public sealed class ScanResultSerializer(ISecuritySettingsService securitySettin
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         TypeInfoResolver = FileSystemNodeJsonContext.Default,
-        MaxDepth = 256,
+        MaxDepth = FileSystemNodeJsonContext.MaxTreeJsonDepth,
         PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
     };
 
@@ -21,12 +21,22 @@ public sealed class ScanResultSerializer(ISecuritySettingsService securitySettin
 
         if (!securitySettings.EncryptScanResults)
         {
-            await JsonSerializer.SerializeAsync(stream, rootNode, JsonOptions);
+            await LargeStack.RunAsync(() =>
+            {
+                JsonSerializer.Serialize(stream, rootNode, JsonOptions);
+                return true;
+            });
             return;
         }
 
-        var json = JsonSerializer.SerializeToUtf8Bytes(rootNode, JsonOptions);
-        await stream.WriteAsync(ScanResultCipher.Encrypt(json, keyStore.GetOrCreateKey()));
+        var key = keyStore.GetOrCreateKey();
+        await LargeStack.RunAsync(() =>
+        {
+            using var encrypting = ScanResultCipher.CreateEncryptingStream(stream, key);
+            JsonSerializer.Serialize(encrypting, rootNode, JsonOptions);
+            encrypting.Complete();
+            return true;
+        });
     }
 
     public async Task<FileSystemNode?> ReadAsync(Stream stream)
@@ -35,22 +45,25 @@ public sealed class ScanResultSerializer(ISecuritySettingsService securitySettin
         var headerLength = await stream.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false);
         stream.Seek(0, SeekOrigin.Begin);
 
-        var rootNode = ScanResultCipher.IsEncrypted(header.AsSpan(0, headerLength))
-            ? await ReadEncryptedAsync(stream)
-            : await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
+        if (!ScanResultCipher.IsEncrypted(header.AsSpan(0, headerLength)))
+        {
+            return await LargeStack.RunAsync(() => LinkParents(JsonSerializer.Deserialize<FileSystemNode>(stream, JsonOptions)));
+        }
 
-        rootNode?.EstablishParentLinksRecursively();
-        return rootNode;
-    }
-
-    private async Task<FileSystemNode?> ReadEncryptedAsync(Stream stream)
-    {
         var key = keyStore.TryGetKey() ?? throw new ScanResultKeyUnavailableException();
 
-        using var buffer = new MemoryStream();
-        await stream.CopyToAsync(buffer);
-        var json = ScanResultCipher.Decrypt(buffer.GetBuffer().AsSpan(0, (int)buffer.Length), key);
+        return await LargeStack.RunAsync(() =>
+        {
+            using var decrypting = ScanResultCipher.OpenDecryptingStream(stream, key);
+            var rootNode = JsonSerializer.Deserialize<FileSystemNode>(decrypting, JsonOptions);
+            decrypting.CopyTo(Stream.Null);
+            return LinkParents(rootNode);
+        });
+    }
 
-        return JsonSerializer.Deserialize<FileSystemNode>(json, JsonOptions);
+    private static FileSystemNode? LinkParents(FileSystemNode? rootNode)
+    {
+        rootNode?.EstablishParentLinksRecursively();
+        return rootNode;
     }
 }

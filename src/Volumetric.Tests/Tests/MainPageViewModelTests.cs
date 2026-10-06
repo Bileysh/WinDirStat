@@ -11,7 +11,7 @@ public class MainPageViewModelTests
     [Fact]
     public async Task OpenFolderAsync_WhenFolderSelected_PopulatesRootNodes()
     {
-        var tempFolder = Directory.CreateTempSubdirectory();
+        using var tempFolder = new TempDirectory();
 
         var vm = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -39,8 +39,8 @@ public class MainPageViewModelTests
     [Fact]
     public async Task TwoViewModels_WithIndependentScanStateServices_DoNotLeakResultsIntoEachOther()
     {
-        var folderA = Directory.CreateTempSubdirectory();
-        var folderB = Directory.CreateTempSubdirectory();
+        using var folderA = new TempDirectory();
+        using var folderB = new TempDirectory();
 
         var vmA = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
