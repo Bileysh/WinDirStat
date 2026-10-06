@@ -15,6 +15,21 @@ public static class VolumetricPackage
         return string.IsNullOrWhiteSpace(familyName) ? null : familyName;
     }
 
+    public static string GetDataFolder() =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages",
+            FindFamilyName() ?? throw new InvalidOperationException($"Package '{IdentityName}' is not installed."));
+
+    public static string GetLatestLogFile() =>
+        new DirectoryInfo(Path.Combine(GetDataFolder(), "LocalCache", "Local", "Volumetric", "Logs"))
+            .GetFiles("log-*.txt").OrderByDescending(f => f.LastWriteTimeUtc).First().FullName;
+
+    public static string[] ReadLogLines(string logFile)
+    {
+        using var stream = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
+    }
+
     public static string GetAppUserModelId() =>
         $"{FindFamilyName() ?? throw new InvalidOperationException($"Package '{IdentityName}' is not installed.")}!{ApplicationId}";
 

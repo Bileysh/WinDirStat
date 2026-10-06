@@ -109,7 +109,8 @@
                                     <TextBlock x:Uid="TestNotificationHeader" Style="{ThemeResource BodyTextBlockStyle}" />
                                     <TextBlock x:Uid="TestNotificationDesc" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" x:Uid="TestNotificationBtn" Command="{x:Bind ViewModel.TestScanNowCommand}" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" x:Uid="TestNotificationBtn" Command="{x:Bind ViewModel.TestScanNowCommand}" VerticalAlignment="Center"
+                                        AutomationProperties.AutomationId="TestScanNowButton" />
                             </Grid>
                         </StackPanel>
                     </Border>

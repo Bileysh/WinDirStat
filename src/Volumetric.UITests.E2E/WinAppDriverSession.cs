@@ -82,6 +82,9 @@ public sealed class WinAppDriverSession : IDisposable
 
     public Task ClickAsync(string elementId) => PostAsync($"element/{elementId}/click", new { });
 
+    public Task PressSpaceAsync(string elementId) =>
+        PostAsync($"element/{elementId}/value", new { value = new[] { "" } });
+
     public async Task<string> GetWindowHandleAsync() =>
         (await GetAsync("window_handle"))?.GetValue<string>() ??
         throw new InvalidOperationException("WinAppDriver returned no current window handle.");
