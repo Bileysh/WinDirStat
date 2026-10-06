@@ -156,7 +156,8 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ExportAsync()
     {
-        var fileName = await _fileService.ExportAsync(_settings.ExportToJson(), "volumetric-settings", WindowHandle);
+        var fileName = await _fileService.ExportAsync(SettingsTransfer.Export(_settings, _securitySettings),
+            "volumetric-settings", WindowHandle);
         if (fileName is null)
         {
             return;
@@ -174,13 +175,14 @@ public partial class SettingsViewModel : ObservableObject
             return;
         }
 
-        var validationResult = _settings.ImportFromJson(result.Value.Json);
+        var validationResult = SettingsTransfer.Import(result.Value.Json, _settings, _securitySettings);
 
         if (validationResult == SettingsValidationError.None)
         {
             ScanIntervalMinutes = _settings.ScanIntervalMinutes;
             LowFreeSpaceThresholdPercent = _settings.LowFreeSpaceThresholdPercent;
             AccountForHardLinks = _settings.AccountForHardLinks;
+            EncryptScanResults = _securitySettings.EncryptScanResults;
             StatusMessage = string.Format(_localizationService.GetString(ResourceKeys.SettingsImportedStatus), result.Value.FileName);
         }
         else

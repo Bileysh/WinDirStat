@@ -1,12 +1,10 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Windows.Storage;
 using Volumetric.Core.BackgroundScan;
 using Volumetric.Core.Interfaces;
 
 namespace Volumetric_App.Services;
 
-public partial class BackgroundScanSettingsService : IBackgroundScanSettingsService
+public class BackgroundScanSettingsService : IBackgroundScanSettingsService
 {
     private const string IntervalKey = "BackgroundScan.IntervalMinutes";
     private const string ThresholdKey = "BackgroundScan.LowFreeSpaceThresholdPercent";
@@ -29,47 +27,6 @@ public partial class BackgroundScanSettingsService : IBackgroundScanSettingsServ
             : 10.0;
         set => _localSettings.Values[ThresholdKey] = BackgroundScanSettingsValidator.ClampThreshold(value);
     }
-
-    public string ExportToJson()
-    {
-        var dto = new SettingsDto(ScanIntervalMinutes, LowFreeSpaceThresholdPercent, AccountForHardLinks);
-        return JsonSerializer.Serialize(dto, SettingsJsonContext.Default.SettingsDto);
-    }
-
-    public SettingsValidationError ImportFromJson(string json)
-    {
-        try
-        {
-            var dto = JsonSerializer.Deserialize(json, SettingsJsonContext.Default.SettingsDto);
-            if (dto is null)
-            {
-                return SettingsValidationError.InvalidFormat;
-            }
-
-            var validation =
-                BackgroundScanSettingsValidator.ValidateImport(dto.ScanIntervalMinutes,
-                    dto.LowFreeSpaceThresholdPercent);
-            if (validation != SettingsValidationError.None)
-            {
-                return validation;
-            }
-
-            ScanIntervalMinutes = dto.ScanIntervalMinutes;
-            LowFreeSpaceThresholdPercent = dto.LowFreeSpaceThresholdPercent;
-            AccountForHardLinks = dto.AccountForHardLinks;
-            return SettingsValidationError.None;
-        }
-        catch (JsonException)
-        {
-            return SettingsValidationError.InvalidFormat;
-        }
-    }
-
-    private record SettingsDto(uint ScanIntervalMinutes, double LowFreeSpaceThresholdPercent,
-        bool AccountForHardLinks = false);
-
-    [JsonSerializable(typeof(SettingsDto))]
-    private partial class SettingsJsonContext : JsonSerializerContext;
 
     public bool AccountForHardLinks
     {

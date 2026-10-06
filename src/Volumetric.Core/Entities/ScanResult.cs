@@ -17,6 +17,8 @@ public class ScanResult
     public TimeSpan ScanDuration { get; }
     public DateTime ScannedAt { get; }
     public long TotalSize => RootNode.SizeLogical;
+    public long FileCount { get; }
+    public long FolderCount { get; }
 
     public ScanResult(
         string rootPath,
@@ -31,5 +33,30 @@ public class ScanResult
         StatisticsByExtension = statisticsByExtension;
         ScanDuration = scanDuration;
         ScannedAt = DateTime.Now;
+        (FileCount, FolderCount) = CountNodes(rootNode);
+    }
+
+    private static (long Files, long Folders) CountNodes(FileSystemNode root)
+    {
+        long files = 0, folders = 0;
+        var pending = new Stack<FileSystemNode>();
+        pending.Push(root);
+
+        while (pending.TryPop(out var node))
+        {
+            if (!node.IsDirectory)
+            {
+                files++;
+                continue;
+            }
+
+            folders++;
+            foreach (var child in node.Children)
+            {
+                pending.Push(child);
+            }
+        }
+
+        return (files, folders);
     }
 }

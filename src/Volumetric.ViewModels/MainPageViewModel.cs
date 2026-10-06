@@ -320,13 +320,9 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
                 _backgroundScanSettingsService.AccountForHardLinks);
             _scanStateService.SetResult(scanResult);
 
-            var fileCount = 0;
-            var folderCount = 0;
-            CountNodes(scanResult.RootNode, ref fileCount, ref folderCount);
-
             var title = _localizationService.GetString(ResourceKeys.ScanCompleteTitle);
             var msg = string.Format(_localizationService.GetString(ResourceKeys.ScanCompleteMessageFormat),
-                scanResult.ScanDuration.TotalSeconds, fileCount, folderCount);
+                scanResult.ScanDuration.TotalSeconds, scanResult.FileCount, scanResult.FolderCount);
 
             _notificationService.ShowNotification(title, msg, path);
         }
@@ -338,23 +334,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             IsScanning = false;
             _scanCts?.Dispose();
             _scanCts = null;
-        }
-    }
-
-    private void CountNodes(FileSystemNode node, ref int fileCount, ref int folderCount)
-    {
-        if (node.IsDirectory)
-        {
-            folderCount++;
-        }
-        else
-        {
-            fileCount++;
-        }
-
-        foreach (var child in node.Children)
-        {
-            CountNodes(child, ref fileCount, ref folderCount);
         }
     }
 

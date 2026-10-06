@@ -102,6 +102,24 @@ public class SettingsViewModelSecurityTests
         Assert.True(vm.IsWindowsHelloToggleEnabled);
     }
 
+    [Fact]
+    public async Task Import_UpdatesEncryptionToggleAndReportsTheImportedFile()
+    {
+        var files = new NoOpSettingsFileService
+        {
+            ImportResult = ("""{"ScanIntervalMinutes":30,"LowFreeSpaceThresholdPercent":10,"EncryptScanResults":true}""",
+                "team-settings.json")
+        };
+        var vm = new SettingsViewModel(new FakeBackgroundScanSettingsService(), new NoOpRegistrar(), files,
+            new NoOpTestRunner(), new FakeLocalizationService(), _security, _hello);
+
+        await vm.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(vm.EncryptScanResults);
+        Assert.True(_security.EncryptScanResults);
+        Assert.Equal(ResourceKeys.SettingsImportedStatus, vm.StatusMessage);
+    }
+
     private sealed class NoOpRegistrar : IBackgroundScanTaskRegistrar
     {
         public void EnsureRegistered()
@@ -115,11 +133,12 @@ public class SettingsViewModelSecurityTests
 
     private sealed class NoOpSettingsFileService : ISettingsFileService
     {
+        public (string Json, string FileName)? ImportResult { get; init; }
+
         public Task<string?> ExportAsync(string json, string suggestedFileName, IntPtr ownerHwnd) =>
             Task.FromResult<string?>(null);
 
-        public Task<(string Json, string FileName)?> ImportAsync(IntPtr ownerHwnd) =>
-            Task.FromResult<(string Json, string FileName)?>(null);
+        public Task<(string Json, string FileName)?> ImportAsync(IntPtr ownerHwnd) => Task.FromResult(ImportResult);
     }
 
     private sealed class NoOpTestRunner : IBackgroundScanTestRunner
