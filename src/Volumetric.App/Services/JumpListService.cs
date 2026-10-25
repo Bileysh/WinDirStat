@@ -4,7 +4,7 @@ using Windows.UI.StartScreen;
 
 namespace Volumetric_App.Services;
 
-public sealed class JumpListService(IScanStateService scanStateService)
+public sealed class JumpListService(IScanStateService scanStateService) : IRecentScansService
 {
     private const int MaxRecentEntries = 5;
 
@@ -17,6 +17,29 @@ public sealed class JumpListService(IScanStateService scanStateService)
                 _ = UpdateAsync(result.RootPath);
             }
         };
+    }
+
+    public async Task<IReadOnlyList<string>> GetRecentPathsAsync()
+    {
+        try
+        {
+            if (!JumpList.IsSupported())
+            {
+                return [];
+            }
+
+            var jumpList = await JumpList.LoadCurrentAsync();
+            return jumpList.Items
+                .Select(item => item.Arguments)
+                .Where(path => !string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
+                .Take(MaxRecentEntries)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "JumpListService: failed to read recent scans");
+            return [];
+        }
     }
 
     private static async Task UpdateAsync(string scannedPath)

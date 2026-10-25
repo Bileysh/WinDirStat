@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Volumetric.ViewModels;
+using Windows.System;
 
 namespace Volumetric_App.UserControls;
 
@@ -43,6 +44,20 @@ public sealed partial class TreeMapControl : UserControl
 
     private void OnRectTapped(object sender, TappedRoutedEventArgs e)
     {
+        if (sender is FrameworkElement fe && fe.DataContext is TreeMapRectViewModel rectVm)
+        {
+            ViewModel?.DrillDownTreeMapCommand.Execute(rectVm);
+            e.Handled = true;
+        }
+    }
+
+    private void OnRectKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter && e.Key != VirtualKey.Space)
+        {
+            return;
+        }
+
         if (sender is FrameworkElement fe && fe.DataContext is TreeMapRectViewModel rectVm)
         {
             ViewModel?.DrillDownTreeMapCommand.Execute(rectVm);

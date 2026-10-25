@@ -24,6 +24,7 @@ public partial class TreeMapRectViewModel
     public string SizeFormatted { get; }
     public bool IsSizeVisible { get; }
     public bool IsFolder { get; }
+    public string AccessibleName { get; }
 
     public TreeMapRectViewModel(TreeMapRect rect, INotificationService? notificationService = null,
         ILocalizationService? localizationService = null, IFileExplorerService? fileExplorerService = null,
@@ -51,6 +52,7 @@ public partial class TreeMapRectViewModel
         IsTitleVisible = Width > TreeMapConstants.MinWidthForTitle && Height > TreeMapConstants.MinHeightForTitle;
         IsSizeVisible = !IsFolder && Width > TreeMapConstants.MinWidthForSize &&
                         Height > TreeMapConstants.MinHeightForSize;
+        AccessibleName = $"{Name}, {SizeFormatted}";
     }
 
     [RelayCommand]

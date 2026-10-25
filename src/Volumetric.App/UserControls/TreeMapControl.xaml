@@ -64,7 +64,11 @@
                                 Background="{x:Bind Category, Converter={StaticResource CategoryToBrushConverter}}"
                                 BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
                                 ToolTipService.ToolTip="{x:Bind ToolTipText}"
-                                Tapped="OnRectTapped">
+                                Tapped="OnRectTapped"
+                                KeyDown="OnRectKeyDown"
+                                IsTabStop="True"
+                                XYFocusKeyboardNavigation="Enabled"
+                                AutomationProperties.Name="{x:Bind AccessibleName}">
 
                             <Border.ContextFlyout>
                                 <MenuFlyout>
@@ -93,7 +97,8 @@
                                             Visibility="{x:Bind IsTitleVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
                                     <FontIcon Glyph="&#xE8B7;" FontSize="11" Foreground="White"
-                                              Visibility="{x:Bind IsFolder, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                              Visibility="{x:Bind IsFolder, Converter={StaticResource BoolToVisibilityConverter}}"
+                                              AutomationProperties.AccessibilityView="Raw" />
 
                                     <TextBlock Text="{x:Bind Name}" FontSize="11" FontWeight="SemiBold"
                                                Foreground="White"

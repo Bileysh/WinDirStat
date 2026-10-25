@@ -308,6 +308,9 @@
     <data name="SelectDriveHeader.Text" xml:space="preserve">
     <value>Оберіть диск для сканування</value>
   </data>
+    <data name="RecentScansHeader.Text" xml:space="preserve">
+    <value>Останні сканування</value>
+  </data>
     <data name="SelectCustomFolderButton.Content" xml:space="preserve">
     <value>Обрати іншу папку…</value>
   </data>
@@ -416,11 +419,47 @@
     <data name="MenuFileImportScan.Text" xml:space="preserve">
     <value>Імпортувати скан…</value>
   </data>
+    <data name="MenuFileOpenReport.Text" xml:space="preserve">
+    <value>Відкрити звіт сканування…</value>
+  </data>
     <data name="ExportCompleteTitle" xml:space="preserve">
     <value>Скан експортовано</value>
   </data>
     <data name="ExportErrorTitle" xml:space="preserve">
     <value>Не вдалося експортувати</value>
+  </data>
+    <data name="WindowTitle_ScanReport" xml:space="preserve">
+    <value>Звіт сканування</value>
+  </data>
+    <data name="ReportTitle" xml:space="preserve">
+    <value>Звіт про розмір сканування</value>
+  </data>
+    <data name="ReportRootPath" xml:space="preserve">
+    <value>Кореневий шлях</value>
+  </data>
+    <data name="ReportScannedAt" xml:space="preserve">
+    <value>Проскановано (UTC)</value>
+  </data>
+    <data name="ReportTotalSize" xml:space="preserve">
+    <value>Загальний розмір</value>
+  </data>
+    <data name="ReportSizeBreakdownByCategory" xml:space="preserve">
+    <value>Розподіл розміру за категоріями</value>
+  </data>
+    <data name="ReportSizeBreakdownByExtension" xml:space="preserve">
+    <value>Розподіл розміру за розширеннями</value>
+  </data>
+    <data name="ReportColumnType" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+    <data name="ReportColumnSize" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
+    <data name="ReportColumnFiles" xml:space="preserve">
+    <value>Файли</value>
+  </data>
+    <data name="ReportColumnPercent" xml:space="preserve">
+    <value>Відсоток</value>
   </data>
     <data name="InvalidPathTitle" xml:space="preserve">
     <value>Шлях не знайдено</value>
