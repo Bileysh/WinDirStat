@@ -29,7 +29,8 @@ public static class ElevatedScanServer
                 }
             }
 
-            var json = JsonSerializer.Serialize(results, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode);
+            var json = LargeStack.Run(() =>
+                JsonSerializer.Serialize(results, FileSystemNodeJsonContext.Default.DictionaryStringFileSystemNode));
             File.WriteAllText(outputFile, json);
 
             return 0;

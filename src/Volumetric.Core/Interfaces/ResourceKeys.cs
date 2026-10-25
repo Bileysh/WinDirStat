@@ -4,6 +4,7 @@ public static class ResourceKeys
 {
     public const string InvalidPathTitle = "InvalidPathTitle";
     public const string TrayIconToolTipText = "TrayIconToolTipText";
+    public const string TrayIconScanningToolTipFormat = "TrayIconScanningToolTipFormat";
 
     public const string AboutTitle = "AboutTitle";
     public const string AboutMessage = "AboutMessage";
@@ -36,6 +37,16 @@ public static class ResourceKeys
 
     public const string ExportCompleteTitle = "ExportCompleteTitle";
     public const string ExportErrorTitle = "ExportErrorTitle";
+    public const string ImportErrorTitle = "ImportErrorTitle";
+    public const string ImportKeyUnavailableMessage = "ImportKeyUnavailableMessage";
+    public const string EncryptScanResultsEnabledStatus = "EncryptScanResultsEnabledStatus";
+    public const string EncryptScanResultsDisabledStatus = "EncryptScanResultsDisabledStatus";
+    public const string RequireWindowsHelloEnabledStatus = "RequireWindowsHelloEnabledStatus";
+    public const string RequireWindowsHelloDisabledStatus = "RequireWindowsHelloDisabledStatus";
+    public const string WindowsHelloLaunchPrompt = "WindowsHelloLaunchPrompt";
+    public const string WindowsHelloEnablePrompt = "WindowsHelloEnablePrompt";
+    public const string WindowsHelloVerificationFailed = "WindowsHelloVerificationFailed";
+    public const string WindowsHelloUnavailablePrefix = "WindowsHelloUnavailable_";
     public const string SettingsExportedStatus = "SettingsExportedStatus";
     public const string SettingsImportedStatus = "SettingsImportedStatus";
     public const string SettingsErrorPrefix = "SettingsError_";
@@ -63,4 +74,9 @@ public static class ResourceKeys
     public const string ReportColumnSize = "ReportColumnSize";
     public const string ReportColumnFiles = "ReportColumnFiles";
     public const string ReportColumnPercent = "ReportColumnPercent";
+    public const string ReportAllFilesAndFolders = "ReportAllFilesAndFolders";
+    public const string ReportColumnPath = "ReportColumnPath";
+    public const string ReportColumnModified = "ReportColumnModified";
+    public const string ReportKindFolder = "ReportKindFolder";
+    public const string ReportKindFile = "ReportKindFile";
 }

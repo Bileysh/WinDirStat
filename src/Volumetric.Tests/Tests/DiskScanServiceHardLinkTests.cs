@@ -9,7 +9,7 @@ public class DiskScanServiceHardLinkTests
     [Fact]
     public async Task ScanAsync_WhenTwoFilesShareIdentity_ZerosPhysicalSizeOnSecondOccurrenceOnly()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "b.txt"), new byte[100]);
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "c.txt"), new byte[50]);
@@ -51,7 +51,7 @@ public class DiskScanServiceHardLinkTests
     [Fact]
     public async Task ScanAsync_WhenLinkCountIsOne_NeverMarksAsDuplicate_EvenWithColldingIdentity()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "b.txt"), new byte[100]);
 
@@ -75,7 +75,7 @@ public class DiskScanServiceHardLinkTests
     [Fact]
     public async Task ScanAsync_WhenIdentityLookupFails_TreatsFileAsNonDuplicate()
     {
-        var tempRoot = Directory.CreateTempSubdirectory();
+        using var tempRoot = new TempDirectory();
         await File.WriteAllBytesAsync(Path.Combine(tempRoot.FullName, "a.txt"), new byte[100]);
 
         var service = new DiskScanService(new FakeFileIdentityService());

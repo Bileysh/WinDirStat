@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -15,17 +13,12 @@ public sealed class ScanResultFileService : IScanResultFileService
     private const string Extension = ".volscan";
 
     private readonly IAppLogger _logger;
+    private readonly ScanResultSerializer _serializer;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        TypeInfoResolver = FileSystemNodeJsonContext.Default,
-        MaxDepth = 256,
-        PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
-    };
-
-    public ScanResultFileService(IAppLogger logger)
+    public ScanResultFileService(IAppLogger logger, ScanResultSerializer serializer)
     {
         _logger = logger;
+        _serializer = serializer;
     }
 
     public async Task<string?> ExportAsync(FileSystemNode rootNode, string suggestedFileName, IntPtr ownerHwnd)
@@ -36,11 +29,13 @@ public sealed class ScanResultFileService : IScanResultFileService
         WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 
         var file = await picker.PickSaveFileAsync();
-        if (file is null) return null;
+        if (file is null)
+        {
+            return null;
+        }
 
         using var stream = await file.OpenStreamForWriteAsync();
-        stream.SetLength(0);
-        await JsonSerializer.SerializeAsync(stream, rootNode, JsonOptions);
+        await _serializer.WriteAsync(stream, rootNode);
 
         return file.Name;
     }
@@ -52,18 +47,15 @@ public sealed class ScanResultFileService : IScanResultFileService
         WinRT.Interop.InitializeWithWindow.Initialize(picker, ownerHwnd);
 
         var file = await picker.PickSingleFileAsync();
-        if (file is null) return null;
-
-        using var stream = await file.OpenStreamForReadAsync();
-        var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
-
-        if (rootNode is not null)
+        if (file is null)
         {
-            rootNode.EstablishParentLinksRecursively();
-            return (rootNode, file.Name);
+            return null;
         }
 
-        return null;
+        using var stream = await file.OpenStreamForReadAsync();
+        var rootNode = await _serializer.ReadAsync(stream);
+
+        return rootNode is null ? null : (rootNode, file.Name);
     }
 
     public async Task<FileSystemNode?> ImportFromPathAsync(string filePath)
@@ -71,9 +63,7 @@ public sealed class ScanResultFileService : IScanResultFileService
         try
         {
             await using var stream = File.OpenRead(filePath);
-            var rootNode = await JsonSerializer.DeserializeAsync<FileSystemNode>(stream, JsonOptions);
-            rootNode?.EstablishParentLinksRecursively();
-            return rootNode;
+            return await _serializer.ReadAsync(stream);
         }
         catch (Exception ex)
         {

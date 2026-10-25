@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="Volumetric_App.UserControls.ScanReportControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Loaded="OnLoaded"
+    Unloaded="OnUnloaded">
+
+    <Grid>
+        <WebView2 x:Name="ReportWebView" />
+
+        <StackPanel x:Name="FailurePanel"
+                    Margin="16"
+                    Spacing="8"
+                    Visibility="Collapsed">
+            <TextBlock x:Uid="ScanReportLoadFailedText" TextWrapping="Wrap" />
+            <HyperlinkButton x:Uid="ScanReportDownloadWebView2Link"
+                             Padding="0"
+                             NavigateUri="https://developer.microsoft.com/microsoft-edge/webview2/" />
+            <TextBlock x:Uid="ScanReportTechnicalDetailsLabel" Opacity="0.7" />
+            <TextBlock x:Name="FailureDetailsText"
+                       IsTextSelectionEnabled="True"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
+</UserControl>

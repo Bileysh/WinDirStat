@@ -1,5 +1,6 @@
 ﻿using Volumetric.Services;
 using Volumetric.Core.Entities;
+using Volumetric.Core.Interfaces;
 using Volumetric.Tests.FakeService;
 using Volumetric.ViewModels;
 
@@ -10,7 +11,7 @@ public class MainPageViewModelTests
     [Fact]
     public async Task OpenFolderAsync_WhenFolderSelected_PopulatesRootNodes()
     {
-        var tempFolder = Directory.CreateTempSubdirectory();
+        using var tempFolder = new TempDirectory();
 
         var vm = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -28,8 +29,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            new FakeScanReportService());
+            new FakeRecentScansService());
 
         await vm.OpenFolderCommand.ExecuteAsync(null);
 
@@ -39,8 +39,8 @@ public class MainPageViewModelTests
     [Fact]
     public async Task TwoViewModels_WithIndependentScanStateServices_DoNotLeakResultsIntoEachOther()
     {
-        var folderA = Directory.CreateTempSubdirectory();
-        var folderB = Directory.CreateTempSubdirectory();
+        using var folderA = new TempDirectory();
+        using var folderB = new TempDirectory();
 
         var vmA = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -58,8 +58,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            new FakeScanReportService());
+            new FakeRecentScansService());
 
         var vmB = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
@@ -77,8 +76,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            new FakeScanReportService());
+            new FakeRecentScansService());
 
         await vmA.OpenFolderCommand.ExecuteAsync(null);
 
@@ -87,11 +85,85 @@ public class MainPageViewModelTests
         Assert.False(vmB.IsScanning);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ScanPathAsync_MissingPath_DoesNothing(string? path)
+    {
+        var vm = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService(),
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        await vm.ScanPathAsync(path);
+
+        Assert.False(vm.IsScanning);
+        Assert.Empty(vm.RootNodes);
+        Assert.False(vm.RescanCommand.CanExecute(null));
+    }
+
     [Fact]
-    public async Task OpenScanReportAsync_WithScanResult_OpensWindowWithGeneratedHtml()
+    public async Task ImportScanResults_EncryptedFileWithoutKey_ShowsKeyUnavailableMessage()
+    {
+        var dialogs = new FakeDialogService();
+        var vm = CreateViewModelForImport(dialogs, new ScanResultKeyUnavailableException());
+
+        await vm.ImportScanResultsCommand.ExecuteAsync(null);
+
+        Assert.Equal(ResourceKeys.ImportErrorTitle, dialogs.LastTitle);
+        Assert.Equal(ResourceKeys.ImportKeyUnavailableMessage, dialogs.LastMessage);
+        Assert.False(vm.HasScanResult);
+    }
+
+    [Fact]
+    public async Task ImportScanResults_CorruptedFile_ShowsErrorInsteadOfThrowing()
+    {
+        var dialogs = new FakeDialogService();
+        var vm = CreateViewModelForImport(dialogs, new InvalidDataException("corrupted"));
+
+        await vm.ImportScanResultsCommand.ExecuteAsync(null);
+
+        Assert.Equal(ResourceKeys.ImportErrorTitle, dialogs.LastTitle);
+        Assert.Equal("corrupted", dialogs.LastMessage);
+    }
+
+    private static MainPageViewModel CreateViewModelForImport(FakeDialogService dialogs, Exception importException) =>
+        new(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService(),
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            dialogs,
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService { ImportException = importException },
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+    [Fact]
+    public Task OpenScanReportAsync_WithScanResult_OpensWindowWithRootNode()
     {
         var fakeWindowManager = new FakeWindowManagerService();
-        var fakeReportService = new FakeScanReportService { ReportHtmlToReturn = "<html><body>report</body></html>" };
         var vm = new MainPageViewModel(
             new DiskScanService(new FileIdentityService()),
             new FakeFolderPickerService(),
@@ -108,8 +180,7 @@ public class MainPageViewModelTests
             new FakeScanResultFileService(),
             new FakeWindowHandleProvider(),
             new FakeAppLogger(),
-            new FakeRecentScansService(),
-            fakeReportService);
+            new FakeRecentScansService());
 
         var root = new FileSystemNode
         {
@@ -127,9 +198,8 @@ public class MainPageViewModelTests
         root.AddChild(child);
         vm.LoadImportedResult(root);
 
-        await vm.OpenScanReportCommand.ExecuteAsync(null);
-
-        Assert.NotNull(fakeReportService.LastResult);
-        Assert.Equal(fakeReportService.ReportHtmlToReturn, fakeWindowManager.LastReportHtml);
+        vm.OpenScanReportCommand.Execute(null);
+        Assert.Same(root, fakeWindowManager.LastReportedRootNode);
+        return Task.CompletedTask;
     }
 }

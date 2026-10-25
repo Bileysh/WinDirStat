@@ -17,14 +17,19 @@ public class WindowManagerService : IWindowManagerService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IThemeService _themeService;
     private readonly ILocalizationService _localizationService;
+    private readonly ScanReportHtmlBuilder _scanReportHtmlBuilder;
+    private readonly AppLockViewModel _appLock;
     private readonly List<Window> _openWindows = new();
 
     public WindowManagerService(IServiceScopeFactory scopeFactory,
-        IThemeService themeService, ILocalizationService localizationService)
+        IThemeService themeService, ILocalizationService localizationService,
+        ScanReportHtmlBuilder scanReportHtmlBuilder, AppLockViewModel appLock)
     {
         _scopeFactory = scopeFactory;
         _themeService = themeService;
         _localizationService = localizationService;
+        _scanReportHtmlBuilder = scanReportHtmlBuilder;
+        _appLock = appLock;
 
         _themeService.ThemeChanged += OnThemeChanged;
     }
@@ -34,17 +39,26 @@ public class WindowManagerService : IWindowManagerService
         var theme = isDark ? ElementTheme.Dark : ElementTheme.Light;
 
         if (App.MainWindow?.Content is FrameworkElement mainContent)
+        {
             mainContent.RequestedTheme = theme;
+        }
 
         foreach (var window in _openWindows)
         {
             if (window.Content is FrameworkElement fe)
+            {
                 fe.RequestedTheme = theme;
+            }
         }
     }
 
     public void OpenMainWindow(string? initialScanPath = null)
     {
+        if (ShowLockedRootWindowInstead())
+        {
+            return;
+        }
+
         var (viewModel, _) = CreateAndShowNewMainWindow();
 
         if (!string.IsNullOrWhiteSpace(initialScanPath))
@@ -55,8 +69,24 @@ public class WindowManagerService : IWindowManagerService
 
     public void OpenMainWindowWithImportedResult(FileSystemNode rootNode)
     {
+        if (ShowLockedRootWindowInstead())
+        {
+            return;
+        }
+
         var (viewModel, _) = CreateAndShowNewMainWindow();
         viewModel.LoadImportedResult(rootNode);
+    }
+
+    private bool ShowLockedRootWindowInstead()
+    {
+        if (!_appLock.IsLocked)
+        {
+            return false;
+        }
+
+        (App.MainWindow as MainWindow)?.RestoreWindowCommand.Execute(null);
+        return true;
     }
 
     private (MainPageViewModel ViewModel, Window Window) CreateAndShowNewMainWindow()
@@ -64,11 +94,14 @@ public class WindowManagerService : IWindowManagerService
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
             MicaController.IsSupported())
+        {
             newWindow.SystemBackdrop = new MicaBackdrop();
+        }
 
         var scope = _scopeFactory.CreateScope();
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         var xamlRootProvider = scope.ServiceProvider.GetRequiredService<ICurrentXamlRootProvider>();
+        scope.ServiceProvider.GetRequiredService<JumpListService>().Initialize();
         var page = new MainPage(viewModel, xamlRootProvider);
 
         scope.ServiceProvider.GetRequiredService<IWindowHandleProvider>().Hwnd =
@@ -98,7 +131,9 @@ public class WindowManagerService : IWindowManagerService
         var newWindow = new Window { ExtendsContentIntoTitleBar = true };
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
             MicaController.IsSupported())
+        {
             newWindow.SystemBackdrop = new MicaBackdrop();
+        }
 
         var rootGrid = new Grid
         {
@@ -152,8 +187,15 @@ public class WindowManagerService : IWindowManagerService
     {
         window.Activated += (_, e) =>
         {
-            if (e.WindowActivationState == WindowActivationState.Deactivated) return;
-            if (root.XamlRoot is not null) xamlRootProvider.XamlRoot = root.XamlRoot;
+            if (e.WindowActivationState == WindowActivationState.Deactivated)
+            {
+                return;
+            }
+
+            if (root.XamlRoot is not null)
+            {
+                xamlRootProvider.XamlRoot = root.XamlRoot;
+            }
         };
     }
 
@@ -209,14 +251,10 @@ public class WindowManagerService : IWindowManagerService
                 WindowManagerConstants.TreeMapWindowWidth, WindowManagerConstants.TreeMapWindowHeight)
             .Activate();
     }
-
-    public void OpenScanReportWindow(string reportHtml)
+    public void OpenScanReportWindow(FileSystemNode rootNode)
     {
-        var webView = new WebView2();
-        webView.Loaded += (_, _) => webView.NavigateToString(reportHtml);
-
-        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), webView,
-                WindowManagerConstants.TreeViewWindowWidth, WindowManagerConstants.TreeViewWindowHeight)
+        var report = new ScanReportControl(_scanReportHtmlBuilder.Build(rootNode));
+        CreateDetachedWindow(_localizationService.GetString(ResourceKeys.WindowTitle_ScanReport), report, 900, 650)
             .Activate();
     }
 
@@ -230,7 +268,9 @@ public class WindowManagerService : IWindowManagerService
 
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, WindowManagerConstants.MicaMinBuildNumber) &&
             MicaController.IsSupported())
+        {
             window.SystemBackdrop = new MicaBackdrop();
+        }
 
         if (window.Content is FrameworkElement fe)
         {
@@ -262,7 +302,10 @@ public class WindowManagerService : IWindowManagerService
 
     public void SetRootWindowHandle(Window window)
     {
-        if (_rootWindowScope is null) return;
+        if (_rootWindowScope is null)
+        {
+            return;
+        }
 
         var handleProvider = _rootWindowScope.ServiceProvider.GetRequiredService<IWindowHandleProvider>();
         handleProvider.Hwnd = WindowNative.GetWindowHandle(window);
@@ -282,7 +325,10 @@ public class WindowManagerService : IWindowManagerService
 
         _openWindows.Clear();
 
-        if (App.MainWindow is not MainWindow window) return;
+        if (App.MainWindow is not MainWindow window)
+        {
+            return;
+        }
 
         window.CurrentPage?.ViewModel.Dispose();
         var previousResult = _rootWindowScope?.ServiceProvider.GetService<IScanStateService>()?.CurrentResult;
@@ -292,7 +338,9 @@ public class WindowManagerService : IWindowManagerService
         _rootWindowScope = scope;
 
         if (previousResult is not null)
+        {
             scope.ServiceProvider.GetRequiredService<IScanStateService>().SetResult(previousResult);
+        }
 
         var viewModel = scope.ServiceProvider.GetRequiredService<MainPageViewModel>();
         App.RootViewModel = viewModel;

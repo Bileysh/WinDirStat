@@ -25,7 +25,10 @@ public static class ActivationDispatcher
 
     public static ExtractedActivation Extract(AppActivationArguments? args)
     {
-        if (args is null) return new ExtractedActivation(ActivationAction.None, null);
+        if (args is null)
+        {
+            return new ExtractedActivation(ActivationAction.None, null);
+        }
 
         switch (args.Kind)
         {
@@ -147,10 +150,16 @@ public static class ActivationDispatcher
 
     private static async void ImportScanFile(string? path, bool isColdStart)
     {
-        if (string.IsNullOrEmpty(path)) return;
+        if (string.IsNullOrEmpty(path))
+        {
+            return;
+        }
 
         var fileService = App.StaticServices?.GetService(typeof(IScanResultFileService)) as IScanResultFileService;
-        if (fileService is null) return;
+        if (fileService is null)
+        {
+            return;
+        }
 
         var rootNode = await fileService.ImportFromPathAsync(path);
 

@@ -48,14 +48,15 @@
                         <FontIcon Glyph="&#xE74E;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="MenuFileOpenScanReport"
+                                Command="{x:Bind ViewModel.OpenScanReportCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE774;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutItem x:Uid="MenuFileImportScan" Command="{x:Bind ViewModel.ImportScanResultsCommand}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE8E5;" />
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem x:Uid="MenuFileOpenReport" Command="{x:Bind ViewModel.OpenScanReportCommand}">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE9D9;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator />
@@ -65,7 +66,7 @@
                 <MenuFlyoutItem x:Uid="MenuWindowOpenNew" Icon="NewWindow"
                                 Command="{x:Bind ViewModel.OpenInNewWindowCommand}" />
             </MenuBarItem>
-            <MenuBarItem x:Uid="MenuOptions">
+            <MenuBarItem x:Uid="MenuOptions" AutomationProperties.AutomationId="MenuOptions">
                 <MenuFlyoutSubItem x:Uid="MenuOptionsLanguage" Icon="Globe">
                     <MenuFlyoutItem Text="Українська"
                                     Command="{x:Bind ViewModel.ChangeLanguageCommand}"
@@ -78,6 +79,7 @@
                                 Command="{x:Bind ViewModel.ToggleThemeCommand}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem x:Uid="MenuOptionsSettings" Icon="Setting"
+                                AutomationProperties.AutomationId="MenuOptionsSettings"
                                 Command="{x:Bind ViewModel.OpenSettingsCommand}" />
             </MenuBarItem>
 

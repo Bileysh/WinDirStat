@@ -6,7 +6,10 @@ public static class SizeFormatter
 
     public static string Format(long bytes)
     {
-        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024)
+        {
+            return $"{bytes} B";
+        }
 
         double size = bytes;
         var unitIndex = 0;

@@ -52,7 +52,7 @@ $publishArgs = @(
     "-p:Platform=$Platform",
     "-p:RuntimeIdentifier=win-$Platform",
     "-p:GenerateAppxPackageOnBuild=true",
-    "-p:AppxPackageDir=$OutputDir\",
+    "-p:AppxPackageDir=$($OutputDir.TrimEnd('\', '/'))/",
     "-p:AppxBundle=Never",
     "-p:PublishTrimmed=false",
     "-p:UapAppxPackageBuildMode=SideloadOnly"
@@ -75,13 +75,18 @@ if ($CertificatePath) {
     Write-Host "  Signing with: $CertificatePath"
     $publishArgs += "-p:PackageCertificateKeyFile=$CertificatePath"
     if ($CertificatePassword) {
-        $publishArgs += "-p:PackageCertificatePassword=$CertificatePassword"
+        $env:PackageCertificatePassword = $CertificatePassword
     }
 }
 
 Write-Step "Running dotnet publish"
-& dotnet @publishArgs
-$publishExit = $LASTEXITCODE
+try {
+    & dotnet @publishArgs
+    $publishExit = $LASTEXITCODE
+}
+finally {
+    Remove-Item Env:\PackageCertificatePassword -ErrorAction SilentlyContinue
+}
 
 if ($publishExit -ne 0) {
     Write-Err "dotnet publish failed with exit code $publishExit"

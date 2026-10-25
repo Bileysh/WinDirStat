@@ -52,8 +52,15 @@ public class DiskScanService : IDiskScanService
 
         public void OnItemScanned(string currentPath, IProgress<ScanProgress>? progress)
         {
-            if (progress is null) return;
-            if (++_itemsSinceLastReport < ReportEveryNItems) return;
+            if (progress is null)
+            {
+                return;
+            }
+
+            if (++_itemsSinceLastReport < ReportEveryNItems)
+            {
+                return;
+            }
 
             _itemsSinceLastReport = 0;
             progress.Report(new ScanProgress(currentPath, FilesScanned, FoldersScanned));
@@ -88,10 +95,12 @@ public class DiskScanService : IDiskScanService
                     {
                         foreach (var deniedNode in deniedNodes)
                         {
-                            if (!elevatedResults.TryGetValue(deniedNode.FullPath, out var elevatedNode)) continue;
+                            if (!elevatedResults.TryGetValue(deniedNode.FullPath, out var elevatedNode))
+                            {
+                                continue;
+                            }
 
-                            deniedNode.Children.Clear();
-                            deniedNode.Children.AddRange(elevatedNode.Children);
+                            deniedNode.ReplaceChildren(elevatedNode.Children);
                             deniedNode.EstablishParentLinksRecursively();
                             deniedNode.Status = elevatedNode.Status;
                             deniedNode.ErrorMessage = elevatedNode.ErrorMessage;
@@ -187,7 +196,7 @@ public class DiskScanService : IDiskScanService
                     {
                         Name = entry.Name,
                         IsDirectory = false,
-                        Extension = Path.GetExtension(entry.Name),
+                        Extension = string.Intern(Path.GetExtension(entry.Name)),
                         SizeLogical = entry.Length,
                         SizePhysical = physicalSize >= 0 ? physicalSize : entry.Length,
                         LastModified = entry.LastWriteTimeUtc
@@ -230,7 +239,10 @@ public class DiskScanService : IDiskScanService
 
     private static void RecomputeSizes(FileSystemNode node)
     {
-        if (node.Children.Count == 0) return;
+        if (node.Children.Count == 0)
+        {
+            return;
+        }
 
         long logical = 0, physical = 0;
         foreach (var child in node.Children)

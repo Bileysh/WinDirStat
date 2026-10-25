@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -7,6 +7,10 @@ namespace Volumetric.Core.Entities;
 
 public class FileSystemNode
 {
+    private static readonly FileSystemNode[] NoChildren = [];
+
+    private List<FileSystemNode>? _children;
+
     public required string Name { get; init; }
 
     [JsonIgnore] public FileSystemNode? Parent { get; set; }
@@ -23,7 +27,13 @@ public class FileSystemNode
     public long SizeLogical { get; set; }
     public long SizePhysical { get; set; }
     public DateTime LastModified { get; set; }
-    public List<FileSystemNode> Children { get; set; } = new();
+
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Replace)]
+    public IReadOnlyList<FileSystemNode> Children
+    {
+        get => _children is null ? NoChildren : _children;
+        set => _children = value.Count == 0 ? null : [.. value];
+    }
 
     public ScanStatus Status { get; set; } = ScanStatus.Ok;
     public string? ErrorMessage { get; set; }
@@ -32,7 +42,16 @@ public class FileSystemNode
     public void AddChild(FileSystemNode child)
     {
         child.Parent = this;
-        Children.Add(child);
+        (_children ??= []).Add(child);
+    }
+
+    public void ReplaceChildren(IEnumerable<FileSystemNode> children)
+    {
+        _children = null;
+        foreach (var child in children)
+        {
+            AddChild(child);
+        }
     }
 
     public void EstablishParentLinksRecursively()

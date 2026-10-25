@@ -36,10 +36,27 @@
             <AutoSuggestBox x:Name="SearchBox" Grid.Column="1" VerticalAlignment="Center"
                              Margin="0,8,12,8" QueryIcon="Find" x:Uid="TitleBarSearchBox"
                              Text="{x:Bind ViewModel.SearchText, Mode=OneWay}"
-                             TextChanged="SearchBox_OnTextChanged" />
+                             TextChanged="SearchBox_OnTextChanged"
+                             Visibility="{x:Bind LockViewModel.IsUnlocked, Mode=OneWay}" />
         </Grid>
 
-        <Frame x:Name="RootFrame" Grid.Row="1" />
+        <Frame x:Name="RootFrame" Grid.Row="1"
+               Visibility="{x:Bind LockViewModel.IsUnlocked, Mode=OneWay}" />
+
+        <StackPanel x:Name="LockOverlay" Grid.Row="1"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Spacing="12" MaxWidth="420"
+                    Visibility="{x:Bind LockViewModel.IsLocked, Mode=OneWay}">
+            <FontIcon Glyph="&#xE72E;" FontSize="48" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="AppLockedTitle" Style="{ThemeResource SubtitleTextBlockStyle}"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <TextBlock x:Uid="AppLockedDesc" TextWrapping="Wrap" TextAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock Text="{x:Bind LockViewModel.StatusMessage, Mode=OneWay}" TextWrapping="Wrap"
+                       TextAlignment="Center" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+            <Button x:Uid="UnlockButton" Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Center"
+                    Command="{x:Bind LockViewModel.UnlockCommand}" />
+        </StackPanel>
 
         <tb:TaskbarIcon x:Name="TrayIcon"
                         ToolTipText="Volumetric"

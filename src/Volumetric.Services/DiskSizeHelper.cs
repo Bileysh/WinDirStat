@@ -20,7 +20,9 @@ public static class DiskSizeHelper
     public static uint GetClusterSize(string rootPath)
     {
         if (GetDiskFreeSpaceW(rootPath, out var sectorsPerCluster, out var bytesPerSector, out _, out _))
+        {
             return sectorsPerCluster * bytesPerSector;
+        }
 
         return 4096;
     }
@@ -29,11 +31,15 @@ public static class DiskSizeHelper
     {
         if (!attributes.HasFlag(FileAttributes.Compressed) &&
             !attributes.HasFlag(FileAttributes.SparseFile))
+        {
             return RoundUpToCluster(length, clusterSize);
+        }
 
         var low = GetCompressedFileSizeW(fullPath, out var high);
         if (low == INVALID_FILE_SIZE && Marshal.GetLastWin32Error() != 0)
+        {
             return -1;
+        }
 
         var rawSize = ((long)high << 32) | low;
         return RoundUpToCluster(rawSize, clusterSize);
@@ -41,7 +47,11 @@ public static class DiskSizeHelper
 
     public static long RoundUpToCluster(long rawSize, uint clusterSize)
     {
-        if (clusterSize == 0) return rawSize;
+        if (clusterSize == 0)
+        {
+            return rawSize;
+        }
+
         return (rawSize + clusterSize - 1) / clusterSize * clusterSize;
     }
 }

@@ -12,10 +12,16 @@ public static class ClassicFolderPicker
         dialog.SetOptions(FOS.FOS_PICKFOLDERS | FOS.FOS_FORCEFILESYSTEM);
 
         if (title != null)
+        {
             dialog.SetTitle(title);
+        }
 
         var hr = dialog.Show(ownerHwnd);
-        if (hr == ErrorCancelled) return null;
+        if (hr == ErrorCancelled)
+        {
+            return null;
+        }
+
         Marshal.ThrowExceptionForHR(hr);
 
         dialog.GetResult(out var item);

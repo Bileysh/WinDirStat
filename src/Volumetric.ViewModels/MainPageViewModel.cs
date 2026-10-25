@@ -25,7 +25,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private readonly IFileExplorerService _fileExplorerService;
     private readonly IBackgroundScanSettingsService _backgroundScanSettingsService;
     private readonly IScanResultFileService _scanResultFileService;
-    private readonly IScanReportService _scanReportService;
     private readonly IWindowHandleProvider _windowHandleProvider;
     private readonly IAppLogger _appLogger;
     private readonly IRecentScansService _recentScansService;
@@ -39,8 +38,7 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         IDriveInfoService driveInfoService, IClipboardService clipboardService,
         IFileExplorerService fileExplorerService, IBackgroundScanSettingsService backgroundScanSettingsService,
         IScanResultFileService scanResultFileService, IWindowHandleProvider windowHandleProvider,
-        IAppLogger appLogger, IRecentScansService recentScansService,
-        IScanReportService scanReportService)
+        IAppLogger appLogger, IRecentScansService recentScansService)
     {
         _diskScanService = diskScanService;
         _folderPickerService = folderPickerService;
@@ -55,21 +53,18 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
         _fileExplorerService = fileExplorerService;
         _backgroundScanSettingsService = backgroundScanSettingsService;
         _scanResultFileService = scanResultFileService;
-        _scanReportService = scanReportService;
         _windowHandleProvider = windowHandleProvider;
         _appLogger = appLogger;
         _recentScansService = recentScansService;
 
         _scanStateService.StateChanged += OnStateChanged;
 
+        LoadAvailableDrives();
+        _ = LoadRecentScansAsync();
+
         if (_scanStateService.CurrentResult is not null)
         {
             OnStateChanged(this, _scanStateService.CurrentResult);
-        }
-        else
-        {
-            LoadAvailableDrives();
-            _ = LoadRecentScansAsync();
         }
     }
 
@@ -156,7 +151,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private void OnStateChanged(object? sender, ScanResult? result)
     {
-        if (result is null) return;
+        if (result is null)
+        {
+            return;
+        }
 
         RootNodes =
         [
@@ -173,6 +171,25 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
         RefreshStatistics();
         RefreshTreeMap();
+        AddToRecentScans(result.RootPath);
+    }
+
+    private const int MaxRecentScans = 5;
+
+    private void AddToRecentScans(string path)
+    {
+        var existing = RecentScans.FirstOrDefault(r =>
+            string.Equals(r.FullPath, path, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            RecentScans.Remove(existing);
+        }
+
+        RecentScans.Insert(0, new RecentScanItemViewModel(path));
+        while (RecentScans.Count > MaxRecentScans)
+        {
+            RecentScans.RemoveAt(RecentScans.Count - 1);
+        }
     }
 
     private void LoadAvailableDrives()
@@ -201,7 +218,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private async Task OpenRecentScanAsync(RecentScanItemViewModel? recentScan)
     {
-        if (recentScan is null) return;
+        if (recentScan is null)
+        {
+            return;
+        }
 
         await ScanPathAsync(recentScan.FullPath);
     }
@@ -209,7 +229,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private void RefreshStatistics()
     {
         var currentResult = _scanStateService.CurrentResult;
-        if (currentResult is null) return;
+        if (currentResult is null)
+        {
+            return;
+        }
 
         var stats = GroupByCategory
             ? currentResult.StatisticsByCategory
@@ -223,7 +246,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private async Task OpenFolderAsync()
     {
         var path = await _folderPickerService.PickFolderAsync();
-        if (path is null) return;
+        if (path is null)
+        {
+            return;
+        }
 
         await ScanPathAsync(path);
     }
@@ -231,7 +257,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private async Task SelectDriveAsync(DriveItemViewModel? drive)
     {
-        if (drive is null) return;
+        if (drive is null)
+        {
+            return;
+        }
 
         await ScanPathAsync(drive.RootPath);
     }
@@ -258,6 +287,11 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     public async Task ScanPathAsync(string? path, bool useElevatedFallbackForAccessDenied = false)
     {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
         CancelScan();
         _scanCts = new CancellationTokenSource();
         _lastScanPath = path;
@@ -286,13 +320,9 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
                 _backgroundScanSettingsService.AccountForHardLinks);
             _scanStateService.SetResult(scanResult);
 
-            var fileCount = 0;
-            var folderCount = 0;
-            CountNodes(scanResult.RootNode, ref fileCount, ref folderCount);
-
             var title = _localizationService.GetString(ResourceKeys.ScanCompleteTitle);
             var msg = string.Format(_localizationService.GetString(ResourceKeys.ScanCompleteMessageFormat),
-                scanResult.ScanDuration.TotalSeconds, fileCount, folderCount);
+                scanResult.ScanDuration.TotalSeconds, scanResult.FileCount, scanResult.FolderCount);
 
             _notificationService.ShowNotification(title, msg, path);
         }
@@ -304,17 +334,6 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             IsScanning = false;
             _scanCts?.Dispose();
             _scanCts = null;
-        }
-    }
-
-    private void CountNodes(FileSystemNode node, ref int fileCount, ref int folderCount)
-    {
-        if (node.IsDirectory) folderCount++;
-        else fileCount++;
-
-        foreach (var child in node.Children)
-        {
-            CountNodes(child, ref fileCount, ref folderCount);
         }
     }
 
@@ -339,9 +358,20 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
 
     private void RefreshTreeMap()
     {
-        if (CurrentTreeMapRoot is null) return;
-        if (_treeMapWidth <= 0) return;
-        if (_treeMapHeight <= 0) return;
+        if (CurrentTreeMapRoot is null)
+        {
+            return;
+        }
+
+        if (_treeMapWidth <= 0)
+        {
+            return;
+        }
+
+        if (_treeMapHeight <= 0)
+        {
+            return;
+        }
 
         var rects = SquarifiedTreeMapLayout.Compute(CurrentTreeMapRoot, 0, 0, _treeMapWidth, _treeMapHeight);
         var viewModels = rects.Select(r =>
@@ -410,7 +440,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     [RelayCommand]
     private void ChangeLanguage(string cultureCode)
     {
-        if (_localizationService.CurrentLanguage == cultureCode) return;
+        if (_localizationService.CurrentLanguage == cultureCode)
+        {
+            return;
+        }
 
         _localizationService.SetLanguage(cultureCode);
 
@@ -447,7 +480,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     private async Task ExportScanResultsAsync()
     {
         var result = _scanStateService.CurrentResult;
-        if (result is null) return;
+        if (result is null)
+        {
+            return;
+        }
 
         try
         {
@@ -470,30 +506,37 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
     }
 
     [RelayCommand(CanExecute = nameof(HasScanResult))]
-    private async Task OpenScanReportAsync()
+    private void OpenScanReport()
     {
         var result = _scanStateService.CurrentResult;
-        if (result is null) return;
-
-        try
+        if (result is not null)
         {
-            var reportHtml = _scanReportService.GenerateReportHtml(result);
-            _windowManagerService.OpenScanReportWindow(reportHtml);
-        }
-        catch (Exception ex)
-        {
-            _appLogger.Warning(ex, "[MainPageViewModel] Failed to generate scan report.");
-            await _dialogService.ShowMessageAsync(
-                _localizationService.GetString(ResourceKeys.ExportErrorTitle),
-                ex.Message);
+            _windowManagerService.OpenScanReportWindow(result.RootNode);
         }
     }
 
     [RelayCommand]
     private async Task ImportScanResultsAsync()
     {
-        var imported = await _scanResultFileService.ImportAsync(_windowHandleProvider.Hwnd);
-        if (imported is null) return;
+        (FileSystemNode RootNode, string FileName)? imported;
+        try
+        {
+            imported = await _scanResultFileService.ImportAsync(_windowHandleProvider.Hwnd);
+        }
+        catch (Exception ex)
+        {
+            var title = _localizationService.GetString(ResourceKeys.ImportErrorTitle);
+            var message = ex is ScanResultKeyUnavailableException
+                ? _localizationService.GetString(ResourceKeys.ImportKeyUnavailableMessage)
+                : ex.Message;
+            await _dialogService.ShowMessageAsync(title, message);
+            return;
+        }
+
+        if (imported is null)
+        {
+            return;
+        }
 
         LoadImportedResult(imported.Value.RootNode);
     }
@@ -516,7 +559,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             p.EndsWith(".volscan", StringComparison.OrdinalIgnoreCase) ||
             p.EndsWith(".wdsscan", StringComparison.OrdinalIgnoreCase));
 
-        if (scanPath is null) return;
+        if (scanPath is null)
+        {
+            return;
+        }
 
         var rootNode = await _scanResultFileService.ImportFromPathAsync(scanPath);
         if (rootNode is not null)
@@ -534,7 +580,10 @@ public partial class MainPageViewModel : ObservableObject, IDisposable, IMainPag
             var root = TreeMapAbsoluteRootPath;
             var current = CurrentTreeMapRoot?.FullPath ?? string.Empty;
             if (string.IsNullOrEmpty(root) || !current.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+            {
                 return string.Empty;
+            }
+
             return current[root.Length..];
         }
     }
