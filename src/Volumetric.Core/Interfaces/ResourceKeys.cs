@@ -1,0 +1,82 @@
+namespace Volumetric.Core.Interfaces;
+
+public static class ResourceKeys
+{
+    public const string InvalidPathTitle = "InvalidPathTitle";
+    public const string TrayIconToolTipText = "TrayIconToolTipText";
+    public const string TrayIconScanningToolTipFormat = "TrayIconScanningToolTipFormat";
+
+    public const string AboutTitle = "AboutTitle";
+    public const string AboutMessage = "AboutMessage";
+
+    public const string AccessDeniedText = "AccessDeniedText";
+    public const string ReparsePointText = "ReparsePointText";
+    public const string ScanErrorText = "ScanErrorText";
+    public const string HardLinkTooltipText = "HardLinkTooltipText";
+    public const string FilesText = "FilesText";
+    public const string FoldersText = "FoldersText";
+    public const string NoExtensionLabel = "NoExtensionLabel";
+    public const string OpenInExplorerFailedTitle = "OpenInExplorerFailedTitle";
+    public const string ShowPropertiesFailedTitle = "ShowPropertiesFailedTitle";
+
+    public const string Category_Archives = "Category_Archives";
+    public const string Category_Audio = "Category_Audio";
+    public const string Category_Development = "Category_Development";
+    public const string Category_Documents = "Category_Documents";
+    public const string Category_Executables = "Category_Executables";
+    public const string Category_Folder = "Category_Folder";
+    public const string Category_Images = "Category_Images";
+    public const string Category_Other = "Category_Other";
+    public const string Category_System = "Category_System";
+    public const string Category_Videos = "Category_Videos";
+    public const string Category_VirtualDisks = "Category_VirtualDisks";
+
+    public const string ScanProgressFormat = "ScanProgressFormat";
+    public const string ScanCompleteTitle = "ScanCompleteTitle";
+    public const string ScanCompleteMessageFormat = "ScanCompleteMessageFormat";
+
+    public const string ExportCompleteTitle = "ExportCompleteTitle";
+    public const string ExportErrorTitle = "ExportErrorTitle";
+    public const string ImportErrorTitle = "ImportErrorTitle";
+    public const string ImportKeyUnavailableMessage = "ImportKeyUnavailableMessage";
+    public const string EncryptScanResultsEnabledStatus = "EncryptScanResultsEnabledStatus";
+    public const string EncryptScanResultsDisabledStatus = "EncryptScanResultsDisabledStatus";
+    public const string RequireWindowsHelloEnabledStatus = "RequireWindowsHelloEnabledStatus";
+    public const string RequireWindowsHelloDisabledStatus = "RequireWindowsHelloDisabledStatus";
+    public const string WindowsHelloLaunchPrompt = "WindowsHelloLaunchPrompt";
+    public const string WindowsHelloEnablePrompt = "WindowsHelloEnablePrompt";
+    public const string WindowsHelloVerificationFailed = "WindowsHelloVerificationFailed";
+    public const string WindowsHelloUnavailablePrefix = "WindowsHelloUnavailable_";
+    public const string SettingsExportedStatus = "SettingsExportedStatus";
+    public const string SettingsImportedStatus = "SettingsImportedStatus";
+    public const string SettingsErrorPrefix = "SettingsError_";
+
+    public const string ScanIntervalStatus = "ScanIntervalStatus";
+    public const string LowSpaceThresholdStatus = "LowSpaceThresholdStatus";
+    public const string TestScanCompletedStatus = "TestScanCompletedStatus";
+
+    public const string FolderPickerTitle = "FolderPickerTitle";
+
+    public const string WindowTitle_New = "WindowTitle_New";
+    public const string WindowTitle_Settings = "WindowTitle_Settings";
+    public const string WindowTitle_Statistics = "WindowTitle_Statistics";
+    public const string WindowTitle_TreeMap = "WindowTitle_TreeMap";
+    public const string WindowTitle_TreeView = "WindowTitle_TreeView";
+    public const string WindowTitle_ScanReport = "WindowTitle_ScanReport";
+
+    public const string ReportTitle = "ReportTitle";
+    public const string ReportRootPath = "ReportRootPath";
+    public const string ReportScannedAt = "ReportScannedAt";
+    public const string ReportTotalSize = "ReportTotalSize";
+    public const string ReportSizeBreakdownByCategory = "ReportSizeBreakdownByCategory";
+    public const string ReportSizeBreakdownByExtension = "ReportSizeBreakdownByExtension";
+    public const string ReportColumnType = "ReportColumnType";
+    public const string ReportColumnSize = "ReportColumnSize";
+    public const string ReportColumnFiles = "ReportColumnFiles";
+    public const string ReportColumnPercent = "ReportColumnPercent";
+    public const string ReportAllFilesAndFolders = "ReportAllFilesAndFolders";
+    public const string ReportColumnPath = "ReportColumnPath";
+    public const string ReportColumnModified = "ReportColumnModified";
+    public const string ReportKindFolder = "ReportKindFolder";
+    public const string ReportKindFile = "ReportKindFile";
+}

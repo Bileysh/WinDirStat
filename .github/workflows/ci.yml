@@ -1,0 +1,61 @@
+﻿name: CI
+
+on:
+  pull_request:
+    branches: [ develop, main ]
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  test:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore src/Volumetric.Tests/Volumetric.Tests.csproj
+
+      - name: Build
+        run: dotnet build src/Volumetric.Tests/Volumetric.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: >
+          dotnet test src/Volumetric.Tests/Volumetric.Tests.csproj
+          --configuration Release --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+
+      - name: Install Windows App Runtime
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP "windowsappruntimeinstall-x64.exe"
+          Invoke-WebRequest -Uri "https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x64.exe" -OutFile $installer
+          Start-Process -FilePath $installer -ArgumentList "--quiet" -Wait
+
+      - name: Restore UI tests
+        run: dotnet restore src/Volumetric.UITests/Volumetric.UITests.csproj -p:Platform=x64
+
+      - name: Build UI tests
+        run: dotnet build src/Volumetric.UITests/Volumetric.UITests.csproj --configuration Debug --no-restore -p:Platform=x64
+
+      - name: Run UI tests
+        run: >
+          dotnet test src/Volumetric.UITests/Volumetric.UITests.csproj
+          --configuration Debug --no-build -p:Platform=x64
+          --logger "trx;LogFileName=ui-test-results.trx"
+          --results-directory TestResults

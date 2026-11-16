@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Volumetric.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Volumetric.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

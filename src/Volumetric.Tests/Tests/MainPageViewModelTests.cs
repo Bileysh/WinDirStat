@@ -1,0 +1,205 @@
+﻿using Volumetric.Services;
+using Volumetric.Core.Entities;
+using Volumetric.Core.Interfaces;
+using Volumetric.Tests.FakeService;
+using Volumetric.ViewModels;
+
+namespace Volumetric.Tests.Tests;
+
+public class MainPageViewModelTests
+{
+    [Fact]
+    public async Task OpenFolderAsync_WhenFolderSelected_PopulatesRootNodes()
+    {
+        using var tempFolder = new TempDirectory();
+
+        var vm = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService { PathToReturn = tempFolder.FullName },
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        await vm.OpenFolderCommand.ExecuteAsync(null);
+
+        Assert.Single(vm.RootNodes);
+    }
+
+    [Fact]
+    public async Task TwoViewModels_WithIndependentScanStateServices_DoNotLeakResultsIntoEachOther()
+    {
+        using var folderA = new TempDirectory();
+        using var folderB = new TempDirectory();
+
+        var vmA = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService { PathToReturn = folderA.FullName },
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        var vmB = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService { PathToReturn = folderB.FullName },
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        await vmA.OpenFolderCommand.ExecuteAsync(null);
+
+        Assert.Single(vmA.RootNodes);
+        Assert.Empty(vmB.RootNodes);
+        Assert.False(vmB.IsScanning);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ScanPathAsync_MissingPath_DoesNothing(string? path)
+    {
+        var vm = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService(),
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        await vm.ScanPathAsync(path);
+
+        Assert.False(vm.IsScanning);
+        Assert.Empty(vm.RootNodes);
+        Assert.False(vm.RescanCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task ImportScanResults_EncryptedFileWithoutKey_ShowsKeyUnavailableMessage()
+    {
+        var dialogs = new FakeDialogService();
+        var vm = CreateViewModelForImport(dialogs, new ScanResultKeyUnavailableException());
+
+        await vm.ImportScanResultsCommand.ExecuteAsync(null);
+
+        Assert.Equal(ResourceKeys.ImportErrorTitle, dialogs.LastTitle);
+        Assert.Equal(ResourceKeys.ImportKeyUnavailableMessage, dialogs.LastMessage);
+        Assert.False(vm.HasScanResult);
+    }
+
+    [Fact]
+    public async Task ImportScanResults_CorruptedFile_ShowsErrorInsteadOfThrowing()
+    {
+        var dialogs = new FakeDialogService();
+        var vm = CreateViewModelForImport(dialogs, new InvalidDataException("corrupted"));
+
+        await vm.ImportScanResultsCommand.ExecuteAsync(null);
+
+        Assert.Equal(ResourceKeys.ImportErrorTitle, dialogs.LastTitle);
+        Assert.Equal("corrupted", dialogs.LastMessage);
+    }
+
+    private static MainPageViewModel CreateViewModelForImport(FakeDialogService dialogs, Exception importException) =>
+        new(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService(),
+            new ScanStateService(),
+            new FakeWindowManagerService(),
+            dialogs,
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService { ImportException = importException },
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+    [Fact]
+    public Task OpenScanReportAsync_WithScanResult_OpensWindowWithRootNode()
+    {
+        var fakeWindowManager = new FakeWindowManagerService();
+        var vm = new MainPageViewModel(
+            new DiskScanService(new FileIdentityService()),
+            new FakeFolderPickerService(),
+            new ScanStateService(),
+            fakeWindowManager,
+            new FakeDialogService(),
+            new FakeLocalizationService(),
+            new FakeThemeService(),
+            new FakeNotificationService(),
+            new DriveInfoService(),
+            new FakeClipboardService(),
+            new FakeFileExplorerService(),
+            new FakeBackgroundScanSettingsService(),
+            new FakeScanResultFileService(),
+            new FakeWindowHandleProvider(),
+            new FakeAppLogger(),
+            new FakeRecentScansService());
+
+        var root = new FileSystemNode
+        {
+            Name = "C:\\",
+            IsDirectory = true,
+            SizeLogical = 1
+        };
+        var child = new FileSystemNode
+        {
+            Name = "a.txt",
+            IsDirectory = false,
+            Extension = ".txt",
+            SizeLogical = 1
+        };
+        root.AddChild(child);
+        vm.LoadImportedResult(root);
+
+        vm.OpenScanReportCommand.Execute(null);
+        Assert.Same(root, fakeWindowManager.LastReportedRootNode);
+        return Task.CompletedTask;
+    }
+}
